@@ -3,60 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hydroline - Premium Online Market</title>
+    <title>Hydroline Market - Premium Online Do'kon</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Mobile meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2A5CAA">
 </head>
 <body>
+    <!-- Floating Cart Button -->
+    <button class="floating-cart-btn" onclick="showCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="floatingCartCount">0</span>
+    </button>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-premium">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container">
+            <!-- Logo -->
             <a class="navbar-brand" href="#">
-                <i class="fas fa-store me-2"></i>Hydroline Market
+                <i class="fas fa-store me-2"></i>
+                <span class="d-none d-md-inline">Hydroline Market</span>
             </a>
+
+            <!-- Mobile Cart Button -->
+            <div class="d-lg-none ms-auto me-3">
+                <button class="btn btn-outline-light btn-sm position-relative" onclick="showCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="mobileCartCount">
+                        0
+                    </span>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
+            <!-- Navbar Menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Nav Links -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#home">
-                            <i class="fas fa-home me-1"></i>Bosh sahifa
+                        <a class="nav-link active" href="#home" onclick="closeNavbar()">
+                            <i class="fas fa-home me-1"></i> Bosh sahifa
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#categories">
-                            <i class="fas fa-list me-1"></i>Kategoriyalar
+                        <a class="nav-link" href="#categories" onclick="closeNavbar()">
+                            <i class="fas fa-list me-1"></i> Kategoriyalar
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#products">
-                            <i class="fas fa-box me-1"></i>Mahsulotlar
+                        <a class="nav-link" href="#products" onclick="closeNavbar()">
+                            <i class="fas fa-box me-1"></i> Mahsulotlar
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-lg-none">
                         <a class="nav-link" href="#" onclick="showCart()">
-                            <i class="fas fa-shopping-cart me-1"></i>Savat 
-                            <span id="cartCount" class="badge bg-danger">0</span>
+                            <i class="fas fa-shopping-cart me-1"></i> Savat
+                            <span class="badge bg-danger ms-1" id="navCartCount">0</span>
                         </a>
                     </li>
                 </ul>
-                
-                <div class="d-flex align-items-center">
-                    <div class="input-group search-box">
-                        <input type="text" class="form-control" id="searchInput" placeholder="Mahsulot izlash...">
-                        <button class="btn btn-search" onclick="searchProducts()">
+
+                <!-- Search Bar -->
+                <form class="d-flex mb-2 mb-lg-0 me-lg-3" onsubmit="searchProducts(); return false;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Qidirish...">
+                        <button class="btn btn-outline-light" type="submit">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
-                    
-                    <div class="dropdown ms-3">
-                        <button class="btn btn-user dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                </form>
+
+                <!-- User Menu -->
+                <div class="navbar-nav">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i>
                             <span id="userName">Kirish</span>
-                        </button>
+                        </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="showLogin()"><i class="fas fa-sign-in-alt me-2"></i>Kirish</a></li>
                             <li><a class="dropdown-item" href="#" onclick="showRegister()"><i class="fas fa-user-plus me-2"></i>Ro'yxatdan o'tish</a></li>
@@ -71,111 +108,213 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section" id="home">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeInUp">
-                        Premium <span class="text-gradient">Online Market</span>
-                    </h1>
-                    <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
-                        Eng sifatli mahsulotlar, eng qulay narxlar. Yetkazib berish - 24 soat ichida!
-                    </p>
-                    <div class="d-flex gap-3 animate__animated animate__fadeInUp animate__delay-2s">
-                        <button class="btn btn-hero-primary" onclick="scrollToProducts()">
-                            <i class="fas fa-shopping-bag me-2"></i>Hozir xarid qiling
-                        </button>
-                        <button class="btn btn-hero-secondary" onclick="showCategories()">
-                            <i class="fas fa-list me-2"></i>Kategoriyalarni ko'rish
-                        </button>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="hero-stats animate__animated animate__fadeIn animate__delay-1s">
-                        <div class="stat-card">
-                            <h3>10,000+</h3>
-                            <p>Mijozlar</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>500+</h3>
-                            <p>Mahsulotlar</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>24/7</h3>
-                            <p>Qo'llab-quvvatlash</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Main Content -->
-    <div class="container mt-5" id="mainContent">
-        <!-- Categories Section -->
-        <section id="categories" class="mb-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="section-title">Kategoriyalar</h2>
-                <button class="btn btn-link" onclick="showAllCategories()">Hammasini ko'rish</button>
+    <main class="pt-5">
+        <!-- Hero Section -->
+        <section id="home" class="hero-section py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-4">
+                            Premium <span class="text-primary">Online Market</span>
+                        </h1>
+                        <p class="lead mb-4">
+                            Eng sifatli mahsulotlar, eng qulay narxlar. Yetkazib berish - 24 soat ichida!
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <button class="btn btn-primary btn-lg" onclick="scrollToProducts()">
+                                <i class="fas fa-shopping-bag me-2"></i>Hozir xarid qiling
+                            </button>
+                            <button class="btn btn-outline-primary btn-lg" onclick="scrollToCategories()">
+                                <i class="fas fa-list me-2"></i>Kategoriyalarni ko'rish
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-4 mt-lg-0">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <div class="text-center p-3 bg-white rounded shadow-sm">
+                                    <h3 class="text-primary mb-2">10,000+</h3>
+                                    <p class="mb-0">Mijozlar</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-center p-3 bg-white rounded shadow-sm">
+                                    <h3 class="text-primary mb-2">500+</h3>
+                                    <p class="mb-0">Mahsulotlar</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-center p-3 bg-white rounded shadow-sm">
+                                    <h3 class="text-primary mb-2">24/7</h3>
+                                    <p class="mb-0">Qo'llab-quvvatlash</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="row" id="categoriesContainer">
-                <!-- Kategoriyalar bu yerga yuklanadi -->
+        </section>
+
+        <!-- Categories Section -->
+        <section id="categories" class="py-5 bg-light">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">Kategoriyalar</h2>
+                    <button class="btn btn-link" onclick="showAllCategories()">Hammasini ko'rish</button>
+                </div>
+                
+                <div class="row g-3" id="categoriesContainer">
+                    <!-- Categories will be loaded here -->
+                </div>
             </div>
         </section>
 
         <!-- Products Section -->
-        <section id="products">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="section-title">Ommabop Mahsulotlar</h2>
-                <div class="d-flex gap-2">
-                    <select class="form-select form-select-sm w-auto" id="sortSelect" onchange="loadProducts()">
-                        <option value="popular">Ommabop</option>
-                        <option value="new">Yangi</option>
-                        <option value="price_asc">Narx: Pastdan yuqori</option>
-                        <option value="price_desc">Narx: Yuqoridan past</option>
-                    </select>
+        <section id="products" class="py-5">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">Ommabop Mahsulotlar</h2>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm w-auto" id="sortSelect" onchange="loadProducts()">
+                            <option value="popular">Ommabop</option>
+                            <option value="new">Yangi</option>
+                            <option value="price_asc">Narx: Pastdan yuqori</option>
+                            <option value="price_desc">Narx: Yuqoridan past</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row g-4" id="productsContainer">
+                    <!-- Products will be loaded here -->
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary" onclick="loadMoreProducts()">
+                        <i class="fas fa-arrow-down me-2"></i>Ko'proq mahsulotlar
+                    </button>
                 </div>
             </div>
-            <div class="row" id="productsContainer">
-                <!-- Mahsulotlar bu yerga yuklanadi -->
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center p-4">
+                            <div class="icon-wrapper mb-3">
+                                <i class="fas fa-shipping-fast fa-2x text-primary"></i>
+                            </div>
+                            <h4>Tez Yetkazib Berish</h4>
+                            <p class="text-muted mb-0">24 soat ichida yetkazib beramiz</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-4">
+                            <div class="icon-wrapper mb-3">
+                                <i class="fas fa-shield-alt fa-2x text-primary"></i>
+                            </div>
+                            <h4>100% Kafolat</h4>
+                            <p class="text-muted mb-0">Barcha mahsulotlarimiz sifat kafolatlangan</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-4">
+                            <div class="icon-wrapper mb-3">
+                                <i class="fas fa-headset fa-2x text-primary"></i>
+                            </div>
+                            <h4>24/7 Qo'llab-quvvatlash</h4>
+                            <p class="text-muted mb-0">Har qanday savol uchun biz bilan bog'laning</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
-    </div>
+    </main>
 
-    <!-- Modal Windows -->
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="mb-3"><i class="fas fa-store me-2"></i>Hydroline Market</h5>
+                    <p class="text-muted">Eng sifatli mahsulotlar, ishonchli yetkazib berish va 24/7 mijozlar xizmati.</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-white"><i class="fab fa-telegram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6>Kategoriyalar</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none">Oziq-ovqat</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Elektronika</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Kiyim-kechak</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Uy-ro'zg'or</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6>Xizmatlar</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted text-decoration-none">Yetkazib berish</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Qaytarish</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Kafolat</a></li>
+                        <li><a href="#" class="text-muted text-decoration-none">Yordam markazi</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6>Aloqa ma'lumotlari</h6>
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i>+998 90 123 45 67</p>
+                    <p class="mb-1"><i class="fas fa-envelope me-2"></i>info@hydroline.uz</p>
+                    <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Toshkent shahri, Yunusobod tumani</p>
+                </div>
+            </div>
+            <hr class="bg-secondary my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2024 Hydroline Market. Barcha huquqlar himoyalangan.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-muted text-decoration-none me-3">Maxfiylik siyosati</a>
+                    <a href="#" class="text-muted text-decoration-none">Foydalanish shartlari</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MODAL WINDOWS ==================== -->
+
+    <!-- Login Modal -->
     <div class="modal fade" id="loginModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-sign-in-alt me-2"></i>Kirish</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="loginForm" onsubmit="event.preventDefault(); login();">
+                    <form id="loginForm">
                         <div class="mb-3">
-                            <label class="form-label">Telefon raqam</label>
-                            <input type="tel" class="form-control form-control-premium" id="loginPhone" 
-                                   placeholder="+998901234567" required>
+                            <label>Telefon raqam</label>
+                            <input type="tel" class="form-control" id="loginPhone" placeholder="+998901234567" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Parol</label>
+                            <label>Parol</label>
                             <div class="input-group">
-                                <input type="password" class="form-control form-control-premium" 
-                                       id="loginPassword" required>
-                                <button class="btn btn-outline-secondary" type="button" 
-                                        onclick="togglePassword('loginPassword')">
+                                <input type="password" class="form-control" id="loginPassword" placeholder="Parolingiz" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('loginPassword')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Eslab qolish</label>
+                            <label class="form-check-label">Eslab qolish</label>
                         </div>
-                        <button type="submit" class="btn btn-primary-premium w-100">
-                            <i class="fas fa-sign-in-alt me-2"></i>Kirish
-                        </button>
+                        <button type="submit" class="btn btn-primary w-100">Kirish</button>
                     </form>
                     <div class="text-center mt-3">
                         <p class="mb-0">Hisobingiz yo'qmi? 
@@ -187,76 +326,70 @@
         </div>
     </div>
 
+    <!-- Register Modal -->
     <div class="modal fade" id="registerModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Ro'yxatdan o'tish</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="registerForm" onsubmit="event.preventDefault(); register();">
+                    <form id="registerForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Ism</label>
-                                <input type="text" class="form-control form-control-premium" 
-                                       id="registerFirstName" required>
+                                <label>Ism</label>
+                                <input type="text" class="form-control" id="registerFirstName" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Familiya</label>
-                                <input type="text" class="form-control form-control-premium" 
-                                       id="registerLastName" required>
+                                <label>Familiya</label>
+                                <input type="text" class="form-control" id="registerLastName" required>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Telefon raqam</label>
-                            <input type="tel" class="form-control form-control-premium" 
-                                   id="registerPhone" placeholder="+998901234567" required>
+                            <label>Telefon raqam</label>
+                            <input type="tel" class="form-control" id="registerPhone" placeholder="+998901234567" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control form-control-premium" 
-                                   id="registerEmail">
+                            <label>Email</label>
+                            <input type="email" class="form-control" id="registerEmail">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Parol</label>
+                            <label>Parol</label>
                             <div class="input-group">
-                                <input type="password" class="form-control form-control-premium" 
-                                       id="registerPassword" required>
-                                <button class="btn btn-outline-secondary" type="button" 
-                                        onclick="togglePassword('registerPassword')">
+                                <input type="password" class="form-control" id="registerPassword" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('registerPassword')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Parolni takrorlang</label>
-                            <input type="password" class="form-control form-control-premium" 
-                                   id="registerConfirmPassword" required>
+                            <label>Parolni takrorlang</label>
+                            <input type="password" class="form-control" id="registerConfirmPassword" required>
                         </div>
-                        <button type="submit" class="btn btn-primary-premium w-100">
-                            <i class="fas fa-user-plus me-2"></i>Ro'yxatdan o'tish
-                        </button>
+                        <button type="submit" class="btn btn-primary w-100">Ro'yxatdan o'tish</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Cart Modal -->
     <div class="modal fade" id="cartModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-shopping-cart me-2"></i>Savat</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="cartItemsContainer">
-                        <!-- Savatdagi mahsulotlar bu yerga yuklanadi -->
+                        <!-- Cart items will be loaded here -->
                     </div>
-                    <div class="cart-summary mt-4">
+                    
+                    <div class="mt-4">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <div class="d-grid">
                                     <button class="btn btn-outline-danger" onclick="clearCart()">
                                         <i class="fas fa-trash me-2"></i>Savatni tozalash
@@ -264,9 +397,9 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card bg-light">
+                                <div class="card">
                                     <div class="card-body">
-                                        <h6 class="card-title">Buyurtma xulosasi</h6>
+                                        <h6>Buyurtma xulosasi</h6>
                                         <table class="table table-sm">
                                             <tr>
                                                 <td>Mahsulotlar:</td>
@@ -285,7 +418,7 @@
                                                 <td id="summaryGrandTotal">20,000 so'm</td>
                                             </tr>
                                         </table>
-                                        <button class="btn btn-primary-premium w-100" onclick="checkout()">
+                                        <button class="btn btn-success w-100" onclick="checkout()">
                                             <i class="fas fa-credit-card me-2"></i>Buyurtma berish
                                         </button>
                                     </div>
@@ -298,117 +431,65 @@
         </div>
     </div>
 
-    <div class="modal fade" id="profileModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-gradient-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-user me-2"></i>Profil</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center mb-4">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <h4 id="profileFullName" class="mt-3">Foydalanuvchi</h4>
-                        <p class="text-muted" id="profilePhone">Telefon: +998901234567</p>
-                    </div>
-                    <form id="profileForm" onsubmit="event.preventDefault(); updateProfile();">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Ism</label>
-                                <input type="text" class="form-control form-control-premium" 
-                                       id="profileFirstName" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Familiya</label>
-                                <input type="text" class="form-control form-control-premium" 
-                                       id="profileLastName" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control form-control-premium" 
-                                   id="profileEmail">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Yangi parol (agar o'zgartirmoqchi bo'lsangiz)</label>
-                            <input type="password" class="form-control form-control-premium" 
-                                   id="profileNewPassword">
-                        </div>
-                        <button type="submit" class="btn btn-primary-premium w-100">
-                            <i class="fas fa-save me-2"></i>Saqlash
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Checkout Modal -->
     <div class="modal fade" id="checkoutModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-credit-card me-2"></i>Buyurtma berish</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="checkoutForm" onsubmit="event.preventDefault(); placeOrder();">
+                    <form id="checkoutForm">
                         <div class="row">
                             <div class="col-md-6">
                                 <h6 class="mb-3">Yetkazib berish ma'lumotlari</h6>
                                 <div class="mb-3">
                                     <label class="form-label">Shahar</label>
-                                    <select class="form-select form-control-premium" id="checkoutCity" required>
+                                    <select class="form-select" id="checkoutCity" required>
                                         <option value="">Tanlang</option>
                                         <option value="toshkent">Toshkent</option>
                                         <option value="samarqand">Samarqand</option>
                                         <option value="buxoro">Buxoro</option>
-                                        <option value="andijon">Andijon</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Tuman</label>
-                                    <input type="text" class="form-control form-control-premium" 
-                                           id="checkoutDistrict" required>
+                                    <input type="text" class="form-control" id="checkoutDistrict" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">To'liq manzil</label>
-                                    <textarea class="form-control form-control-premium" 
-                                              id="checkoutAddress" rows="3" required></textarea>
+                                    <textarea class="form-control" id="checkoutAddress" rows="3" required></textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <h6 class="mb-3">To'lov usuli</h6>
-                                <div class="payment-methods">
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" 
-                                               value="click" id="paymentClick" checked>
-                                        <label class="form-check-label" for="paymentClick">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" value="click" checked>
+                                        <label class="form-check-label">
                                             <i class="fas fa-mobile-alt me-2"></i>Click
                                         </label>
                                     </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" 
-                                               value="payme" id="paymentPayme">
-                                        <label class="form-check-label" for="paymentPayme">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" value="payme">
+                                        <label class="form-check-label">
                                             <i class="fas fa-wallet me-2"></i>Payme
                                         </label>
                                     </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" 
-                                               value="cash" id="paymentCash">
-                                        <label class="form-check-label" for="paymentCash">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" value="cash">
+                                        <label class="form-check-label">
                                             <i class="fas fa-money-bill-wave me-2"></i>Naqd pul
                                         </label>
                                     </div>
                                 </div>
                                 
-                                <div class="card mt-4">
+                                <div class="card">
                                     <div class="card-body">
                                         <h6>Buyurtma ma'lumotlari</h6>
                                         <div id="checkoutSummary">
-                                            <!-- Buyurtma xulosasi bu yerga yuklanadi -->
+                                            <!-- Order summary will be loaded here -->
                                         </div>
                                     </div>
                                 </div>
@@ -416,7 +497,7 @@
                         </div>
                         
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-success-premium w-100">
+                            <button type="submit" class="btn btn-success w-100">
                                 <i class="fas fa-check-circle me-2"></i>Buyurtmani tasdiqlash
                             </button>
                         </div>
@@ -426,17 +507,60 @@
         </div>
     </div>
 
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user me-2"></i>Profil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 id="profileFullName" class="mt-3">Foydalanuvchi</h4>
+                        <p class="text-muted" id="profilePhone"></p>
+                    </div>
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label>Ism</label>
+                                <input type="text" class="form-control" id="profileFirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Familiya</label>
+                                <input type="text" class="form-control" id="profileLastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input type="email" class="form-control" id="profileEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label>Yangi parol (agar o'zgartirmoqchi bo'lsangiz)</label>
+                            <input type="password" class="form-control" id="profileNewPassword">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Saqlash</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Modal -->
     <div class="modal fade" id="ordersModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header bg-gradient-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-history me-2"></i>Buyurtmalar tarixi</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
+                        <table class="table">
+                            <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Sana</th>
@@ -447,7 +571,7 @@
                                 </tr>
                             </thead>
                             <tbody id="ordersTable">
-                                <!-- Buyurtmalar bu yerga yuklanadi -->
+                                <!-- Orders will be loaded here -->
                             </tbody>
                         </table>
                     </div>
@@ -456,60 +580,10 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer-premium mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h5 class="mb-3"><i class="fas fa-store me-2"></i>Hydroline Market</h5>
-                    <p>Eng sifatli mahsulotlar, ishonchli yetkazib berish va 24/7 mijozlar xizmati.</p>
-                    <div class="social-icons mt-3">
-                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6>Kategoriyalar</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Oziq-ovqat</a></li>
-                        <li><a href="#">Elektronika</a></li>
-                        <li><a href="#">Kiyim-kechak</a></li>
-                        <li><a href="#">Uy-ro'zg'or</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6>Xizmatlar</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Yetkazib berish</a></li>
-                        <li><a href="#">Qaytarish</a></li>
-                        <li><a href="#">Kafolat</a></li>
-                        <li><a href="#">Yordam markazi</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 mb-4">
-                    <h6>Aloqa ma'lumotlari</h6>
-                    <p><i class="fas fa-phone me-2"></i>+998 90 123 45 67</p>
-                    <p><i class="fas fa-envelope me-2"></i>info@hydroline.uz</p>
-                    <p><i class="fas fa-map-marker-alt me-2"></i>Toshkent shahri, Yunusobod tumani</p>
-                </div>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="col-md-6">
-                    <p>&copy; 2024 Hydroline Market. Barcha huquqlar himoyalangan.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="footer-link me-3">Maxfiylik siyosati</a>
-                    <a href="#" class="footer-link">Foydalanish shartlari</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/script.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
 </body>
 </html>
