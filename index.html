@@ -3,64 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Rasmlar</title>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .image-card { border: 1px solid #ddd; padding: 10px; }
-        .image-card img { width: 100%; height: 200px; object-fit: cover; }
-    </style>
+    <title>Kategoriyalar</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>📸 Admin Rasmlari</h1>
-    
-    <div id="gallery" class="gallery">
-        <!-- Rasmlar bu yerga keladi -->
+    <div class="container">
+        <h1>Barcha Kategoriyalar</h1>
+        <div class="categories">
+            <!-- 1-10 -->
+            <div class="category" data-name="Noutbuklar"><img src="rasm.png" alt="Noutbuklar"><span>Noutbuklar</span></div>
+            <div class="category" data-name="Televizorlar"><img src="rasm.png" alt="Televizorlar"><span>Televizorlar</span></div>
+            <div class="category" data-name="Planchetlar"><img src="rasm.png" alt="Planchetlar"><span>Planchetlar</span></div>
+            <div class="category" data-name="Smart-soatlar"><img src="rasm.png" alt="Smart-soatlar"><span>Smart-soatlar</span></div>
+        </div>
     </div>
-    
-    <script>
-        const API_URL = 'https://sizning-backend.herokuapp.com';  // Python backend manzili
-        
-        // Rasmlarni yuklash
-        async function loadImages() {
-            try {
-                const response = await axios.get(`${API_URL}/api/images`);
-                displayImages(response.data);
-            } catch (error) {
-                console.error('Xato:', error);
-            }
-        }
-        
-        // Rasmlarni ko'rsatish
-        function displayImages(images) {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            
-            images.forEach(img => {
-                const card = document.createElement('div');
-                card.className = 'image-card';
-                card.innerHTML = `
-                    <img src="${img.web_url}" alt="${img.caption}">
-                    <h3>${img.caption}</h3>
-                    <p>${new Date(img.date).toLocaleDateString()}</p>
-                `;
-                gallery.appendChild(card);
-            });
-        }
-        
-        // Har 10 soniyada yangilash
-        loadImages();
-        setInterval(loadImages, 10000);
-        
-        // WebSocket yoki Polling orqali realtime yangilash
-        const ws = new WebSocket('wss://sizning-backend.herokuapp.com/ws');
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'new_image') {
-                loadImages(); // Yangi rasm kelganda yangilash
-            }
-        };
-    </script>
+
+    <script src="script.js"></script>
 </body>
 </html>
