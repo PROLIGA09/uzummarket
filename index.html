@@ -26,8 +26,8 @@
                 </div>
 
                 <button class="btn btn-primary" onclick="startApp()">
-            <i class="fas fa-sign-in-alt"></i> Do'konga kirish
-          </button>
+                    <i class="fas fa-sign-in-alt"></i> Do'konga kirish
+                </button>
             </div>
 
             <div class="login-footer">
@@ -107,8 +107,8 @@
             </div>
             <div style="padding: 20px">
                 <button class="btn btn-primary" style="width: 100%; padding: 15px" onclick="showCheckoutPage()">
-            <i class="fas fa-shopping-bag"></i> Buyurtma berish
-          </button>
+                    <i class="fas fa-shopping-bag"></i> Buyurtma berish
+                </button>
             </div>
         </div>
 
@@ -231,8 +231,8 @@
                     </div>
                 </div>
                 <button class="btn btn-primary" style="width: 100%; margin-top: 20px" onclick="openAddAddress()">
-            <i class="fas fa-plus"></i> Yangi manzil qo'shish
-          </button>
+                    <i class="fas fa-plus"></i> Yangi manzil qo'shish
+                </button>
             </div>
         </div>
 
@@ -283,11 +283,11 @@
 
                     <div class="product-detail-actions">
                         <button class="btn btn-primary" onclick="addToCartFromDetail()">
-                <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
-              </button>
+                            <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
+                        </button>
                         <button class="btn btn-outline" onclick="addToFavorites()">
-                <i class="fas fa-heart"></i> Sevimlilarga
-              </button>
+                            <i class="fas fa-heart"></i> Sevimlilarga
+                        </button>
                     </div>
                 </div>
             </div>
@@ -335,15 +335,15 @@
                 <div class="form-group">
                     <label>Viloyat</label>
                     <select id="regionSelect" onchange="updateDistricts()">
-              <option value="">Viloyatni tanlang</option>
-              <!-- JavaScript orqali to'ldiriladi -->
-            </select>
+                        <option value="">Viloyatni tanlang</option>
+                        <!-- JavaScript orqali to'ldiriladi -->
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Tuman/Shahar</label>
                     <select id="districtSelect" disabled>
-              <option value="">Avval viloyatni tanlang</option>
-            </select>
+                        <option value="">Avval viloyatni tanlang</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>To'liq manzil</label>
@@ -365,28 +365,28 @@
                 </div>
                 <div class="payment-methods">
                     <label class="payment-method">
-              <input type="radio" name="payment" value="cash" checked />
-              <span>Naqd pul</span>
-            </label>
+                        <input type="radio" name="payment" value="cash" checked />
+                        <span>Naqd pul</span>
+                    </label>
                     <label class="payment-method">
-              <input type="radio" name="payment" value="card" />
-              <span>Karta orqali</span>
-            </label>
+                        <input type="radio" name="payment" value="card" />
+                        <span>Karta orqali</span>
+                    </label>
                     <label class="payment-method">
-              <input type="radio" name="payment" value="click" />
-              <span>Click</span>
-            </label>
+                        <input type="radio" name="payment" value="click" />
+                        <span>Click</span>
+                    </label>
                     <label class="payment-method">
-              <input type="radio" name="payment" value="payme" />
-              <span>Payme</span>
-            </label>
+                        <input type="radio" name="payment" value="payme" />
+                        <span>Payme</span>
+                    </label>
                 </div>
             </div>
 
             <div style="padding: 20px">
                 <button class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px" onclick="submitOrder()">
-            <i class="fas fa-check-circle"></i> BUYURTMA TASDIQLASH
-          </button>
+                    <i class="fas fa-check-circle"></i> BUYURTMA TASDIQLASH
+                </button>
             </div>
         </div>
 
@@ -419,11 +419,11 @@
 
                 <div class="confirmation-actions">
                     <button class="btn btn-primary" onclick="continueShopping()">
-              <i class="fas fa-shopping-cart"></i> Xaridni davom ettirish
-            </button>
+                        <i class="fas fa-shopping-cart"></i> Xaridni davom ettirish
+                    </button>
                     <button class="btn btn-outline" onclick="viewOrders()">
-              <i class="fas fa-list"></i> Buyurtmalarimni ko'rish
-            </button>
+                        <i class="fas fa-list"></i> Buyurtmalarimni ko'rish
+                    </button>
                 </div>
             </div>
         </div>
@@ -454,98 +454,78 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Profilni tahrirlash</h2>
-                <span class="close-modal" onclick="closeModal('profileModal')">&times;</span
-          >
+                <span class="close-modal" onclick="closeModal('profileModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Telefon raqam</label>
+                <input type="text" id="editPhone" placeholder="+998901234567" />
+            </div>
+            <div class="form-group">
+                <label>Email (ixtiyoriy)</label>
+                <input type="email" id="editEmail" placeholder="email@example.com" />
+            </div>
+            <button class="btn btn-primary" style="width: 100%" onclick="saveProfile()">
+                Saqlash
+            </button>
         </div>
-        <div class="form-group">
-          <label>Telefon raqam</label>
-          <input type="text" id="editPhone" placeholder="+998901234567" />
-        </div>
-        <div class="form-group">
-          <label>Email (ixtiyoriy)</label>
-          <input type="email" id="editEmail" placeholder="email@example.com" />
-        </div>
-        <button
-          class="btn btn-primary"
-          style="width: 100%"
-          onclick="saveProfile()">
-          Saqlash
-        </button>
-      </div>
     </div>
 
     <!-- Ism o'zgartirish modali -->
     <div class="modal" id="nameModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Ismni o'zgartirish</h2>
-          <span class="close-modal" onclick="closeModal('nameModal')"
-            >&times;</span
-          >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ismni o'zgartirish</h2>
+                <span class="close-modal" onclick="closeModal('nameModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Yangi ism</label>
+                <input type="text" id="newUserName" placeholder="Yangi ismingiz" />
+            </div>
+            <button class="btn btn-primary" style="width: 100%" onclick="saveNewName()">
+                Saqlash
+            </button>
         </div>
-        <div class="form-group">
-          <label>Yangi ism</label>
-          <input type="text" id="newUserName" placeholder="Yangi ismingiz" />
-        </div>
-        <button
-          class="btn btn-primary"
-          style="width: 100%"
-          onclick="saveNewName()">
-          Saqlash
-        </button>
-      </div>
     </div>
 
     <!-- Manzil qo'shish modali -->
     <div class="modal" id="addressModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Yangi manzil qo'shish</h2>
-          <span class="close-modal" onclick="closeModal('addressModal')"
-            >&times;</span
-          >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Yangi manzil qo'shish</h2>
+                <span class="close-modal" onclick="closeModal('addressModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Manzil nomi</label>
+                <input type="text" id="addressName" placeholder="Uy, Ish, Ota-ona uyi" />
+            </div>
+            <div class="form-group">
+                <label>Viloyat</label>
+                <select id="modalRegionSelect" onchange="updateModalDistricts()">
+                    <option value="">Viloyatni tanlang</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tuman/Shahar</label>
+                <select id="modalDistrictSelect" disabled>
+                    <option value="">Avval viloyatni tanlang</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>To'liq manzil</label>
+                <textarea id="modalFullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%" onclick="saveAddress()">
+                Saqlash
+            </button>
         </div>
-        <div class="form-group">
-          <label>Manzil nomi</label>
-          <input
-            type="text"
-            id="addressName"
-            placeholder="Uy, Ish, Ota-ona uyi" />
-        </div>
-        <div class="form-group">
-          <label>Viloyat</label>
-          <select id="modalRegionSelect" onchange="updateModalDistricts()">
-            <option value="">Viloyatni tanlang</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Tuman/Shahar</label>
-          <select id="modalDistrictSelect" disabled>
-            <option value="">Avval viloyatni tanlang</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>To'liq manzil</label>
-          <textarea
-            id="modalFullAddress"
-            rows="3"
-            placeholder="Ko'cha, uy, kvartira..."></textarea>
-        </div>
-        <button
-          class="btn btn-primary"
-          style="width: 100%"
-          onclick="saveAddress()">
-          Saqlash
-        </button>
-      </div>
     </div>
 
     <!-- Xabarlar -->
     <div class="notification" id="notification">
-      <span id="notificationText">Amal muvaffaqiyatli bajarildi!</span>
-            </div>
+        <span id="notificationText">Amal muvaffaqiyatli bajarildi!</span>
+    </div>
 
-            <script src="/app.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
