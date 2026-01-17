@@ -993,364 +993,359 @@
     <!-- Main Content -->
     <div class="content">
         <!-- Bosh sahifa -->
-        <div class="page" id="homePage">
-            <div class="categories">
-                <div class="category-card" onclick="showCategory('Oyoq kiyimlar')">
-                    <i class="fas fa-shoe-prints"></i>
-                    <h3>Oyoq kiyimlar</h3>
-                </div>
-                <div class="category-card" onclick="showCategory('Kiyimlar')">
-                    <i class="fas fa-tshirt"></i>
-                    <h3>Kiyimlar</h3>
-                </div>
-                <div class="category-card" onclick="showCategory('Uy-ro\'zg\'or')">
-                    <i class="fas fa-home"></i>
-                    <h3>Uy-ro'zg'or</h3>
-                </div>
-                <div class="category-card" onclick="showCategory('Elektronika')">
-                    <i class="fas fa-laptop"></i>
-                    <h3>Elektronika</h3>
-                </div>
-                <div class="category-card" onclick="showCategory('Go\'zallik')">
-                    <i class="fas fa-heartbeat"></i>
-                    <h3>Go'zallik</h3>
-                </div>
-                <div class="category-card" onclick="showCategory('mmmmmm')">
-                    <i class="fas fa-heartbeat"></i>
-                    <h3>sssss</h3>
-                </div>
-                <div class="category-card" onclick="showCategory('Barcha kategoriyalar')">
-                    <i class="fas fa-th-large"></i>
-                    <h3>Barcha kategoriyalar</h3>
-                </div>
+    </div>
+    <div class="category-card" onclick="showCategory('Kiyimlar')">
+        <i class="fas fa-tshirt"></i>
+        <h3>Kiyimlar</h3>
+    </div>
+    <div class="category-card" onclick="showCategory('Uy-ro\'zg\'or')">
+        <i class="fas fa-home"></i>
+        <h3>Uy-ro'zg'or</h3>
+    </div>
+    <div class="category-card" onclick="showCategory('Elektronika')">
+        <i class="fas fa-laptop"></i>
+        <h3>Elektronika</h3>
+    </div>
+    <div class="category-card" onclick="showCategory('Go\'zallik')">
+        <i class="fas fa-heartbeat"></i>
+        <h3>Go'zallik</h3>
+    </div>
+    <div class="category-card" onclick="showCategory('mmmmmm')">
+        <i class="fas fa-heartbeat"></i>
+        <h3>sssss</h3>
+    </div>
+    <div class="category-card" onclick="showCategory('Barcha kategoriyalar')">
+        <i class="fas fa-th-large"></i>
+        <h3>Barcha kategoriyalar</h3>
+    </div>
+    </div>
+    </div>
+
+    <!-- Katalog sahifasi -->
+    <div class="page" id="catalogPage">
+        <div class="catalog-container">
+            <h2 style="margin: 15px;" id="catalogTitle">Barcha mahsulotlar</h2>
+            <div class="product-grid" id="productGrid">
+                <!-- Mahsulotlar JavaScript orqali qo'shiladi -->
             </div>
         </div>
+    </div>
 
-        <!-- Katalog sahifasi -->
-        <div class="page" id="catalogPage">
-            <div class="catalog-container">
-                <h2 style="margin: 15px;" id="catalogTitle">Barcha mahsulotlar</h2>
-                <div class="product-grid" id="productGrid">
-                    <!-- Mahsulotlar JavaScript orqali qo'shiladi -->
-                </div>
-            </div>
+    <!-- Savat sahifasi -->
+    <div class="page" id="cartPage">
+        <div id="cartItems">
+            <!-- Savatdagi mahsulotlar JavaScript orqali qo'shiladi -->
         </div>
-
-        <!-- Savat sahifasi -->
-        <div class="page" id="cartPage">
-            <div id="cartItems">
-                <!-- Savatdagi mahsulotlar JavaScript orqali qo'shiladi -->
-            </div>
-            <div class="cart-total">
-                <span>Jami:</span>
-                <span id="totalPrice">0 so'm</span>
-            </div>
-            <div style="padding: 20px;">
-                <button class="btn btn-primary" style="width: 100%; padding: 15px;" onclick="showCheckoutPage()">
+        <div class="cart-total">
+            <span>Jami:</span>
+            <span id="totalPrice">0 so'm</span>
+        </div>
+        <div style="padding: 20px;">
+            <button class="btn btn-primary" style="width: 100%; padding: 15px;" onclick="showCheckoutPage()">
                     <i class="fas fa-shopping-bag"></i> Buyurtma berish
                 </button>
+        </div>
+    </div>
+
+    <!-- Profil sahifasi -->
+    <div class="page" id="profilePage">
+        <div class="profile-header">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <h2 id="profileUserName">Foydalanuvchi</h2>
+                <p id="profileUserPhone">Telefon raqam kiritilmagan</p>
             </div>
         </div>
 
-        <!-- Profil sahifasi -->
-        <div class="page" id="profilePage">
-            <div class="profile-header">
-                <div class="avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-info">
-                    <h2 id="profileUserName">Foydalanuvchi</h2>
-                    <p id="profileUserPhone">Telefon raqam kiritilmagan</p>
-                </div>
+        <div class="section">
+            <div class="section-title"><i class="fas fa-shopping-bag"></i> XARIDLAR</div>
+            <div class="menu-item" onclick="showOrders()">
+                <div><i class="fas fa-cog"></i> Mening buyurtmalarim</div>
+                <div class="badge" id="ordersCount">0</div>
             </div>
-
-            <div class="section">
-                <div class="section-title"><i class="fas fa-shopping-bag"></i> XARIDLAR</div>
-                <div class="menu-item" onclick="showOrders()">
-                    <div><i class="fas fa-cog"></i> Mening buyurtmalarim</div>
-                    <div class="badge" id="ordersCount">0</div>
-                </div>
-                <div class="menu-item" onclick="showFavorites()">
-                    <div><i class="fas fa-heart"></i> Sevimlilar</div>
-                    <div class="badge" id="favoritesCount">0</div>
-                </div>
-                <div class="menu-item" onclick="showViewed()">
-                    <div><i class="fas fa-eye"></i> Ko'rilgan mahsulotlar</div>
-                    <div class="badge" id="viewedCount">0</div>
-                </div>
+            <div class="menu-item" onclick="showFavorites()">
+                <div><i class="fas fa-heart"></i> Sevimlilar</div>
+                <div class="badge" id="favoritesCount">0</div>
             </div>
-
-            <div class="section">
-                <div class="section-title"><i class="fas fa-user-circle"></i> SHAXSIY KABINET</div>
-                <div class="menu-item" onclick="editProfile()">
-                    <div><i class="fas fa-user-edit"></i> Mening profilim</div>
-                </div>
-                <div class="menu-item" onclick="showAddresses()">
-                    <div><i class="fas fa-map-marker-alt"></i> Mening manzillarim</div>
-                </div>
-                <div class="menu-item" onclick="showLoyalty()">
-                    <div><i class="fas fa-chart-line"></i> Loyallik dasturi</div>
-                    <div class="badge" id="loyaltyPoints">0</div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title"><i class="fas fa-cog"></i> SOZLAMALAR</div>
-                <div class="menu-item" onclick="changeName()">
-                    <div><i class="fas fa-exchange-alt"></i> Ismni o'zgartirish</div>
-                </div>
-                <div class="menu-item" onclick="logout()">
-                    <div><i class="fas fa-sign-out-alt"></i> Chiqish</div>
-                </div>
+            <div class="menu-item" onclick="showViewed()">
+                <div><i class="fas fa-eye"></i> Ko'rilgan mahsulotlar</div>
+                <div class="badge" id="viewedCount">0</div>
             </div>
         </div>
 
-        <!-- Buyurtmalar sahifasi -->
-        <div class="page" id="ordersPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
+        <div class="section">
+            <div class="section-title"><i class="fas fa-user-circle"></i> SHAXSIY KABINET</div>
+            <div class="menu-item" onclick="editProfile()">
+                <div><i class="fas fa-user-edit"></i> Mening profilim</div>
             </div>
-            <div class="section">
-                <div class="section-title">Mening buyurtmalarim</div>
-                <div id="ordersList">
-                    <div class="empty-state">
-                        <div class="empty-icon">📦</div>
-                        <div>Sizda hali buyurtmalar yo'q</div>
-                    </div>
-                </div>
+            <div class="menu-item" onclick="showAddresses()">
+                <div><i class="fas fa-map-marker-alt"></i> Mening manzillarim</div>
+            </div>
+            <div class="menu-item" onclick="showLoyalty()">
+                <div><i class="fas fa-chart-line"></i> Loyallik dasturi</div>
+                <div class="badge" id="loyaltyPoints">0</div>
             </div>
         </div>
 
-        <!-- Sevimlilar sahifasi -->
-        <div class="page" id="favoritesPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
+        <div class="section">
+            <div class="section-title"><i class="fas fa-cog"></i> SOZLAMALAR</div>
+            <div class="menu-item" onclick="changeName()">
+                <div><i class="fas fa-exchange-alt"></i> Ismni o'zgartirish</div>
             </div>
-            <div class="section">
-                <div class="section-title">Sevimlilar</div>
-                <div id="favoritesList">
-                    <div class="empty-state">
-                        <div class="empty-icon">❤️</div>
-                        <div>Sevimlilarda hali hech narsa yo'q</div>
-                    </div>
+            <div class="menu-item" onclick="logout()">
+                <div><i class="fas fa-sign-out-alt"></i> Chiqish</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buyurtmalar sahifasi -->
+    <div class="page" id="ordersPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+        <div class="section">
+            <div class="section-title">Mening buyurtmalarim</div>
+            <div id="ordersList">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <div>Sizda hali buyurtmalar yo'q</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Ko'rilganlar sahifasi -->
-        <div class="page" id="viewedPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
-            </div>
-            <div class="section">
-                <div class="section-title">Ko'rilgan mahsulotlar</div>
-                <div id="viewedList">
-                    <div class="empty-state">
-                        <div class="empty-icon">👁️</div>
-                        <div>Siz hali hech qanday mahsulotni ko'rmagansiz</div>
-                    </div>
+    <!-- Sevimlilar sahifasi -->
+    <div class="page" id="favoritesPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+        <div class="section">
+            <div class="section-title">Sevimlilar</div>
+            <div id="favoritesList">
+                <div class="empty-state">
+                    <div class="empty-icon">❤️</div>
+                    <div>Sevimlilarda hali hech narsa yo'q</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Manzillar sahifasi -->
-        <div class="page" id="addressesPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
-            </div>
-            <div class="section">
-                <div class="section-title">Mening manzillarim</div>
-                <div id="addressesList">
-                    <div class="empty-state">
-                        <div class="empty-icon">📍</div>
-                        <div>Sizda hali manzillar yo'q</div>
-                    </div>
+    <!-- Ko'rilganlar sahifasi -->
+    <div class="page" id="viewedPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+        <div class="section">
+            <div class="section-title">Ko'rilgan mahsulotlar</div>
+            <div id="viewedList">
+                <div class="empty-state">
+                    <div class="empty-icon">👁️</div>
+                    <div>Siz hali hech qanday mahsulotni ko'rmagansiz</div>
                 </div>
-                <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="openAddAddress()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Manzillar sahifasi -->
+    <div class="page" id="addressesPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+        <div class="section">
+            <div class="section-title">Mening manzillarim</div>
+            <div id="addressesList">
+                <div class="empty-state">
+                    <div class="empty-icon">📍</div>
+                    <div>Sizda hali manzillar yo'q</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="openAddAddress()">
                     <i class="fas fa-plus"></i> Yangi manzil qo'shish
                 </button>
-            </div>
         </div>
+    </div>
 
-        <!-- Loyallik sahifasi -->
-        <div class="page" id="loyaltyPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
-            </div>
-            <div class="section">
-                <div class="section-title">Loyallik dasturi</div>
-                <div class="loyalty-content">
-                    <div class="loyalty-icon">🏆</div>
-                    <div class="loyalty-points" id="loyaltyPointsDisplay">0 ball</div>
-                    <div class="loyalty-subtitle">Ball qanday to'planadi:</div>
-                    <div class="loyalty-info">
-                        <ul class="loyalty-list">
-                            <li>Har 10 000 so'm xarid uchun - 1 ball</li>
-                            <li>Do'stni taklif qilish - 50 ball</li>
-                            <li>Har oy yangi mahsulot xaridi - 20 ball</li>
-                        </ul>
-                    </div>
+    <!-- Loyallik sahifasi -->
+    <div class="page" id="loyaltyPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+        <div class="section">
+            <div class="section-title">Loyallik dasturi</div>
+            <div class="loyalty-content">
+                <div class="loyalty-icon">🏆</div>
+                <div class="loyalty-points" id="loyaltyPointsDisplay">0 ball</div>
+                <div class="loyalty-subtitle">Ball qanday to'planadi:</div>
+                <div class="loyalty-info">
+                    <ul class="loyalty-list">
+                        <li>Har 10 000 so'm xarid uchun - 1 ball</li>
+                        <li>Do'stni taklif qilish - 50 ball</li>
+                        <li>Har oy yangi mahsulot xaridi - 20 ball</li>
+                    </ul>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Mahsulot tafsilotlari sahifasi -->
-        <div class="page" id="productDetailPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
+    <!-- Mahsulot tafsilotlari sahifasi -->
+    <div class="page" id="productDetailPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+        <div class="product-detail-container">
+            <div class="product-detail-image" id="productDetailImage">
+                <!-- Rasm JavaScript orqali yuklanadi -->
             </div>
-            <div class="product-detail-container">
-                <div class="product-detail-image" id="productDetailImage">
-                    <!-- Rasm JavaScript orqali yuklanadi -->
+            <div class="product-detail-info">
+                <h2 id="productDetailName">Mahsulot nomi</h2>
+                <div class="product-detail-price" id="productDetailPrice">0 so'm</div>
+                <div class="product-detail-category" id="productDetailCategory">Kategoriya</div>
+
+                <div class="product-detail-description">
+                    <h3>Ta'rif</h3>
+                    <p id="productDetailDesc">Mahsulot ta'rifi...</p>
                 </div>
-                <div class="product-detail-info">
-                    <h2 id="productDetailName">Mahsulot nomi</h2>
-                    <div class="product-detail-price" id="productDetailPrice">0 so'm</div>
-                    <div class="product-detail-category" id="productDetailCategory">Kategoriya</div>
 
-                    <div class="product-detail-description">
-                        <h3>Ta'rif</h3>
-                        <p id="productDetailDesc">Mahsulot ta'rifi...</p>
-                    </div>
-
-                    <div class="product-detail-actions">
-                        <button class="btn btn-primary" onclick="addToCartFromDetail()">
+                <div class="product-detail-actions">
+                    <button class="btn btn-primary" onclick="addToCartFromDetail()">
                             <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
                         </button>
-                        <button class="btn btn-outline" onclick="addToFavorites()">
+                    <button class="btn btn-outline" onclick="addToFavorites()">
                             <i class="fas fa-heart"></i> Sevimlilarga
                         </button>
-                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buyurtma berish sahifasi -->
+    <div class="page" id="checkoutPage">
+        <div class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-shopping-cart"></i> Savatdagi mahsulotlar</div>
+            <div id="checkoutItems">
+                <!-- Mahsulotlar JavaScript orqali ko'rsatiladi -->
+            </div>
+            <div class="checkout-total">
+                <span>Umumiy summa:</span>
+                <span id="checkoutTotal">0 so'm</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-user"></i> Ma'lumotlaringiz</div>
+            <div class="checkout-user-info">
+                <div class="info-row">
+                    <span>Ism:</span>
+                    <span id="checkoutUserName">Foydalanuvchi</span>
+                </div>
+                <div class="info-row">
+                    <span>Telefon:</span>
+                    <span id="checkoutUserPhone">+998</span>
                 </div>
             </div>
         </div>
 
-        <!-- Buyurtma berish sahifasi -->
-        <div class="page" id="checkoutPage">
-            <div class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Orqaga
-            </div>
-
-            <div class="section">
-                <div class="section-title"><i class="fas fa-shopping-cart"></i> Savatdagi mahsulotlar</div>
-                <div id="checkoutItems">
-                    <!-- Mahsulotlar JavaScript orqali ko'rsatiladi -->
-                </div>
-                <div class="checkout-total">
-                    <span>Umumiy summa:</span>
-                    <span id="checkoutTotal">0 so'm</span>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title"><i class="fas fa-user"></i> Ma'lumotlaringiz</div>
-                <div class="checkout-user-info">
-                    <div class="info-row">
-                        <span>Ism:</span>
-                        <span id="checkoutUserName">Foydalanuvchi</span>
-                    </div>
-                    <div class="info-row">
-                        <span>Telefon:</span>
-                        <span id="checkoutUserPhone">+998</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title"><i class="fas fa-map-marker-alt"></i> Yetkazib berish manzili</div>
-                <div class="form-group">
-                    <label>Viloyat</label>
-                    <select id="regionSelect" onchange="updateDistricts()">
+        <div class="section">
+            <div class="section-title"><i class="fas fa-map-marker-alt"></i> Yetkazib berish manzili</div>
+            <div class="form-group">
+                <label>Viloyat</label>
+                <select id="regionSelect" onchange="updateDistricts()">
                         <option value="">Viloyatni tanlang</option>
                         <!-- JavaScript orqali to'ldiriladi -->
                     </select>
-                </div>
-                <div class="form-group">
-                    <label>Tuman/Shahar</label>
-                    <select id="districtSelect" disabled>
+            </div>
+            <div class="form-group">
+                <label>Tuman/Shahar</label>
+                <select id="districtSelect" disabled>
                         <option value="">Avval viloyatni tanlang</option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <label>To'liq manzil</label>
-                    <textarea id="fullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Telefon raqamingiz</label>
-                    <input type="tel" id="userPhone" placeholder="+998901234567" required>
-                </div>
-                <div class="form-group">
-                    <label>Izoh (ixtiyoriy)</label>
-                    <textarea id="orderComment" rows="2" placeholder="Qo'shimcha izohlar..."></textarea>
-                </div>
             </div>
+            <div class="form-group">
+                <label>To'liq manzil</label>
+                <textarea id="fullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Telefon raqamingiz</label>
+                <input type="tel" id="userPhone" placeholder="+998901234567" required>
+            </div>
+            <div class="form-group">
+                <label>Izoh (ixtiyoriy)</label>
+                <textarea id="orderComment" rows="2" placeholder="Qo'shimcha izohlar..."></textarea>
+            </div>
+        </div>
 
-            <div class="section">
-                <div class="section-title"><i class="fas fa-credit-card"></i> To'lov usuli</div>
-                <div class="payment-methods">
-                    <label class="payment-method">
+        <div class="section">
+            <div class="section-title"><i class="fas fa-credit-card"></i> To'lov usuli</div>
+            <div class="payment-methods">
+                <label class="payment-method">
                         <input type="radio" name="payment" value="cash" checked>
                         <span>Naqd pul</span>
                     </label>
-                    <label class="payment-method">
+                <label class="payment-method">
                         <input type="radio" name="payment" value="card">
                         <span>Karta orqali</span>
                     </label>
-                    <label class="payment-method">
+                <label class="payment-method">
                         <input type="radio" name="payment" value="click">
                         <span>Click</span>
                     </label>
-                    <label class="payment-method">
+                <label class="payment-method">
                         <input type="radio" name="payment" value="payme">
                         <span>Payme</span>
                     </label>
-                </div>
             </div>
+        </div>
 
-            <div style="padding: 20px;">
-                <button class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px;" onclick="submitOrder()">
+        <div style="padding: 20px;">
+            <button class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px;" onclick="submitOrder()">
                     <i class="fas fa-check-circle"></i> BUYURTMA TASDIQLASH
                 </button>
-            </div>
         </div>
+    </div>
 
-        <!-- Buyurtma tasdiq sahifasi -->
-        <div class="page" id="orderConfirmationPage">
-            <div class="order-confirmation">
-                <div class="confirmation-icon">
-                    <i class="fas fa-check-circle"></i>
+    <!-- Buyurtma tasdiq sahifasi -->
+    <div class="page" id="orderConfirmationPage">
+        <div class="order-confirmation">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Buyurtmangiz qabul qilindi!</h2>
+            <p class="confirmation-text">
+                Hurmatli <span id="confirmationUserName"></span>, buyurtmangiz muvaffaqiyatli qabul qilindi. Tez orada operatorlarimiz siz bilan bog'lanadi.
+            </p>
+
+            <div class="order-summary">
+                <h3>Buyurtma ma'lumotlari:</h3>
+                <div class="summary-item">
+                    <span>Buyurtma raqami:</span>
+                    <span id="orderNumber">#0001</span>
                 </div>
-                <h2>Buyurtmangiz qabul qilindi!</h2>
-                <p class="confirmation-text">
-                    Hurmatli <span id="confirmationUserName"></span>, buyurtmangiz muvaffaqiyatli qabul qilindi. Tez orada operatorlarimiz siz bilan bog'lanadi.
-                </p>
-
-                <div class="order-summary">
-                    <h3>Buyurtma ma'lumotlari:</h3>
-                    <div class="summary-item">
-                        <span>Buyurtma raqami:</span>
-                        <span id="orderNumber">#0001</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Umumiy summa:</span>
-                        <span id="summaryTotal">0 so'm</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Yetkazib berish:</span>
-                        <span id="summaryAddress">Manzil</span>
-                    </div>
+                <div class="summary-item">
+                    <span>Umumiy summa:</span>
+                    <span id="summaryTotal">0 so'm</span>
                 </div>
+                <div class="summary-item">
+                    <span>Yetkazib berish:</span>
+                    <span id="summaryAddress">Manzil</span>
+                </div>
+            </div>
 
-                <div class="confirmation-actions">
-                    <button class="btn btn-primary" onclick="continueShopping()">
+            <div class="confirmation-actions">
+                <button class="btn btn-primary" onclick="continueShopping()">
                         <i class="fas fa-shopping-cart"></i> Xaridni davom ettirish
                     </button>
-                    <button class="btn btn-outline" onclick="viewOrders()">
+                <button class="btn btn-outline" onclick="viewOrders()">
                         <i class="fas fa-list"></i> Buyurtmalarimni ko'rish
                     </button>
-                </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Pastki navigatsiya -->
