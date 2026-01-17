@@ -1,23 +1,1490 @@
 <!DOCTYPE html>
 <html lang="uz">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kategoriyalar</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Magicbot - Onlayn Do'kon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* === UMUMIY STILLAR === */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+         :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #38b000;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            position: relative;
+        }
+        /* Header */
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+        /* Search Bar */
+        
+        .search-container {
+            padding: 15px;
+            background-color: white;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: var(--light-gray);
+            border-radius: 50px;
+            padding: 10px 20px;
+        }
+        
+        .search-box i {
+            color: var(--gray);
+            margin-right: 10px;
+        }
+        
+        .search-box input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 16px;
+            outline: none;
+        }
+        /* Navigation */
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+            z-index: 200;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-item:hover {
+            color: var(--primary);
+        }
+        /* Main Content */
+        
+        .content {
+            padding-bottom: 70px;
+            min-height: calc(100vh - 140px);
+        }
+        /* Profile Page */
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-right: 15px;
+        }
+        
+        .user-info h2 {
+            margin-bottom: 5px;
+        }
+        
+        .user-info p {
+            opacity: 0.9;
+        }
+        
+        .section {
+            background-color: white;
+            margin: 10px;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light-gray);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background-color: var(--light-gray);
+            padding-left: 10px;
+            padding-right: 10px;
+            margin: 0 -10px;
+            border-radius: 5px;
+        }
+        
+        .menu-item div {
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            color: var(--gray);
+        }
+        
+        .badge {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        /* Home Page */
+        
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 15px;
+        }
+        
+        .category-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-card i {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        /* Catalog Page */
+        
+        .catalog-container {
+            padding: 15px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            height: 150px;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+        }
+        
+        .product-info {
+            padding: 12px;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+        
+        .product-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2a75ff;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--light-gray);
+        }
+        /* Cart Page */
+        
+        .cart-item {
+            display: flex;
+            background-color: white;
+            margin: 10px;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-price {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .quantity {
+            margin: 0 10px;
+            font-weight: 600;
+        }
+        
+        .cart-total {
+            background-color: white;
+            margin: 10px;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+        }
+        /* Modallar */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--light-gray);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        /* Xabarlar */
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        /* Sahifa o'tish animatsiyasi */
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .page.active {
+            display: block;
+        }
+        /* Footer */
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+        /* Back Button */
+        
+        .back-button {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--primary);
+            cursor: pointer;
+            background-color: white;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .back-button i {
+            margin-right: 8px;
+        }
+        /* Empty States */
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        /* Address Items */
+        
+        .address-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+        
+        .address-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+            color: var(--primary);
+        }
+        
+        .address-info {
+            flex: 1;
+        }
+        
+        .address-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .address-details {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        /* Loyalty Page */
+        
+        .loyalty-content {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loyalty-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .loyalty-points {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .loyalty-subtitle {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+        
+        .loyalty-info {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+        }
+        
+        .loyalty-info-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .loyalty-list {
+            padding-left: 20px;
+            color: var(--gray);
+        }
+        
+        .loyalty-list li {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Barcha Kategoriyalar</h1>
-        <div class="categories">
-            <!-- 1-10 -->
-            <div class="category" data-name="Noutbuklar"><img src="rasm.png" alt="Noutbuklar"><span>Noutbuklar</span></div>
-            <div class="category" data-name="Televizorlar"><img src="rasm.png" alt="Televizorlar"><span>Televizorlar</span></div>
-            <div class="category" data-name="Planchetlar"><img src="rasm.png" alt="Planchetlar"><span>Planchetlar</span></div>
-            <div class="category" data-name="Smart-soatlar"><img src="rasm.png" alt="Smart-soatlar"><span>Smart-soatlar</span></div>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Magic<span>bot</span>®</div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Izlash...">
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Bosh sahifa -->
+        <div class="page active" id="homePage">
+            <div class="categories">
+                <div class="category-card" onclick="showCategory('Oyoq kiyimlar')">
+                    <i class="fas fa-shoe-prints"></i>
+                    <h3>Oyoq kiyimlar</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('Kiyimlar')">
+                    <i class="fas fa-tshirt"></i>
+                    <h3>Kiyimlar</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('Uy-ro\'zg\'or')">
+                    <i class="fas fa-home"></i>
+                    <h3>Uy-ro'zg'or</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('Elektronika')">
+                    <i class="fas fa-laptop"></i>
+                    <h3>Elektronika</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('Go\'zallik')">
+                    <i class="fas fa-heartbeat"></i>
+                    <h3>Go'zallik</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('Barcha kategoriyalar')">
+                    <i class="fas fa-th-large"></i>
+                    <h3>Barcha kategoriyalar</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Katalog sahifasi -->
+        <div class="page" id="catalogPage">
+            <div class="catalog-container">
+                <h2 style="margin: 15px;" id="catalogTitle">Barcha mahsulotlar</h2>
+                <div class="product-grid" id="productGrid">
+                    <!-- Mahsulotlar JavaScript orqali qo'shiladi -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Savat sahifasi -->
+        <div class="page" id="cartPage">
+            <div id="cartItems">
+                <!-- Savatdagi mahsulotlar JavaScript orqali qo'shiladi -->
+            </div>
+            <div class="cart-total">
+                <span>Jami:</span>
+                <span id="totalPrice">0 so'm</span>
+            </div>
+            <div style="padding: 20px;">
+                <button class="btn btn-primary" style="width: 100%; padding: 15px;" onclick="checkout()">
+                    Buyurtma berish
+                </button>
+            </div>
+        </div>
+
+        <!-- Profil sahifasi -->
+        <div class="page" id="profilePage">
+            <div class="profile-header">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h2>adhmamjonov</h2>
+                    <p>+998 90 123 45 67</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-shopping-bag"></i> XARIDLAR</div>
+                <div class="menu-item" onclick="showOrders()">
+                    <div><i class="fas fa-cog"></i> Mening buyurtmalarim</div>
+                    <div class="badge" id="ordersCount">0</div>
+                </div>
+                <div class="menu-item" onclick="showFavorites()">
+                    <div><i class="fas fa-heart"></i> Sevimlilar</div>
+                    <div class="badge" id="favoritesCount">0</div>
+                </div>
+                <div class="menu-item" onclick="showViewed()">
+                    <div><i class="fas fa-eye"></i> Ko'rilgan mahsulotlar</div>
+                    <div class="badge" id="viewedCount">0</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><i class="fas fa-user-circle"></i> SHAXSIY KABINET</div>
+                <div class="menu-item" onclick="editProfile()">
+                    <div><i class="fas fa-user-edit"></i> Mening profilim</div>
+                </div>
+                <div class="menu-item" onclick="showAddresses()">
+                    <div><i class="fas fa-map-marker-alt"></i> Mening manzillarim</div>
+                </div>
+                <div class="menu-item" onclick="showLoyalty()">
+                    <div><i class="fas fa-chart-line"></i> Loyallik dasturi</div>
+                    <div class="badge" id="loyaltyPoints">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buyurtmalar sahifasi -->
+        <div class="page" id="ordersPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Mening buyurtmalarim</div>
+                <div id="ordersList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <div>Sizda hali buyurtmalar yo'q</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sevimlilar sahifasi -->
+        <div class="page" id="favoritesPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Sevimlilar</div>
+                <div id="favoritesList">
+                    <div class="empty-state">
+                        <div class="empty-icon">❤️</div>
+                        <div>Sevimlilarda hali hech narsa yo'q</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ko'rilganlar sahifasi -->
+        <div class="page" id="viewedPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Ko'rilgan mahsulotlar</div>
+                <div id="viewedList">
+                    <div class="empty-state">
+                        <div class="empty-icon">👁️</div>
+                        <div>Siz hali hech qanday mahsulotni ko'rmagansiz</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manzillar sahifasi -->
+        <div class="page" id="addressesPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Mening manzillarim</div>
+                <div id="addressesList">
+                    <div class="address-item">
+                        <div class="address-icon"><i class="fas fa-home"></i></div>
+                        <div class="address-info">
+                            <div class="address-name">Uy</div>
+                            <div class="address-details">Toshkent, Yunusobod tumani, Yunusobod ko'chasi, 12-uy</div>
+                        </div>
+                    </div>
+                    <div class="address-item">
+                        <div class="address-icon"><i class="fas fa-briefcase"></i></div>
+                        <div class="address-info">
+                            <div class="address-name">Ish</div>
+                            <div class="address-details">Toshkent, Mirzo Ulug'bek tumani, Ofis binosi</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="openAddAddress()">
+                    <i class="fas fa-plus"></i> Yangi manzil qo'shish
+                </button>
+            </div>
+        </div>
+
+        <!-- Loyallik sahifasi -->
+        <div class="page" id="loyaltyPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Loyallik dasturi</div>
+                <div class="loyalty-content">
+                    <div class="loyalty-icon">🏆</div>
+                    <div class="loyalty-points">125 ball</div>
+                    <div class="loyalty-subtitle">Sizda 125 ball to'plangan</div>
+                    <div class="loyalty-info">
+                        <div class="loyalty-info-title">Ball qanday to'planadi:</div>
+                        <ul class="loyalty-list">
+                            <li>Har 10 000 so'm xarid uchun - 1 ball</li>
+                            <li>Do'stni taklif qilish - 50 ball</li>
+                            <li>Har oy yangi mahsulot xaridi - 20 ball</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pastki navigatsiya -->
+    <div class="bottom-nav">
+        <a class="nav-item active" onclick="showHome()">
+            <i class="fas fa-home"></i>
+            <span>Bosh sahifa</span>
+        </a>
+        <a class="nav-item" onclick="showCatalog()">
+            <i class="fas fa-th-large"></i>
+            <span>Katalog</span>
+        </a>
+        <a class="nav-item" onclick="showCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Savatcha</span>
+        </a>
+        <a class="nav-item" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </div>
+
+    <!-- Profilni tahrirlash modali -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profilni tahrirlash</h2>
+                <span class="close-modal" onclick="closeModal('profileModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Ism</label>
+                <input type="text" id="editName" value="adhmamjonov">
+            </div>
+            <div class="form-group">
+                <label>Telefon raqam</label>
+                <input type="text" id="editPhone" value="+998901234567">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="editEmail" value="adham@example.com">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveProfile()">Saqlash</button>
+        </div>
+    </div>
+
+    <!-- Manzil qo'shish modali -->
+    <div class="modal" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Yangi manzil qo'shish</h2>
+                <span class="close-modal" onclick="closeModal('addressModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Manzil nomi</label>
+                <input type="text" id="addressName" placeholder="Uy, Ish, Ota-ona uyi">
+            </div>
+            <div class="form-group">
+                <label>Shahar</label>
+                <select id="addressCity">
+                    <option value="Toshkent">Toshkent</option>
+                    <option value="Samarqand">Samarqand</option>
+                    <option value="Buxoro">Buxoro</option>
+                    <option value="Andijon">Andijon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>To'liq manzil</label>
+                <textarea id="addressFull" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveAddress()">Saqlash</button>
+        </div>
+    </div>
+
+    <!-- Xabarlar -->
+    <div class="notification" id="notification">
+        <span id="notificationText">Amal muvaffaqiyatli bajarildi!</span>
+    </div>
+
+    <script>
+        // ===== MA'LUMOTLAR =====
+        let cart = [];
+        let currentCategory = 'all';
+        let lastPage = 'homePage';
+
+        // Dastlabki mahsulotlar
+        const sampleProducts = [{
+            id: 1,
+            name: "Nike Air Max",
+            price: 450000,
+            category: "Oyoq kiyimlar"
+        }, {
+            id: 2,
+            name: "Adidas T-shirt",
+            price: 120000,
+            category: "Kiyimlar"
+        }, {
+            id: 3,
+            name: "iPhone 14 Pro",
+            price: 8500000,
+            category: "Elektronika"
+        }, {
+            id: 4,
+            name: "Samsung TV",
+            price: 3500000,
+            category: "Elektronika"
+        }, {
+            id: 5,
+            name: "Uy pardasi",
+            price: 250000,
+            category: "Uy-ro'zg'or"
+        }, {
+            id: 6,
+            name: "Parfum",
+            price: 180000,
+            category: "Go'zallik"
+        }, {
+            id: 7,
+            name: "Jeans",
+            price: 220000,
+            category: "Kiyimlar"
+        }, {
+            id: 8,
+            name: "Samsung Galaxy S23",
+            price: 7200000,
+            category: "Elektronika"
+        }];
+
+        // Profil ma'lumotlari
+        let profileData = {
+            name: "adhmamjonov",
+            phone: "+998 90 123 45 67",
+            email: "adham@example.com"
+        };
+
+        let addresses = [{
+            id: 1,
+            name: "Uy",
+            city: "Toshkent",
+            address: "Yunusobod tumani, Yunusobod ko'chasi, 12-uy"
+        }, {
+            id: 2,
+            name: "Ish",
+            city: "Toshkent",
+            address: "Mirzo Ulug'bek tumani, Ofis binosi"
+        }];
+
+        let orders = [];
+        let favorites = [];
+        let viewed = [];
+
+        // ===== SAHIFA O'TISH FUNKSIYALARI =====
+
+        function showHome() {
+            switchPage('homePage');
+        }
+
+        function showCatalog() {
+            switchPage('catalogPage');
+            loadCatalog('all');
+        }
+
+        function showCart() {
+            switchPage('cartPage');
+            updateCart();
+        }
+
+        function showProfile() {
+            switchPage('profilePage');
+        }
+
+        function goBack() {
+            switchPage('profilePage');
+        }
+
+        // Sahifani almashtirish
+        function switchPage(pageId) {
+            console.log("Sahifa o'tish:", pageId);
+
+            // Oldingi sahifani eslab qolish
+            if (pageId !== 'profilePage' && pageId !== 'homePage' &&
+                pageId !== 'catalogPage' && pageId !== 'cartPage') {
+                lastPage = 'profilePage';
+            } else {
+                lastPage = pageId;
+            }
+
+            // Barcha sahifalarni yashirish
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Tanlangan sahifani ko'rsatish
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Navigatsiya tugmalarini yangilash
+            updateNavigation(pageId);
+        }
+
+        // Navigatsiyani yangilash
+        function updateNavigation(pageId) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            // Asosiy sahifalar uchun
+            if (pageId === 'homePage') {
+                navItems[0].classList.add('active');
+            } else if (pageId === 'catalogPage') {
+                navItems[1].classList.add('active');
+            } else if (pageId === 'cartPage') {
+                navItems[2].classList.add('active');
+            } else if (pageId === 'profilePage' ||
+                pageId === 'ordersPage' ||
+                pageId === 'favoritesPage' ||
+                pageId === 'viewedPage' ||
+                pageId === 'addressesPage' ||
+                pageId === 'loyaltyPage') {
+                navItems[3].classList.add('active');
+            }
+        }
+
+        // Kategoriyani ko'rsatish
+        function showCategory(category) {
+            switchPage('catalogPage');
+            loadCatalog(category);
+        }
+
+        // Katalog yuklash
+        function loadCatalog(category) {
+            currentCategory = category;
+            const productGrid = document.getElementById('productGrid');
+            const catalogTitle = document.getElementById('catalogTitle');
+
+            // Sarlavhani yangilash
+            if (category === 'all') {
+                catalogTitle.textContent = "Barcha mahsulotlar";
+            } else {
+                catalogTitle.textContent = category;
+            }
+
+            // Mahsulotlarni filtrlash
+            let filteredProducts = sampleProducts;
+            if (category !== 'all') {
+                filteredProducts = sampleProducts.filter(product => product.category === category);
+            }
+
+            // Mahsulotlarni chiqarish
+            productGrid.innerHTML = '';
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString()} so'm</div>
+                        <div class="product-actions">
+                            <button class="btn btn-outline" onclick="addToCart(${product.id})">
+                                <i class="fas fa-cart-plus"></i> Savatchaga
+                            </button>
+                            <button class="btn btn-primary" onclick="showProductDetail(${product.id})">
+                                <i class="fas fa-eye"></i> Ko'rish
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+            });
+
+            // Agar mahsulot yo'q bo'lsa
+            if (filteredProducts.length === 0) {
+                productGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <div>Bu kategoriyada hali mahsulotlar yo'q</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Savatchaga qo'shish
+        function addToCart(productId) {
+            const product = sampleProducts.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1
+                });
+            }
+
+            updateCart();
+            showNotification("Mahsulot savatchaga qo'shildi!");
+        }
+
+        // Savatni yangilash
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const totalPriceElement = document.getElementById('totalPrice');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--gray);">
+                        <i class="fas fa-shopping-cart" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <div>Savatda hali mahsulot yo'q</div>
+                    </div>
+                `;
+                totalPriceElement.textContent = "0 so'm";
+                return;
+            }
+
+            let totalPrice = 0;
+            cartItems.innerHTML = '';
+
+            cart.forEach(item => {
+                totalPrice += item.price * item.quantity;
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-image">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">${(item.price * item.quantity).toLocaleString()} so'm</div>
+                        <div class="cart-item-actions">
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+
+            totalPriceElement.textContent = `${totalPrice.toLocaleString()} so'm`;
+        }
+
+        // Miqdorni o'zgartirish
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+
+            if (item) {
+                item.quantity += change;
+
+                if (item.quantity <= 0) {
+                    cart = cart.filter(item => item.id !== productId);
+                }
+
+                updateCart();
+            }
+        }
+
+        // ===== PROFIL FUNKSIYALARI =====
+
+        // Buyurtmalarni ko'rsatish
+        function showOrders() {
+            switchPage('ordersPage');
+            updateOrdersList();
+        }
+
+        // Buyurtmalar ro'yxatini yangilash
+        function updateOrdersList() {
+            const ordersList = document.getElementById('ordersList');
+            document.getElementById('ordersCount').textContent = orders.length;
+
+            if (orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <div>Sizda hali buyurtmalar yo'q</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Sevimlilarni ko'rsatish
+        function showFavorites() {
+            switchPage('favoritesPage');
+            updateFavoritesList();
+        }
+
+        // Sevimlilar ro'yxatini yangilash
+        function updateFavoritesList() {
+            const favoritesList = document.getElementById('favoritesList');
+            document.getElementById('favoritesCount').textContent = favorites.length;
+
+            if (favorites.length === 0) {
+                favoritesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❤️</div>
+                        <div>Sevimlilarda hali hech narsa yo'q</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Ko'rilganlarni ko'rsatish
+        function showViewed() {
+            switchPage('viewedPage');
+            updateViewedList();
+        }
+
+        // Ko'rilganlar ro'yxatini yangilash
+        function updateViewedList() {
+            const viewedList = document.getElementById('viewedList');
+            document.getElementById('viewedCount').textContent = viewed.length;
+
+            if (viewed.length === 0) {
+                viewedList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👁️</div>
+                        <div>Siz hali hech qanday mahsulotni ko'rmagansiz</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Profilni tahrirlash
+        function editProfile() {
+            document.getElementById('editName').value = profileData.name;
+            document.getElementById('editPhone').value = profileData.phone.replace(/\s/g, '');
+            document.getElementById('editEmail').value = profileData.email;
+            openModal('profileModal');
+        }
+
+        // Profilni saqlash
+        function saveProfile() {
+            const name = document.getElementById('editName').value;
+            const phone = document.getElementById('editPhone').value;
+            const email = document.getElementById('editEmail').value;
+
+            profileData.name = name;
+            profileData.phone = phone;
+            profileData.email = email;
+
+            // UI ni yangilash
+            document.querySelector('.user-info h2').textContent = name;
+            document.querySelector('.user-info p').textContent = phone.replace(/(\d{3})(\d{2})(\d{3})(\d{2})(\d{2})/, '+$1 $2 $3 $4 $5');
+
+            closeModal('profileModal');
+            showNotification("Profil muvaffaqiyatli yangilandi!");
+        }
+
+        // Manzillar ro'yxatini ko'rsatish
+        function showAddresses() {
+            switchPage('addressesPage');
+            updateAddressesList();
+        }
+
+        // Manzillar ro'yxatini yangilash
+        function updateAddressesList() {
+            const addressesList = document.getElementById('addressesList');
+            addressesList.innerHTML = '';
+
+            addresses.forEach(address => {
+                const addressItem = document.createElement('div');
+                addressItem.className = 'address-item';
+                addressItem.innerHTML = `
+                    <div class="address-icon">
+                        <i class="fas fa-${address.name === 'Ish' ? 'briefcase' : 'home'}"></i>
+                    </div>
+                    <div class="address-info">
+                        <div class="address-name">${address.name}</div>
+                        <div class="address-details">${address.city}, ${address.address}</div>
+                    </div>
+                `;
+                addressesList.appendChild(addressItem);
+            });
+        }
+
+        // Manzil qo'shish
+        function openAddAddress() {
+            openModal('addressModal');
+        }
+
+        // Manzilni saqlash
+        function saveAddress() {
+            const name = document.getElementById('addressName').value;
+            const city = document.getElementById('addressCity').value;
+            const fullAddress = document.getElementById('addressFull').value;
+
+            if (!name || !city || !fullAddress) {
+                showNotification("Iltimos, barcha maydonlarni to'ldiring!", "error");
+                return;
+            }
+
+            const newAddress = {
+                id: addresses.length + 1,
+                name: name,
+                city: city,
+                address: fullAddress
+            };
+
+            addresses.push(newAddress);
+            updateAddressesList();
+
+            closeModal('addressModal');
+            showNotification("Yangi manzil qo'shildi!");
+
+            // Formani tozalash
+            document.getElementById('addressName').value = '';
+            document.getElementById('addressFull').value = '';
+        }
+
+        // Loyallik dasturini ko'rsatish
+        function showLoyalty() {
+            switchPage('loyaltyPage');
+        }
+
+        // ===== UMUMIY FUNKSIYALAR =====
+
+        // Hisob-kitob
+        function checkout() {
+            if (cart.length === 0) {
+                showNotification("Iltimos, avval mahsulot qo'shing!", "error");
+                return;
+            }
+
+            showNotification("Buyurtma muvaffaqiyatli amalga oshirildi! Tez orada siz bilan bog'lanamiz.");
+
+            // Buyurtmani saqlash
+            const newOrder = {
+                id: orders.length + 1,
+                date: new Date().toLocaleDateString('uz-UZ'),
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                status: "Yangi"
+            };
+
+            orders.push(newOrder);
+            cart = [];
+            updateCart();
+            updateOrdersList();
+        }
+
+        // Modallarni ochish
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        // Modallarni yopish
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Xabarlarni ko'rsatish
+        function showNotification(message, type = "success") {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+
+            notificationText.textContent = message;
+
+            if (type === "error") {
+                notification.style.backgroundColor = "#ff3b30";
+            } else {
+                notification.style.backgroundColor = "var(--success)";
+            }
+
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Mahsulot tafsilotlarini ko'rsatish
+        function showProductDetail(productId) {
+            const product = sampleProducts.find(p => p.id === productId);
+            showNotification(`${product.name} mahsuloti ko'rilmoqda...`);
+
+            // Ko'rilganlarga qo'shish
+            if (!viewed.some(item => item.id === productId)) {
+                viewed.push(product);
+                updateViewedList();
+            }
+        }
+
+        // ===== DASTLABKI SOZLAMALAR =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Dastur yuklandi!");
+
+            // Loyallik ballarini ko'rsatish
+            document.getElementById('loyaltyPoints').textContent = "125";
+
+            // Qidiruv funksiyasi
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+
+                if (searchTerm.length > 2) {
+                    const filtered = sampleProducts.filter(product =>
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.category.toLowerCase().includes(searchTerm)
+                    );
+
+                    if (document.getElementById('catalogPage').classList.contains('active')) {
+                        // Agar katalog sahifasida bo'lsak
+                        loadSearchResults(filtered);
+                    }
+                }
+            });
+        });
+
+        // Qidiruv natijalarini ko'rsatish
+        function loadSearchResults(filteredProducts) {
+            const productGrid = document.getElementById('productGrid');
+            const catalogTitle = document.getElementById('catalogTitle');
+
+            catalogTitle.textContent = "Qidiruv natijalari";
+
+            productGrid.innerHTML = '';
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString()} so'm</div>
+                        <div class="product-actions">
+                            <button class="btn btn-outline" onclick="addToCart(${product.id})">
+                                <i class="fas fa-cart-plus"></i> Savatchaga
+                            </button>
+                            <button class="btn btn-primary" onclick="showProductDetail(${product.id})">
+                                <i class="fas fa-eye"></i> Ko'rish
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+            });
+
+            if (filteredProducts.length === 0) {
+                productGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <div>Hech narsa topilmadi</div>
+                    </div>
+                `;
+            }
+        }
+    </script>
 </body>
+
 </html>
