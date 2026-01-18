@@ -1,6 +1,6 @@
 // ===== KONFIGURATSIYA =====
 const TELEGRAM_BOT_TOKEN = "7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE";
-const TELEGRAM_CHAT_ID = "8074394669";
+const TELEGRAM_CHAT_ID = "7245353315";
 const EXCHANGE_RATE = 12500; // 1$ = 12,500 so'm (faqat loyallik ballari uchun)
 
 // ===== GLOBAL O'ZGARUVCHILAR =====
