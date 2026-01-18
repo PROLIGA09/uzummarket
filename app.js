@@ -152,6 +152,14 @@ const sampleProducts = [{
         description: "Samsung Galaxy S23 Ultra - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
         image: "https://images.unsplash.com/photo-1678911820854-35c8b0e20949?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
+    {
+        id: 9,
+        name: "Pulll",
+        price: 7200000,
+        category: "kiyimlar",
+        description: "pul - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
+        image: "rasm.png",
+    }
 ];
 
 // ===== ASOSIY FUNKSIYALAR =====
