@@ -435,9 +435,15 @@ function loadCatalog(category) {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
         productCard.onclick = () => showProductDetail(product.id);
+
+        // Rasmlar uchun yangi format - rasm yo'q bo'lsa ikonka ko'rinadi
+        const hasImage = product.image && product.image.trim() !== '';
+        const backgroundStyle = hasImage ? `background-image: url('${product.image}')` : '';
+        const iconStyle = hasImage ? 'display: none;' : '';
+
         productCard.innerHTML = `
-            <div class="product-image" style="background-image: url('${product.image}')">
-                <i class="fas fa-box" style="display: none;"></i>
+            <div class="product-image" style="${backgroundStyle}">
+                <i class="fas fa-box" style="${iconStyle}"></i>
             </div>
             <div class="product-info">
                 <div class="product-title">${product.name}</div>
@@ -477,8 +483,15 @@ function showProductDetail(productId) {
     // LocalStorage ga saqlash
     saveToLocalStorage();
 
+    // Rasmlar uchun yangi format - rasm yo'q bo'lsa ikonka ko'rinadi
+    const hasImage = product.image && product.image.trim() !== '';
+    const backgroundStyle = hasImage ? `background-image: url('${product.image}')` : '';
+    const iconStyle = hasImage ? 'display: none;' : '';
+
     document.getElementById("productDetailImage").innerHTML = `
-        <div style="background-image: url('${product.image}'); width: 100%; height: 100%; background-size: cover; background-position: center;"></div>
+        <div class="product-detail-image" style="${backgroundStyle}">
+            <i class="fas fa-box" style="${iconStyle}"></i>
+        </div>
     `;
     document.getElementById("productDetailName").textContent = product.name;
     // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
@@ -565,10 +578,16 @@ function updateCart() {
 
         const cartItem = document.createElement("div");
         cartItem.className = "cart-item";
+
+        // Rasmlar uchun yangi format
+        const hasImage = item.image && item.image.trim() !== '';
+        const backgroundStyle = hasImage ? `background-image: url('${item.image}')` : '';
+        const iconStyle = hasImage ? 'display: none;' : '';
+
         // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         cartItem.innerHTML = `
-            <div class="cart-item-image" style="background-image: url('${item.image}')">
-                <i class="fas fa-box" style="display: none;"></i>
+            <div class="cart-item-image" style="${backgroundStyle}">
+                <i class="fas fa-box" style="${iconStyle}"></i>
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
@@ -688,10 +707,16 @@ function updateFavoritesList() {
         const favoriteItem = document.createElement("div");
         favoriteItem.className = "cart-item";
         favoriteItem.style.margin = "10px";
+
+        // Rasmlar uchun yangi format
+        const hasImage = item.image && item.image.trim() !== '';
+        const backgroundStyle = hasImage ? `background-image: url('${item.image}')` : '';
+        const iconStyle = hasImage ? 'display: none;' : '';
+
         // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         favoriteItem.innerHTML = `
-            <div class="cart-item-image" style="background-image: url('${item.image}')">
-                <i class="fas fa-box" style="display: none;"></i>
+            <div class="cart-item-image" style="${backgroundStyle}">
+                <i class="fas fa-box" style="${iconStyle}"></i>
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
@@ -906,10 +931,16 @@ function updateViewedList() {
         const viewedItem = document.createElement("div");
         viewedItem.className = "cart-item";
         viewedItem.style.margin = "10px";
+        
+        // Rasmlar uchun yangi format
+        const hasImage = item.image && item.image.trim() !== '';
+        const backgroundStyle = hasImage ? `background-image: url('${item.image}')` : '';
+        const iconStyle = hasImage ? 'display: none;' : '';
+        
         // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         viewedItem.innerHTML = `
-            <div class="cart-item-image" style="background-image: url('${item.image}')">
-                <i class="fas fa-box" style="display: none;"></i>
+            <div class="cart-item-image" style="${backgroundStyle}">
+                <i class="fas fa-box" style="${iconStyle}"></i>
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
@@ -1528,10 +1559,16 @@ function loadSearchResults(filteredProducts) {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
         productCard.onclick = () => showProductDetail(product.id);
+        
+        // Rasmlar uchun yangi format - rasm yo'q bo'lsa ikonka ko'rinadi
+        const hasImage = product.image && product.image.trim() !== '';
+        const backgroundStyle = hasImage ? `background-image: url('${product.image}')` : '';
+        const iconStyle = hasImage ? 'display: none;' : '';
+        
         // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         productCard.innerHTML = `
-            <div class="product-image" style="background-image: url('${product.image}')">
-                <i class="fas fa-box" style="display: none;"></i>
+            <div class="product-image" style="${backgroundStyle}">
+                <i class="fas fa-box" style="${iconStyle}"></i>
             </div>
             <div class="product-info">
                 <div class="product-title">${product.name}</div>
