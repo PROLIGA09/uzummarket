@@ -156,7 +156,7 @@ const sampleProducts = [{
         id: 9,
         name: "Pulll",
         price: 7200000,
-        category: "kiyimlar",
+        category: "Kiyimlar",
         description: "pul - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
         image: "rasm.png",
     }
