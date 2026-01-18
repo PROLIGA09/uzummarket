@@ -1,5 +1,4 @@
-[file name]: app.js[file content begin]
-    // ===== KONFIGURATSIYA =====
+// ===== KONFIGURATSIYA =====
 const TELEGRAM_BOT_TOKEN = "7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE";
 const TELEGRAM_CHAT_ID = "8074394669";
 const EXCHANGE_RATE = 12500; // 1$ = 12,500 so'm (faqat loyallik ballari uchun)
@@ -182,7 +181,7 @@ const sampleProducts = [{
     }
 ];
 
-// ===== ASOSIY FUNKSIYALARI =====
+// ===== ASOSIY FUNKSIYALAR =====
 
 // Dastlabki yuklash
 function initializeApp() {
@@ -261,8 +260,6 @@ function startApp() {
         phone: "",
         email: "",
         loyaltyPoints: 0,
-        addresses: [], // Yangi: manzillar ro'yxati
-        defaultAddress: null // Yangi: default manzil
     };
 
     // LocalStorage ga saqlash
@@ -1007,23 +1004,6 @@ function showCheckoutPage() {
         document.getElementById("userPhone").value = "";
     }
 
-    // ===== YANGI: SAQLANGAN MANZILNI KO'RSATISH =====
-    if (currentUser && currentUser.defaultAddress) {
-        const savedAddress = currentUser.defaultAddress;
-        document.getElementById("regionSelect").value = savedAddress.region;
-        updateDistricts(); // Tumanlarni yangilash
-        setTimeout(() => {
-            document.getElementById("districtSelect").value = savedAddress.district;
-            document.getElementById("fullAddress").value = savedAddress.address;
-        }, 100);
-    } else {
-        // Manzil yo'q, odatdagi holat
-        document.getElementById("regionSelect").value = "";
-        document.getElementById("districtSelect").value = "";
-        document.getElementById("districtSelect").disabled = true;
-        document.getElementById("fullAddress").value = "";
-    }
-
     switchPage("checkoutPage");
 }
 
@@ -1117,53 +1097,6 @@ async function submitOrder() {
     if (!phoneRegex.test(userPhone)) {
         showNotification("Iltimos, to'g'ri telefon raqam kiriting (+998901234567 formatida)", "error");
         return;
-    }
-
-    // ===== YANGI: MANZILNI PROFILGA SAQLASH =====
-    const addressData = {
-        region: region,
-        district: district,
-        address: fullAddress
-    };
-    
-    // Agar hozirgi default manzil yo'q bo'lsa yoki o'zgartirilgan bo'lsa
-    if (!currentUser.defaultAddress || 
-        currentUser.defaultAddress.region !== region || 
-        currentUser.defaultAddress.district !== district || 
-        currentUser.defaultAddress.address !== fullAddress) {
-        
-        // YANGI: Manzilni "Mening manzilim" ro'yxatiga qo'shish
-        const addressName = "Mening manzilim";
-        
-        // Agar bu manzil allaqachon mavjud bo'lsa, o'zgartirish
-        const existingIndex = currentUser.addresses.findIndex(addr => 
-            addr.name === addressName);
-        
-        const newAddress = {
-            name: addressName,
-            region: region,
-            district: district,
-            address: fullAddress,
-            isDefault: true,
-            createdDate: new Date().toLocaleString("uz-UZ")
-        };
-        
-        if (existingIndex !== -1) {
-            currentUser.addresses[existingIndex] = newAddress;
-        } else {
-            currentUser.addresses.push(newAddress);
-        }
-        
-        // Default manzil sifatida belgilash
-        currentUser.defaultAddress = {
-            region: region,
-            district: district,
-            address: fullAddress
-        };
-        
-        // Profilni yangilash
-        updateUserDisplay();
-        saveToLocalStorage();
     }
 
     // Yuklanmoqda bildirishnomasini ko'rsatish
@@ -1350,52 +1283,6 @@ function editProfile() {
 
     document.getElementById("editPhone").value = currentUser.phone || "";
     document.getElementById("editEmail").value = currentUser.email || "";
-    
-    // ===== YANGI: SAQLANGAN MANZILLARNI KO'RSATISH =====
-    const addressesList = document.getElementById("profileAddressesList");
-    addressesList.innerHTML = "";
-    
-    if (currentUser.addresses && currentUser.addresses.length > 0) {
-        currentUser.addresses.forEach((addr, index) => {
-            const addressItem = document.createElement("div");
-            addressItem.className = "profile-address-item";
-            addressItem.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>${addr.name}</strong>
-                        <div style="font-size: 14px; color: var(--gray);">
-                            ${addr.region}, ${addr.district}<br>
-                            ${addr.address}
-                        </div>
-                        <div style="font-size: 12px; color: var(--gray); margin-top: 5px;">
-                            ${addr.createdDate}
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-primary btn-sm" onclick="useAddress(${index})">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteAddress(${index})" style="margin-left: 5px;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            if (addr.isDefault) {
-                addressItem.style.border = "2px solid var(--primary)";
-                addressItem.style.backgroundColor = "rgba(0, 123, 255, 0.1)";
-            }
-            addressesList.appendChild(addressItem);
-        });
-    } else {
-        addressesList.innerHTML = `
-            <div style="text-align: center; padding: 20px; color: var(--gray);">
-                <i class="fas fa-map-marker-alt" style="font-size: 32px; margin-bottom: 10px;"></i>
-                <div>Hech qanday saqlangan manzil yo'q</div>
-            </div>
-        `;
-    }
-    
     openModal("profileModal");
 }
 
@@ -1417,48 +1304,6 @@ function saveProfile() {
     saveToLocalStorage(); // LocalStorage ga saqlash
     closeModal("profileModal");
     showNotification("Profil ma'lumotlari yangilandi!", "success");
-}
-
-// ===== YANGI: MANZIL FUNKSIYALARI =====
-
-// Manzilni foydalanish
-function useAddress(addressIndex) {
-    if (!currentUser || !currentUser.addresses || !currentUser.addresses[addressIndex]) return;
-    
-    const address = currentUser.addresses[addressIndex];
-    
-    // Default manzilni o'zgartirish
-    currentUser.defaultAddress = {
-        region: address.region,
-        district: address.district,
-        address: address.address
-    };
-    
-    // Barcha manzillarni default emas qilish
-    currentUser.addresses.forEach((addr, idx) => {
-        addr.isDefault = (idx === addressIndex);
-    });
-    
-    saveToLocalStorage();
-    closeModal("profileModal");
-    showNotification("Default manzil muvaffaqiyatli o'zgartirildi!", "success");
-}
-
-// Manzilni o'chirish
-function deleteAddress(addressIndex) {
-    if (!currentUser || !currentUser.addresses || !currentUser.addresses[addressIndex]) return;
-    
-    if (confirm("Bu manzilni o'chirishni istaysizmi?")) {
-        // Agar o'chirilayotgan manzil default bo'lsa
-        if (currentUser.addresses[addressIndex].isDefault) {
-            currentUser.defaultAddress = null;
-        }
-        
-        currentUser.addresses.splice(addressIndex, 1);
-        saveToLocalStorage();
-        editProfile(); // Ro'yxatni yangilash
-        showNotification("Manzil o'chirildi!", "success");
-    }
 }
 
 // Ismni o'zgartirish
@@ -1493,126 +1338,11 @@ function showAddresses() {
 
 // Manzillar ro'yxatini yangilash
 function updateAddressesList() {
-    const addressesList = document.getElementById("addressesList");
-    
-    if (currentUser && currentUser.addresses && currentUser.addresses.length > 0) {
-        addressesList.innerHTML = "";
-        
-        currentUser.addresses.forEach((addr, index) => {
-            const addressItem = document.createElement("div");
-            addressItem.className = "section";
-            addressItem.style.marginBottom = "15px";
-            addressItem.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <div>
-                        <strong>${addr.name}</strong>
-                        ${addr.isDefault ? '<span style="background-color: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px;">Default</span>' : ''}
-                    </div>
-                    <div style="font-size: 12px; color: var(--gray);">
-                        ${addr.createdDate}
-                    </div>
-                </div>
-                <div style="color: var(--gray); margin-bottom: 10px;">
-                    ${addr.region}, ${addr.district}<br>
-                    ${addr.address}
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-primary" style="flex: 1;" onclick="setDefaultAddress(${index})">
-                        <i class="fas fa-check"></i> Default qilish
-                    </button>
-                    <button class="btn btn-outline" style="flex: 1;" onclick="editSavedAddress(${index})">
-                        <i class="fas fa-edit"></i> Tahrirlash
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteAddressFromList(${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
-            addressesList.appendChild(addressItem);
-        });
-    } else {
-        addressesList.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🏠</div>
-                <div>Sizda hali saqlangan manzillar yo'q</div>
-                <button class="btn btn-primary" style="margin-top: 15px;" onclick="openAddAddress()">
-                    <i class="fas fa-plus"></i> Manzil qo'shish
-                </button>
-            </div>
-        `;
-    }
-}
-
-// Manzilni default qilish
-function setDefaultAddress(addressIndex) {
-    if (!currentUser || !currentUser.addresses || !currentUser.addresses[addressIndex]) return;
-    
-    // Barcha manzillarni default emas qilish
-    currentUser.addresses.forEach((addr, idx) => {
-        addr.isDefault = (idx === addressIndex);
-    });
-    
-    // Default manzilni o'zgartirish
-    const selectedAddress = currentUser.addresses[addressIndex];
-    currentUser.defaultAddress = {
-        region: selectedAddress.region,
-        district: selectedAddress.district,
-        address: selectedAddress.address
-    };
-    
-    saveToLocalStorage();
-    updateAddressesList();
-    showNotification("Default manzil muvaffaqiyatli o'zgartirildi!", "success");
-}
-
-// Manzilni tahrirlash
-function editSavedAddress(addressIndex) {
-    if (!currentUser || !currentUser.addresses || !currentUser.addresses[addressIndex]) return;
-    
-    const address = currentUser.addresses[addressIndex];
-    
-    document.getElementById("addressName").value = address.name;
-    document.getElementById("modalRegionSelect").value = address.region;
-    updateModalDistricts();
-    
-    setTimeout(() => {
-        document.getElementById("modalDistrictSelect").value = address.district;
-        document.getElementById("modalFullAddress").value = address.address;
-    }, 100);
-    
-    // Edit mode uchun indexni saqlash
-    document.getElementById("addressModal").dataset.editIndex = addressIndex;
-    
-    openModal("addressModal");
-}
-
-// Ro'yxatdan manzilni o'chirish
-function deleteAddressFromList(addressIndex) {
-    if (confirm("Bu manzilni o'chirishni istaysizmi?")) {
-        // Agar o'chirilayotgan manzil default bo'lsa
-        if (currentUser.addresses[addressIndex].isDefault) {
-            currentUser.defaultAddress = null;
-        }
-        
-        currentUser.addresses.splice(addressIndex, 1);
-        saveToLocalStorage();
-        updateAddressesList();
-        showNotification("Manzil o'chirildi!", "success");
-    }
+    // Hozircha oddiy sahifa, kelajakda saqlangan manzillar bo'lishi mumkin
 }
 
 // Manzil qo'shish
 function openAddAddress() {
-    // Formani tozalash
-    document.getElementById("addressName").value = "";
-    document.getElementById("modalRegionSelect").value = "";
-    document.getElementById("modalDistrictSelect").value = "";
-    document.getElementById("modalDistrictSelect").disabled = true;
-    document.getElementById("modalFullAddress").value = "";
-    
-    // Edit mode ni o'chirish
-    delete document.getElementById("addressModal").dataset.editIndex;
-    
     openModal("addressModal");
 }
 
@@ -1628,44 +1358,23 @@ function saveAddress() {
         return;
     }
 
-    // Yoki edit mode
-    const editIndex = document.getElementById("addressModal").dataset.editIndex;
+    // Manzilni saqlash (kelajakda ma'lumotlar bazasiga saqlanishi mumkin)
     const newAddress = {
         name: name,
         region: region,
         district: district,
         address: fullAddress,
-        isDefault: false,
-        createdDate: new Date().toLocaleString("uz-UZ")
     };
-    
-    if (editIndex !== undefined) {
-        // Tahrirlash
-        currentUser.addresses[editIndex] = newAddress;
-        showNotification("Manzil muvaffaqiyatli tahrirlandi!", "success");
-    } else {
-        // Yangi manzil qo'shish
-        currentUser.addresses.push(newAddress);
-        showNotification("Yangi manzil qo'shildi!", "success");
-    }
-    
-    // Agar bu birinchi manzil bo'lsa, default qilish
-    if (currentUser.addresses.length === 1) {
-        currentUser.addresses[0].isDefault = true;
-        currentUser.defaultAddress = {
-            region: region,
-            district: district,
-            address: fullAddress
-        };
-    }
-    
-    saveToLocalStorage();
+
+    showNotification("Yangi manzil qo'shildi!", "success");
     closeModal("addressModal");
-    
-    // Agar addresses sahifasida bo'lsak, ro'yxatni yangilash
-    if (document.getElementById("addressesPage").classList.contains("active")) {
-        updateAddressesList();
-    }
+
+    // Formani tozalash
+    document.getElementById("addressName").value = "";
+    document.getElementById("modalRegionSelect").value = "";
+    document.getElementById("modalDistrictSelect").value = "";
+    document.getElementById("modalDistrictSelect").disabled = true;
+    document.getElementById("modalFullAddress").value = "";
 }
 
 // Loyallik dasturini ko'rsatish
@@ -1825,13 +1534,13 @@ function loadSearchResults(filteredProducts) {
                 <i class="fas fa-box" style="display: none;"></i>
             </div>
             <div class="product-info">
-                <div class="product-title">${item.name}</div>
-                <div class="product-price">$${item.price.toFixed(2)}</div>
+                <div class="product-title">${product.name}</div>
+                <div class="product-price">$${product.price.toFixed(2)}</div>
                 <div class="product-actions">
-                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${item.id})">
+                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})">
                         <i class="fas fa-cart-plus"></i> Savatchaga
                     </button>
-                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${item.id})">
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})">
                         <i class="fas fa-eye"></i> Ko'rish
                     </button>
                 </div>
@@ -1854,4 +1563,3 @@ function loadSearchResults(filteredProducts) {
 function viewOrders() {
     showOrders();
 }
-[file content end]
