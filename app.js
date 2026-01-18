@@ -1,6 +1,7 @@
 // ===== KONFIGURATSIYA =====
 const TELEGRAM_BOT_TOKEN = "8208794616:AAEhtC49atlQ2BeNMzphB5zRt7au1QwYQaY";
 const TELEGRAM_CHAT_ID = "8074394669";
+const EXCHANGE_RATE = 12500; // 1$ = 12,500 so'm (faqat loyallik ballari uchun)
 
 // ===== GLOBAL O'ZGARUVCHILAR =====
 let cart = [];
@@ -91,7 +92,7 @@ const regions = {
 const sampleProducts = [{
         id: 1,
         name: "Nike Air Max 270",
-        price: 450000,
+        price: 36, // 36$ (450,000 so'm / 12,500)
         category: "Oyoq kiyimlar",
         description: "Nike Air Max 270 - bu eng yangi va qulay kundalik krossovkalar. Havoni his qilish uchun maxsus tayyorlangan.",
         image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -99,7 +100,7 @@ const sampleProducts = [{
     {
         id: 2,
         name: "Adidas T-shirt",
-        price: 120000,
+        price: 9.6, // 9.6$ (120,000 so'm / 12,500)
         category: "Kiyimlar",
         description: "100% paxtadan tayyorlangan, nafas oladigan Adidas futbolka. Kundalik foydalanish uchun juda qulay.",
         image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -107,7 +108,7 @@ const sampleProducts = [{
     {
         id: 3,
         name: "iPhone 14 Pro",
-        price: 8500000,
+        price: 680, // 680$ (8,500,000 so'm / 12,500)
         category: "Elektronika",
         description: "Apple iPhone 14 Pro - eng yangi texnologiyalar bilan jihozlangan smartfon. 256GB xotira, 48MP asosiy kamera.",
         image: "https://images.unsplash.com/photo-1664478546384-d57ffe74a78c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -115,7 +116,7 @@ const sampleProducts = [{
     {
         id: 4,
         name: 'Samsung 55" 4K Smart TV',
-        price: 3500000,
+        price: 280, // 280$ (3,500,000 so'm / 12,500)
         category: "Elektronika",
         description: "Samsung 55 dyumli 4K Smart TV. Crystal Processor 4K, HDR10+, Smart TV platformasi.",
         image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -123,7 +124,7 @@ const sampleProducts = [{
     {
         id: 5,
         name: "Uy pardasi to'plami",
-        price: 250000,
+        price: 20, // 20$ (250,000 so'm / 12,500)
         category: "Uy-ro'zg'or",
         description: "3 donadan iborat uy pardasi to'plami. 100% paxta, yuvilganda bo'shlashtirmaydi, ranglari o'chmaydi.",
         image: "https://images.unsplash.com/photo-1556228578-9c360e1d8d34?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -131,7 +132,7 @@ const sampleProducts = [{
     {
         id: 6,
         name: "Chanel Chance Parfum",
-        price: 180000,
+        price: 14.4, // 14.4$ (180,000 so'm / 12,500)
         category: "Go'zallik",
         description: "Chanel Chance parfyumeriyasi - yangi va jozibali hid. 50ml, original Fransiyadan.",
         image: "https://images.unsplash.com/photo-1541643600914-78b084683601?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -139,7 +140,7 @@ const sampleProducts = [{
     {
         id: 7,
         name: "Levi's Jeans",
-        price: 220000,
+        price: 17.6, // 17.6$ (220,000 so'm / 12,500)
         category: "Kiyimlar",
         description: "Levi's 501 klassik jeans. 100% paxta, amerikancha uslubda tayyorlangan.",
         image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -147,17 +148,17 @@ const sampleProducts = [{
     {
         id: 8,
         name: "Samsung Galaxy S23",
-        price: 7200000,
+        price: 576, // 576$ (7,200,000 so'm / 12,500)
         category: "Elektronika",
         description: "Samsung Galaxy S23 Ultra - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
         image: "https://images.unsplash.com/photo-1678911820854-35c8b0e20949?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
     {
         id: 9,
-        name: "Pulll",
-        price: 7200000,
+        name: "Premium Suit",
+        price: 96, // 96$ (1,200,000 so'm / 12,500)
         category: "Kiyimlar",
-        description: "pul - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
+        description: "Yuqori sifatli premium kostyum, eng yaxshi materiallardan tayyorlangan.",
         image: "rasm.png",
     }
 ];
@@ -422,7 +423,7 @@ function loadCatalog(category) {
             </div>
             <div class="product-info">
                 <div class="product-title">${product.name}</div>
-                <div class="product-price">${product.price.toLocaleString()} so'm</div>
+                <div class="product-price">$${product.price.toFixed(2)}</div>
                 <div class="product-actions">
                     <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})">
                         <i class="fas fa-cart-plus"></i> Savatchaga
@@ -462,7 +463,7 @@ function showProductDetail(productId) {
         <div style="background-image: url('${product.image}'); width: 100%; height: 100%; background-size: cover; background-position: center;"></div>
     `;
     document.getElementById("productDetailName").textContent = product.name;
-    document.getElementById("productDetailPrice").textContent = `${product.price.toLocaleString()} so'm`;
+    document.getElementById("productDetailPrice").textContent = `$${product.price.toFixed(2)}`;
     document.getElementById("productDetailCategory").textContent = product.category;
     document.getElementById("productDetailDesc").textContent = product.description;
 
@@ -532,7 +533,7 @@ function updateCart() {
                 <div>Savatda hali mahsulot yo'q</div>
             </div>
         `;
-        totalPriceElement.textContent = "0 so'm";
+        totalPriceElement.textContent = "$0.00";
         return;
     }
 
@@ -550,7 +551,7 @@ function updateCart() {
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${(item.price * item.quantity).toLocaleString()} so'm</div>
+                <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
                 <div class="cart-item-actions">
                     <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">
                         <i class="fas fa-minus"></i>
@@ -565,7 +566,7 @@ function updateCart() {
         cartItems.appendChild(cartItem);
     });
 
-    totalPriceElement.textContent = `${totalPrice.toLocaleString()} so'm`;
+    totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 // Miqdorni o'zgartirish
@@ -671,7 +672,7 @@ function updateFavoritesList() {
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${item.price.toLocaleString()} so'm</div>
+                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
                 <div class="cart-item-category" style="color: var(--gray); font-size: 14px; margin-bottom: 10px;">
                     ${item.category}
                 </div>
@@ -749,7 +750,7 @@ function updateOrdersList() {
                 ${order.items.map(item => 
                     `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                         <span>${item.name} × ${item.quantity}</span>
-                        <span>${(item.price * item.quantity).toLocaleString()} so'm</span>
+                        <span>$${(item.price * item.quantity).toFixed(2)}</span>
                     </div>`
                 ).join('')}
             </div>
@@ -757,7 +758,7 @@ function updateOrdersList() {
             <div style="border-top: 1px solid var(--light-gray); padding-top: 10px;">
                 <div style="display: flex; justify-content: space-between; font-weight: bold;">
                     <span>Jami:</span>
-                    <span>${order.totalAmount.toLocaleString()} so'm</span>
+                    <span>$${order.totalAmount.toFixed(2)}</span>
                 </div>
                 <div style="font-size: 12px; color: var(--gray); margin-top: 5px;">
                     To'lov usuli: ${getPaymentMethodName(order.paymentMethod)}
@@ -885,7 +886,7 @@ function updateViewedList() {
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${item.price.toLocaleString()} so'm</div>
+                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
                 <div class="cart-item-category" style="color: var(--gray); font-size: 14px; margin-bottom: 10px;">
                     ${item.category}
                 </div>
@@ -959,13 +960,13 @@ function showCheckoutPage() {
         itemDiv.className = "menu-item";
         itemDiv.innerHTML = `
             <div>${item.name} × ${item.quantity}</div>
-            <div>${(item.price * item.quantity).toLocaleString()} so'm</div>
+            <div>$${(item.price * item.quantity).toFixed(2)}</div>
         `;
         checkoutItems.appendChild(itemDiv);
     });
 
     // Umumiy summani ko'rsatish
-    document.getElementById("checkoutTotal").textContent = `${totalPrice.toLocaleString()} so'm`;
+    document.getElementById("checkoutTotal").textContent = `$${totalPrice.toFixed(2)}`;
 
     // Telefon raqamni o'rnatish
     if (currentUser && currentUser.phone) {
@@ -1077,7 +1078,7 @@ async function submitOrder() {
     let totalAmount = 0;
 
     cart.forEach((item) => {
-        orderItems += `• ${item.name} - ${item.quantity} x ${item.price.toLocaleString()} = ${(item.price * item.quantity).toLocaleString()} so'm\n`;
+        orderItems += `• ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${(item.price * item.quantity).toFixed(2)}\n`;
         totalAmount += item.price * item.quantity;
     });
 
@@ -1096,7 +1097,7 @@ To'liq manzil: ${fullAddress}
 📦 Mahsulotlar:
 ${orderItems}
 
-💰 Umumiy summa: ${totalAmount.toLocaleString()} so'm
+💰 Umumiy summa: $${totalAmount.toFixed(2)}
 💳 To'lov usuli: ${getPaymentMethodName(paymentMethod)}
 📝 Izoh: ${orderComment || "Yo'q"}
 
@@ -1131,8 +1132,11 @@ ${orderItems}
             currentUser.phone = userPhone;
             updateUserDisplay();
 
-            // Loyallik ballarini hisoblash (har 10,000 so'm uchun 1 ball)
-            const newPoints = Math.floor(totalAmount / 10000);
+            // ===== LOYALLIK BALLARINI HISOBLASH =====
+            // $1 = 1 ball
+            const newPoints = Math.floor(totalAmount);
+            // =====================================
+            
             currentUser.loyaltyPoints += newPoints;
             updateLoyaltyBadge();
             document.getElementById("loyaltyPointsDisplay").textContent = `${currentUser.loyaltyPoints} ball`;
@@ -1149,6 +1153,13 @@ ${orderItems}
 
             // Telegramga yuborilganidan keyin tasdiq xabarini ko'rsatish
             showNotification("Ma'lumotlaringiz qabul qilindi. Tez orada sizga aloqaga chiqishadi!", "success");
+            
+            // Loyallik ballari qo'shilgan xabar
+            if (newPoints > 0) {
+                setTimeout(() => {
+                    showNotification(`Sizga ${newPoints} ball qo'shildi! Jami: ${currentUser.loyaltyPoints} ball`, "success");
+                }, 1000);
+            }
 
             // Buyurtma tasdiq sahifasiga o'tish
             showOrderConfirmation();
@@ -1209,7 +1220,7 @@ function showOrderConfirmation() {
     if (!currentOrder) return;
 
     document.getElementById("orderNumber").textContent = `#${currentOrder.id.toString().slice(-6)}`;
-    document.getElementById("summaryTotal").textContent = `${currentOrder.totalAmount.toLocaleString()} so'm`;
+    document.getElementById("summaryTotal").textContent = `$${currentOrder.totalAmount.toFixed(2)}`;
     document.getElementById("summaryAddress").textContent = `${currentOrder.region}, ${currentOrder.district}`;
 
     switchPage("orderConfirmationPage");
@@ -1326,6 +1337,11 @@ function saveAddress() {
 function showLoyalty() {
     if (currentUser) {
         document.getElementById("loyaltyPointsDisplay").textContent = `${currentUser.loyaltyPoints || 0} ball`;
+        
+        // Qo'shimcha: balldan dollar qiymatini ko'rsatish
+        const dollarsValue = (currentUser.loyaltyPoints || 0).toFixed(2);
+        document.querySelector(".loyalty-subtitle").innerHTML = 
+            `Ball qanday to'planadi:<br><small>${currentUser.loyaltyPoints || 0} ball = $${dollarsValue} qiymatiga teng</small>`;
     }
     switchPage("loyaltyPage");
 }
@@ -1449,6 +1465,11 @@ document.addEventListener("DOMContentLoaded", function() {
             loadCatalog(currentCategory);
         }
     });
+    
+    // Page loadda loyallik ma'lumotlarini yangilash
+    if (currentUser) {
+        updateLoyaltyBadge();
+    }
 });
 
 // Qidiruv natijalarini ko'rsatish
@@ -1469,7 +1490,7 @@ function loadSearchResults(filteredProducts) {
             </div>
             <div class="product-info">
                 <div class="product-title">${product.name}</div>
-                <div class="product-price">${product.price.toLocaleString()} so'm</div>
+                <div class="product-price">$${product.price.toFixed(2)}</div>
                 <div class="product-actions">
                     <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})">
                         <i class="fas fa-cart-plus"></i> Savatchaga
