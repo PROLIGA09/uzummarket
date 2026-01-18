@@ -93,7 +93,7 @@ const sampleProducts = [{
         id: 1,
         name: "Nike Air Max 270",
         price: 36, // 36$ (450,000 so'm / 12,500)
-        category: "Oyoq kiyimlar",
+        category: "Barcha kategoriyalar",
         description: "Nike Air Max 270 - bu eng yangi va qulay kundalik krossovkalar. Havoni his qilish uchun maxsus tayyorlangan.",
         image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
