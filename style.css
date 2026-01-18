@@ -348,6 +348,13 @@ body {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    cursor: zoom-in;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.product-image:hover {
+    opacity: 0.9;
 }
 
 .product-image i,
@@ -361,6 +368,34 @@ body {
     justify-content: center;
     width: 100%;
     height: 100%;
+}
+
+.zoom-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.product-image:hover .zoom-icon,
+.cart-item-image:hover .zoom-icon,
+.product-detail-image:hover .zoom-icon {
+    opacity: 1;
+}
+
+.zoom-icon i {
+    font-size: 14px !important;
+    color: var(--dark) !important;
+    opacity: 1 !important;
 }
 
 .product-info {
@@ -456,6 +491,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: zoom-in;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.cart-item-image:hover {
+    opacity: 0.9;
 }
 
 .cart-item-details {
@@ -739,6 +781,13 @@ body {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    cursor: zoom-in;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.product-detail-image:hover {
+    opacity: 0.9;
 }
 
 .product-detail-info {
@@ -1042,6 +1091,74 @@ body {
 }
 
 
+/* ===== RASM TO'LIQ KO'RINISHI (LIGHTBOX) ===== */
+
+.image-lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.lightbox-container {
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 24px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 2001;
+}
+
+.lightbox-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-caption {
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+}
+
+
 /* Responsive */
 
 @media (max-width: 500px) {
@@ -1074,6 +1191,15 @@ body {
         right: 10px;
         max-width: none;
     }
+    .lightbox-container {
+        max-width: 95%;
+        max-height: 95%;
+    }
+    .lightbox-close {
+        top: -35px;
+        width: 35px;
+        height: 35px;
+    }
 }
 
 @media (max-width: 400px) {
@@ -1105,5 +1231,9 @@ body {
     }
     .product-detail-image {
         height: 250px;
+    }
+    .cart-item-image {
+        width: 100%;
+        height: 130px;
     }
 }

@@ -181,6 +181,71 @@ const sampleProducts = [{
     }
 ];
 
+// ===== RASM TO'LIQ KO'RINISHI FUNKSIYALARI =====
+
+// Rasmni to'liq ekranda ko'rsatish
+function showFullImage(imageUrl, productName) {
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+
+    if (!imageUrl || imageUrl.trim() === '' || imageUrl === 'undefined') {
+        showNotification("Bu mahsulot uchun rasm mavjud emas", "warning");
+        return;
+    }
+
+    lightboxImage.src = imageUrl;
+    lightboxImage.alt = productName;
+    lightboxCaption.textContent = productName;
+
+    // Rasm yuklangandan keyin modalni ko'rsatish
+    lightboxImage.onload = function() {
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Scrollni bloklash
+    };
+
+    // Rasm yuklanmagan holatda
+    lightboxImage.onerror = function() {
+        lightboxImage.src = ''; // Rasmni tozalash
+        lightboxImage.style.display = 'none';
+        lightboxCaption.textContent = 'Rasm yuklanmadi';
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+}
+
+// Lightboxni yopish
+function closeLightbox() {
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+
+    lightbox.style.display = 'none';
+    lightboxImage.src = '';
+    document.body.style.overflow = 'auto'; // Scrollni qayta yoqish
+}
+
+// Mahsulot rasmini ko'rish (to'liq ekran)
+function viewProductImage(productId) {
+    const product = sampleProducts.find(p => p.id === productId);
+    if (!product) return;
+
+    showFullImage(product.image, product.name);
+}
+
+// Mahsulot tafsilotlari sahifasida rasm bosilganda
+function setupProductImageClick() {
+    const productImage = document.querySelector('.product-detail-image');
+    if (productImage) {
+        productImage.onclick = function() {
+            const productId = parseInt(document.getElementById("productDetailImage").dataset.productId);
+            const product = sampleProducts.find(p => p.id === productId);
+            if (product) {
+                showFullImage(product.image, product.name);
+            }
+        };
+    }
+}
+
 // ===== ASOSIY FUNKSIYALAR =====
 
 // Dastlabki yuklash
@@ -429,21 +494,22 @@ function loadCatalog(category) {
         );
     }
 
-    // Mahsulotlarni chiqarish (bonusni KO'RSATMAYMIZ)
+    // Mahsulotlarni chiqarish
     productGrid.innerHTML = "";
     filteredProducts.forEach((product) => {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
         productCard.onclick = () => showProductDetail(product.id);
 
-        // Rasmlar uchun yangi format - rasm yo'q bo'lsa ikonka ko'rinadi
+        // Rasmlar uchun yangi format
         const hasImage = product.image && product.image.trim() !== '';
         const backgroundStyle = hasImage ? `background-image: url('${product.image}')` : '';
         const iconStyle = hasImage ? 'display: none;' : '';
 
         productCard.innerHTML = `
-            <div class="product-image" style="${backgroundStyle}">
+            <div class="product-image" style="${backgroundStyle}" onclick="event.stopPropagation(); viewProductImage(${product.id})">
                 <i class="fas fa-box" style="${iconStyle}"></i>
+                ${hasImage ? '<div class="zoom-icon"><i class="fas fa-search-plus"></i></div>' : ''}
             </div>
             <div class="product-info">
                 <div class="product-title">${product.name}</div>
@@ -483,18 +549,19 @@ function showProductDetail(productId) {
     // LocalStorage ga saqlash
     saveToLocalStorage();
 
-    // Rasmlar uchun yangi format - rasm yo'q bo'lsa ikonka ko'rinadi
+    // Rasmlar uchun yangi format
     const hasImage = product.image && product.image.trim() !== '';
     const backgroundStyle = hasImage ? `background-image: url('${product.image}')` : '';
     const iconStyle = hasImage ? 'display: none;' : '';
 
     document.getElementById("productDetailImage").innerHTML = `
-        <div class="product-detail-image" style="${backgroundStyle}">
+        <div class="product-detail-image" style="${backgroundStyle}" onclick="viewProductImage(${productId})">
             <i class="fas fa-box" style="${iconStyle}"></i>
+            ${hasImage ? '<div class="zoom-icon"><i class="fas fa-search-plus"></i></div>' : ''}
         </div>
     `;
+
     document.getElementById("productDetailName").textContent = product.name;
-    // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
     document.getElementById("productDetailPrice").textContent = `$${product.price.toFixed(2)}`;
     document.getElementById("productDetailCategory").textContent = product.category;
     document.getElementById("productDetailDesc").textContent = product.description;
@@ -519,6 +586,9 @@ function showProductDetail(productId) {
 
     switchPage("productDetailPage");
     lastPage = "catalogPage";
+
+    // Rasm bosilishini sozlash
+    setupProductImageClick();
 }
 
 // ===== SAVATCHA FUNKSIYALARI =====
@@ -535,7 +605,7 @@ function addToCart(productId) {
             id: product.id,
             name: product.name,
             price: product.price,
-            bonus: product.bonus || 0, // Bonusni ham saqlaymiz
+            bonus: product.bonus || 0,
             quantity: 1,
             image: product.image,
         });
@@ -584,10 +654,10 @@ function updateCart() {
         const backgroundStyle = hasImage ? `background-image: url('${item.image}')` : '';
         const iconStyle = hasImage ? 'display: none;' : '';
 
-        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         cartItem.innerHTML = `
-            <div class="cart-item-image" style="${backgroundStyle}">
+            <div class="cart-item-image" style="${backgroundStyle}" onclick="viewProductImage(${item.id})">
                 <i class="fas fa-box" style="${iconStyle}"></i>
+                ${hasImage ? '<div class="zoom-icon"><i class="fas fa-search-plus"></i></div>' : ''}
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
@@ -655,7 +725,7 @@ function addToFavorites() {
             id: product.id,
             name: product.name,
             price: product.price,
-            bonus: product.bonus || 0, // Bonusni ham saqlaymiz
+            bonus: product.bonus || 0,
             image: product.image,
             category: product.category,
             addedDate: new Date().toLocaleString("uz-UZ")
@@ -713,10 +783,10 @@ function updateFavoritesList() {
         const backgroundStyle = hasImage ? `background-image: url('${item.image}')` : '';
         const iconStyle = hasImage ? 'display: none;' : '';
 
-        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         favoriteItem.innerHTML = `
-            <div class="cart-item-image" style="${backgroundStyle}">
+            <div class="cart-item-image" style="${backgroundStyle}" onclick="viewProductImage(${item.id})">
                 <i class="fas fa-box" style="${iconStyle}"></i>
+                ${hasImage ? '<div class="zoom-icon"><i class="fas fa-search-plus"></i></div>' : ''}
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
@@ -796,7 +866,6 @@ function updateOrdersList() {
             
             <div style="margin-bottom: 10px;">
                 ${order.items.map(item => 
-                    // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
                     `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                         <span>${item.name} × ${item.quantity}</span>
                         <span>$${(item.price * item.quantity).toFixed(2)}</span>
@@ -937,10 +1006,10 @@ function updateViewedList() {
         const backgroundStyle = hasImage ? `background-image: url('${item.image}')` : '';
         const iconStyle = hasImage ? 'display: none;' : '';
         
-        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         viewedItem.innerHTML = `
-            <div class="cart-item-image" style="${backgroundStyle}">
+            <div class="cart-item-image" style="${backgroundStyle}" onclick="viewProductImage(${item.id})">
                 <i class="fas fa-box" style="${iconStyle}"></i>
+                ${hasImage ? '<div class="zoom-icon"><i class="fas fa-search-plus"></i></div>' : ''}
             </div>
             <div class="cart-item-details">
                 <div class="cart-item-title">${item.name}</div>
@@ -1017,7 +1086,6 @@ function showCheckoutPage() {
 
         const itemDiv = document.createElement("div");
         itemDiv.className = "menu-item";
-        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         itemDiv.innerHTML = `
             <div>${item.name} × ${item.quantity}</div>
             <div>$${(item.price * item.quantity).toFixed(2)}</div>
@@ -1294,7 +1362,6 @@ function showOrderConfirmation() {
     if (!currentOrder) return;
 
     document.getElementById("orderNumber").textContent = `#${currentOrder.id.toString().slice(-6)}`;
-    // Webda faqat asl summani ko'rsatamiz, bonusni ko'rsatmaymiz
     document.getElementById("summaryTotal").textContent = `$${currentOrder.totalAmount.toFixed(2)}`;
     document.getElementById("summaryAddress").textContent = `${currentOrder.region}, ${currentOrder.district}`;
 
@@ -1560,15 +1627,15 @@ function loadSearchResults(filteredProducts) {
         productCard.className = "product-card";
         productCard.onclick = () => showProductDetail(product.id);
         
-        // Rasmlar uchun yangi format - rasm yo'q bo'lsa ikonka ko'rinadi
+        // Rasmlar uchun yangi format
         const hasImage = product.image && product.image.trim() !== '';
         const backgroundStyle = hasImage ? `background-image: url('${product.image}')` : '';
         const iconStyle = hasImage ? 'display: none;' : '';
         
-        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         productCard.innerHTML = `
-            <div class="product-image" style="${backgroundStyle}">
+            <div class="product-image" style="${backgroundStyle}" onclick="event.stopPropagation(); viewProductImage(${product.id})">
                 <i class="fas fa-box" style="${iconStyle}"></i>
+                ${hasImage ? '<div class="zoom-icon"><i class="fas fa-search-plus"></i></div>' : ''}
             </div>
             <div class="product-info">
                 <div class="product-title">${product.name}</div>
