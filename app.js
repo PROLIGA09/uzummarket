@@ -88,24 +88,78 @@ const regions = {
 };
 
 // ===== DASTLABKI MAHSULOTLAR =====
-const sampleProducts = [ //{
-    //        id: 1,
-    //        name: "Nike Air Max 270",
-    //        price: 450000,
-    //        category: "Oyoq kiyimlar",
-    //        description: "Nike Air Max 270 - bu eng yangi va qulay kundalik krossovkalar. Havoni his qilish uchun maxsus tayyorlangan.",
-    //        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-    //    },
-    ,
-    {
+const sampleProducts = [{
         id: 1,
+        name: "Nike Air Max 270",
+        price: 450000,
+        category: "Oyoq kiyimlar",
+        description: "Nike Air Max 270 - bu eng yangi va qulay kundalik krossovkalar. Havoni his qilish uchun maxsus tayyorlangan.",
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 2,
+        name: "Adidas T-shirt",
+        price: 120000,
+        category: "Kiyimlar",
+        description: "100% paxtadan tayyorlangan, nafas oladigan Adidas futbolka. Kundalik foydalanish uchun juda qulay.",
+        image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 3,
         name: "iPhone 14 Pro",
         price: 8500000,
         category: "Elektronika",
         description: "Apple iPhone 14 Pro - eng yangi texnologiyalar bilan jihozlangan smartfon. 256GB xotira, 48MP asosiy kamera.",
         image: "https://images.unsplash.com/photo-1664478546384-d57ffe74a78c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
-
+    {
+        id: 4,
+        name: 'Samsung 55" 4K Smart TV',
+        price: 3500000,
+        category: "Elektronika",
+        description: "Samsung 55 dyumli 4K Smart TV. Crystal Processor 4K, HDR10+, Smart TV platformasi.",
+        image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 5,
+        name: "Uy pardasi to'plami",
+        price: 250000,
+        category: "Uy-ro'zg'or",
+        description: "3 donadan iborat uy pardasi to'plami. 100% paxta, yuvilganda bo'shlashtirmaydi, ranglari o'chmaydi.",
+        image: "https://images.unsplash.com/photo-1556228578-9c360e1d8d34?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 6,
+        name: "Chanel Chance Parfum",
+        price: 180000,
+        category: "Go'zallik",
+        description: "Chanel Chance parfyumeriyasi - yangi va jozibali hid. 50ml, original Fransiyadan.",
+        image: "https://images.unsplash.com/photo-1541643600914-78b084683601?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 7,
+        name: "Levi's Jeans",
+        price: 220000,
+        category: "Kiyimlar",
+        description: "Levi's 501 klassik jeans. 100% paxta, amerikancha uslubda tayyorlangan.",
+        image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 8,
+        name: "Samsung Galaxy S23",
+        price: 7200000,
+        category: "Elektronika",
+        description: "Samsung Galaxy S23 Ultra - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
+        image: "https://images.unsplash.com/photo-1678911820854-35c8b0e20949?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    },
+    {
+        id: 9,
+        name: "Pulll",
+        price: 7200000,
+        category: "Kiyimlar",
+        description: "pul - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
+        image: "rasm.png",
+    }
 ];
 
 // ===== ASOSIY FUNKSIYALAR =====
