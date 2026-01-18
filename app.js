@@ -160,6 +160,14 @@ const sampleProducts = [{
         category: "Kiyimlar",
         description: "Yuqori sifatli premium kostyum, eng yaxshi materiallardan tayyorlangan.",
         image: "rasm.png",
+    },
+    {
+        id: 10,
+        name: "Premium Suit",
+        price: 100, // 96$ (1,200,000 so'm / 12,500)
+        category: "DUSH UCHUN",
+        description: "Yuqori sifatli premium kostyum, eng yaxshi materiallardan tayyorlangan.",
+        image: "rasm.png",
     }
 ];
 
