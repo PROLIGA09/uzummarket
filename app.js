@@ -172,12 +172,12 @@ const sampleProducts = [{
     },
     {
         id: 10,
-        name: "Premium Suit 2",
-        price: 100, // 100$ (1,250,000 so'm / 12,500)
-        bonus: 5, // 5% bonus
+        name: "Ah8037L",
+        price: 46, // 46$ (575,000 so'm / 12,500)
+        bonus: 4, // 4% bonus
         category: "DUSH UCHUN",
-        description: "Yuqori sifatli premium kostyum, eng yaxshi materiallardan tayyorlangan.",
-        image: "rasm.png",
+        description: "DUSH UCHUN MAXSULOT",
+        image: "rasm1.png",
     }
 ];
 
@@ -1560,6 +1560,6 @@ function loadSearchResults(filteredProducts) {
 }
 
 // View orders from confirmation page
-function viewOrders() {
+function viewOrders() { 
     showOrders();
 }
