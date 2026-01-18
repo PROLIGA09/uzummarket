@@ -93,6 +93,7 @@ const sampleProducts = [{
         id: 1,
         name: "Nike Air Max 270",
         price: 36, // 36$ (450,000 so'm / 12,500)
+        bonus: 5, // 5% bonus
         category: "Barcha kategoriyalar",
         description: "Nike Air Max 270 - bu eng yangi va qulay kundalik krossovkalar. Havoni his qilish uchun maxsus tayyorlangan.",
         image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -101,6 +102,7 @@ const sampleProducts = [{
         id: 2,
         name: "Adidas T-shirt",
         price: 9.6, // 9.6$ (120,000 so'm / 12,500)
+        bonus: 3, // 3% bonus
         category: "Kiyimlar",
         description: "100% paxtadan tayyorlangan, nafas oladigan Adidas futbolka. Kundalik foydalanish uchun juda qulay.",
         image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -109,6 +111,7 @@ const sampleProducts = [{
         id: 3,
         name: "iPhone 14 Pro",
         price: 680, // 680$ (8,500,000 so'm / 12,500)
+        bonus: 15, // 15% bonus
         category: "Elektronika",
         description: "Apple iPhone 14 Pro - eng yangi texnologiyalar bilan jihozlangan smartfon. 256GB xotira, 48MP asosiy kamera.",
         image: "https://images.unsplash.com/photo-1664478546384-d57ffe74a78c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -117,6 +120,7 @@ const sampleProducts = [{
         id: 4,
         name: 'Samsung 55" 4K Smart TV',
         price: 280, // 280$ (3,500,000 so'm / 12,500)
+        bonus: 10, // 10% bonus
         category: "Elektronika",
         description: "Samsung 55 dyumli 4K Smart TV. Crystal Processor 4K, HDR10+, Smart TV platformasi.",
         image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -125,6 +129,7 @@ const sampleProducts = [{
         id: 5,
         name: "Uy pardasi to'plami",
         price: 20, // 20$ (250,000 so'm / 12,500)
+        bonus: 2, // 2% bonus
         category: "Uy-ro'zg'or",
         description: "3 donadan iborat uy pardasi to'plami. 100% paxta, yuvilganda bo'shlashtirmaydi, ranglari o'chmaydi.",
         image: "https://images.unsplash.com/photo-1556228578-9c360e1d8d34?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -133,14 +138,16 @@ const sampleProducts = [{
         id: 6,
         name: "Chanel Chance Parfum",
         price: 14.4, // 14.4$ (180,000 so'm / 12,500)
+        bonus: 4, // 4% bonus
         category: "Go'zallik",
-        description: "Chanel Chance parfyumeriyasi - yangi va jozibali hid. 50ml, original Fransiyadan.",
+        description: "Chanai Chance parfyumeriyasi - yangi va jozibali hid. 50ml, original Fransiyadan.",
         image: "https://images.unsplash.com/photo-1541643600914-78b084683601?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
     },
     {
         id: 7,
         name: "Levi's Jeans",
         price: 17.6, // 17.6$ (220,000 so'm / 12,500)
+        bonus: 3, // 3% bonus
         category: "Kiyimlar",
         description: "Levi's 501 klassik jeans. 100% paxta, amerikancha uslubda tayyorlangan.",
         image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -149,6 +156,7 @@ const sampleProducts = [{
         id: 8,
         name: "Samsung Galaxy S23",
         price: 576, // 576$ (7,200,000 so'm / 12,500)
+        bonus: 12, // 12% bonus
         category: "Elektronika",
         description: "Samsung Galaxy S23 Ultra - 200MP kamera, 8K video yozish, Snapdragon 8 Gen 2 protsessori.",
         image: "https://images.unsplash.com/photo-1678911820854-35c8b0e20949?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -157,14 +165,16 @@ const sampleProducts = [{
         id: 9,
         name: "Premium Suit",
         price: 96, // 96$ (1,200,000 so'm / 12,500)
+        bonus: 8, // 8% bonus
         category: "Kiyimlar",
         description: "Yuqori sifatli premium kostyum, eng yaxshi materiallardan tayyorlangan.",
         image: "rasm.png",
     },
     {
         id: 10,
-        name: "Premium Suit",
-        price: 100, // 96$ (1,200,000 so'm / 12,500)
+        name: "Premium Suit 2",
+        price: 100, // 100$ (1,250,000 so'm / 12,500)
+        bonus: 5, // 5% bonus
         category: "DUSH UCHUN",
         description: "Yuqori sifatli premium kostyum, eng yaxshi materiallardan tayyorlangan.",
         image: "rasm.png",
@@ -419,7 +429,7 @@ function loadCatalog(category) {
         );
     }
 
-    // Mahsulotlarni chiqarish
+    // Mahsulotlarni chiqarish (bonusni KO'RSATMAYMIZ)
     productGrid.innerHTML = "";
     filteredProducts.forEach((product) => {
         const productCard = document.createElement("div");
@@ -471,6 +481,7 @@ function showProductDetail(productId) {
         <div style="background-image: url('${product.image}'); width: 100%; height: 100%; background-size: cover; background-position: center;"></div>
     `;
     document.getElementById("productDetailName").textContent = product.name;
+    // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
     document.getElementById("productDetailPrice").textContent = `$${product.price.toFixed(2)}`;
     document.getElementById("productDetailCategory").textContent = product.category;
     document.getElementById("productDetailDesc").textContent = product.description;
@@ -511,6 +522,7 @@ function addToCart(productId) {
             id: product.id,
             name: product.name,
             price: product.price,
+            bonus: product.bonus || 0, // Bonusni ham saqlaymiz
             quantity: 1,
             image: product.image,
         });
@@ -553,6 +565,7 @@ function updateCart() {
 
         const cartItem = document.createElement("div");
         cartItem.className = "cart-item";
+        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         cartItem.innerHTML = `
             <div class="cart-item-image" style="background-image: url('${item.image}')">
                 <i class="fas fa-box" style="display: none;"></i>
@@ -623,6 +636,7 @@ function addToFavorites() {
             id: product.id,
             name: product.name,
             price: product.price,
+            bonus: product.bonus || 0, // Bonusni ham saqlaymiz
             image: product.image,
             category: product.category,
             addedDate: new Date().toLocaleString("uz-UZ")
@@ -674,6 +688,7 @@ function updateFavoritesList() {
         const favoriteItem = document.createElement("div");
         favoriteItem.className = "cart-item";
         favoriteItem.style.margin = "10px";
+        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         favoriteItem.innerHTML = `
             <div class="cart-item-image" style="background-image: url('${item.image}')">
                 <i class="fas fa-box" style="display: none;"></i>
@@ -756,6 +771,7 @@ function updateOrdersList() {
             
             <div style="margin-bottom: 10px;">
                 ${order.items.map(item => 
+                    // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
                     `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                         <span>${item.name} × ${item.quantity}</span>
                         <span>$${(item.price * item.quantity).toFixed(2)}</span>
@@ -814,6 +830,7 @@ function repeatOrder(orderIndex) {
             id: item.id,
             name: item.name,
             price: item.price,
+            bonus: item.bonus || 0,
             quantity: item.quantity,
             image: item.image
         });
@@ -848,6 +865,7 @@ function addToViewed(productId) {
         id: product.id,
         name: product.name,
         price: product.price,
+        bonus: product.bonus || 0,
         image: product.image,
         category: product.category,
         viewedDate: new Date().toLocaleString("uz-UZ")
@@ -888,6 +906,7 @@ function updateViewedList() {
         const viewedItem = document.createElement("div");
         viewedItem.className = "cart-item";
         viewedItem.style.margin = "10px";
+        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         viewedItem.innerHTML = `
             <div class="cart-item-image" style="background-image: url('${item.image}')">
                 <i class="fas fa-box" style="display: none;"></i>
@@ -930,6 +949,7 @@ function addToFavoritesFromViewed(productId) {
             id: product.id,
             name: product.name,
             price: product.price,
+            bonus: product.bonus || 0,
             image: product.image,
             category: product.category,
             addedDate: new Date().toLocaleString("uz-UZ")
@@ -966,6 +986,7 @@ function showCheckoutPage() {
 
         const itemDiv = document.createElement("div");
         itemDiv.className = "menu-item";
+        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         itemDiv.innerHTML = `
             <div>${item.name} × ${item.quantity}</div>
             <div>$${(item.price * item.quantity).toFixed(2)}</div>
@@ -1084,13 +1105,25 @@ async function submitOrder() {
     // Buyurtma ma'lumotlarini tayyorlash
     let orderItems = "";
     let totalAmount = 0;
+    let totalBonusAmount = 0; // Bonuslarni hisoblash
 
     cart.forEach((item) => {
-        orderItems += `• ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${(item.price * item.quantity).toFixed(2)}\n`;
-        totalAmount += item.price * item.quantity;
+        const itemTotal = item.price * item.quantity;
+        totalAmount += itemTotal;
+        
+        // Bonusni hisoblash (foiz sifatida)
+        const bonusAmount = (itemTotal * (item.bonus || 0)) / 100;
+        totalBonusAmount += bonusAmount;
+        
+        // Telegram xabari uchun bonus bilan mahsulot ma'lumotlari
+        orderItems += `• ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${itemTotal.toFixed(2)}`;
+        if (item.bonus && item.bonus > 0) {
+            orderItems += ` (${item.bonus}% bonus: +$${bonusAmount.toFixed(2)})`;
+        }
+        orderItems += `\n`;
     });
 
-    // Telegramga yuborish uchun xabar
+    // Telegramga yuborish uchun xabar - BONUSLARNI KO'RSATAMIZ
     const message = `
 🛒 YANGI BUYURTMA
 
@@ -1106,6 +1139,7 @@ To'liq manzil: ${fullAddress}
 ${orderItems}
 
 💰 Umumiy summa: $${totalAmount.toFixed(2)}
+🎁 Umumiy bonus: $${totalBonusAmount.toFixed(2)} (${totalBonusAmount > 0 ? ((totalBonusAmount / totalAmount) * 100).toFixed(1) : 0}%)
 💳 To'lov usuli: ${getPaymentMethodName(paymentMethod)}
 📝 Izoh: ${orderComment || "Yo'q"}
 
@@ -1128,6 +1162,7 @@ ${orderItems}
                 address: fullAddress,
                 items: [...cart],
                 totalAmount: totalAmount,
+                totalBonus: totalBonusAmount, // Bonusni ham saqlaymiz
                 paymentMethod: paymentMethod,
                 comment: orderComment,
                 status: "Yangi",
@@ -1141,7 +1176,7 @@ ${orderItems}
             updateUserDisplay();
 
             // ===== LOYALLIK BALLARINI HISOBLASH =====
-            // $1 = 1 ball
+            // $1 = 1 ball (faqat asl narx uchun, bonus emas)
             const newPoints = Math.floor(totalAmount);
             // =====================================
             
@@ -1228,6 +1263,7 @@ function showOrderConfirmation() {
     if (!currentOrder) return;
 
     document.getElementById("orderNumber").textContent = `#${currentOrder.id.toString().slice(-6)}`;
+    // Webda faqat asl summani ko'rsatamiz, bonusni ko'rsatmaymiz
     document.getElementById("summaryTotal").textContent = `$${currentOrder.totalAmount.toFixed(2)}`;
     document.getElementById("summaryAddress").textContent = `${currentOrder.region}, ${currentOrder.district}`;
 
@@ -1492,6 +1528,7 @@ function loadSearchResults(filteredProducts) {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
         productCard.onclick = () => showProductDetail(product.id);
+        // Webda faqat narxni ko'rsatamiz, bonusni ko'rsatmaymiz
         productCard.innerHTML = `
             <div class="product-image" style="background-image: url('${product.image}')">
                 <i class="fas fa-box" style="display: none;"></i>
