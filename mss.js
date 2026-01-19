@@ -1,5 +1,8 @@
-// /api/get-messages.js
-export default async function handler(req, res) {
+// api/get-messages.js
+const fs = require('fs');
+const path = require('path');
+
+module.exports = async(req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -7,27 +10,27 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        return res.status(200).end();
     }
 
     if (req.method === 'GET') {
         try {
-            const fs = require('fs');
-            const path = require('path');
-
             const messagesPath = path.join(process.cwd(), 'messages.json');
 
             let messages = [];
             try {
-                const data = fs.readFileSync(messagesPath, 'utf8');
-                messages = JSON.parse(data);
+                if (fs.existsSync(messagesPath)) {
+                    const data = fs.readFileSync(messagesPath, 'utf8');
+                    messages = JSON.parse(data);
+                }
             } catch (error) {
-                // Fayl mavjud emas
+                console.log('❌ Faylni o\'qishda xatolik:', error);
                 messages = [];
             }
 
-            res.status(200).json({
+            console.log(`📊 ${messages.length} ta xabar yuborilmoqda`);
+
+            return res.status(200).json({
                 success: true,
                 messages: messages,
                 count: messages.length,
@@ -36,15 +39,15 @@ export default async function handler(req, res) {
 
         } catch (error) {
             console.error('❌ Xatolik:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 error: 'Server xatosi: ' + error.message
             });
         }
-    } else {
-        res.status(405).json({
-            success: false,
-            error: 'Faqat GET metodiga ruxsat berilgan'
-        });
     }
-}
+
+    return res.status(405).json({
+        success: false,
+        error: 'Faqat GET metodiga ruxsat berilgan'
+    });
+};

@@ -5,18 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🤖 Telegram Bot Xabarlari</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
          :root {
             --primary: #0088cc;
             --primary-dark: #006699;
             --secondary: #25d366;
-            --bg-color: #f0f2f5;
+            --bg-color: #f5f5f5;
             --card-bg: #ffffff;
             --text-color: #333333;
             --text-light: #666666;
             --border-color: #dddddd;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
         * {
@@ -26,48 +26,54 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 90vh;
         }
         
         .header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            padding: 25px;
             text-align: center;
-            box-shadow: var(--shadow);
         }
         
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 28px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         
         .header p {
             opacity: 0.9;
-            font-size: 1rem;
+            font-size: 16px;
+            margin-bottom: 20px;
         }
         
         .status-bar {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
             border-radius: 10px;
             margin-top: 15px;
-            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
         }
         
         .status-indicator {
@@ -92,14 +98,16 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
-            margin-bottom: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 2px solid var(--border-color);
         }
         
         .btn {
             padding: 12px 20px;
             border: none;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -109,24 +117,13 @@
             transition: all 0.3s;
         }
         
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
         .btn-primary {
             background: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        
-        .btn-danger {
-            background: #ff4444;
             color: white;
         }
         
@@ -135,39 +132,53 @@
             color: white;
         }
         
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
         .messages-container {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 80px;
+            padding: 25px;
+            min-height: 400px;
         }
         
         .messages-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 2px solid var(--border-color);
         }
         
         .messages-title {
-            font-size: 1.3rem;
+            font-size: 22px;
             color: var(--primary);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .messages-count {
             background: var(--primary);
             color: white;
-            padding: 5px 15px;
+            padding: 6px 15px;
             border-radius: 20px;
             font-weight: 600;
+            font-size: 16px;
         }
         
         .message-list {
-            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             max-height: 500px;
             overflow-y: auto;
             padding-right: 10px;
@@ -175,17 +186,17 @@
         
         .message-item {
             background: var(--bg-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--primary);
+            border-radius: 15px;
+            padding: 20px;
             animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--primary);
+            position: relative;
         }
         
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -196,19 +207,19 @@
         .message-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
         
         .message-user {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 50%;
             display: flex;
@@ -216,97 +227,156 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 18px;
+            flex-shrink: 0;
         }
         
         .user-info h4 {
             color: var(--primary);
-            margin-bottom: 3px;
+            margin-bottom: 5px;
+            font-size: 17px;
         }
         
         .user-id {
-            font-size: 0.8rem;
+            font-size: 13px;
             color: var(--text-light);
+            font-family: monospace;
         }
         
         .message-time {
-            font-size: 0.85rem;
+            font-size: 13px;
             color: var(--text-light);
             text-align: right;
+            min-width: 120px;
         }
         
         .message-content {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            padding: 10px 0;
-            border-top: 1px solid var(--border-color);
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 15px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
             margin-top: 10px;
+            word-wrap: break-word;
+        }
+        
+        .file-message {
+            background: #f0f8ff;
+            border-left-color: #4f46e5;
+        }
+        
+        .file-content {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .file-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .file-icon {
+            font-size: 24px;
+        }
+        
+        .file-info h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .file-details {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .file-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .photo-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
         
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             color: var(--text-light);
         }
         
-        .empty-state img {
-            width: 100px;
+        .empty-state i {
+            font-size: 80px;
             opacity: 0.3;
             margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--text-color);
         }
         
         .alert {
-            padding: 12px 15px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
             border-radius: 10px;
-            margin-bottom: 15px;
-            animation: slideDown 0.3s ease;
+            background: white;
+            box-shadow: var(--shadow);
             display: flex;
             align-items: center;
             gap: 10px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
         }
         
-        @keyframes slideDown {
+        @keyframes slideInRight {
             from {
+                transform: translateX(100%);
                 opacity: 0;
-                transform: translateY(-10px);
             }
             to {
+                transform: translateX(0);
                 opacity: 1;
-                transform: translateY(0);
             }
         }
         
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            border-left: 4px solid var(--secondary);
         }
         
         .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            border-left: 4px solid #ff4444;
         }
         
         .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+            border-left: 4px solid var(--primary);
         }
         
         .loading {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
+            color: var(--primary);
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--primary);
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto 20px;
         }
         
         @keyframes spin {
@@ -318,102 +388,97 @@
             }
         }
         
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 10px;
-            border-top: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            z-index: 1000;
+        .message-type {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
-        .nav-btn {
-            padding: 10px;
-            border: none;
-            background: none;
-            color: var(--text-light);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        
-        .nav-btn.active {
-            color: var(--primary);
-            background: rgba(0, 136, 204, 0.1);
-        }
-        
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                border-radius: 15px;
+            }
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 22px;
             }
             .controls {
                 grid-template-columns: 1fr;
             }
-            .btn {
-                width: 100%;
-            }
             .message-header {
                 flex-direction: column;
-                align-items: flex-start;
                 gap: 10px;
             }
             .message-time {
                 text-align: left;
+                align-self: flex-start;
+            }
+            .alert {
+                left: 20px;
+                right: 20px;
+                max-width: none;
             }
         }
     </style>
 </head>
 
 <body>
+    <div id="alertContainer"></div>
+
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🤖 Telegram Bot Xabarlari</h1>
-            <p>Botga yozgan xabarlaringiz shu yerda ko'rinadi</p>
+            <h1>
+                <i class="fas fa-robot"></i> Telegram Bot Xabarlari
+            </h1>
+            <p>Botga yozgan xabarlaringiz, rasmlaringiz va fayllaringiz shu yerda ko'rinadi</p>
+
             <div class="status-bar">
                 <div class="status-indicator"></div>
-                <span id="statusText">Vercel serverga ulanmoqda...</span>
+                <span id="statusText">Serverga ulanmoqda...</span>
             </div>
         </div>
-
-        <!-- Alerts -->
-        <div id="alertContainer"></div>
 
         <!-- Controls -->
         <div class="controls">
             <button class="btn btn-primary" onclick="loadMessages()">
-                <span>🔄</span> Xabarlarni Yuklash
+                <i class="fas fa-sync-alt"></i>
+                Xabarlarni Yuklash
             </button>
             <button class="btn btn-success" onclick="startAutoRefresh()">
-                <span>⚡</span> Avtoyangilash
+                <i class="fas fa-bolt"></i>
+                Avtoyangilash
             </button>
             <button class="btn btn-danger" onclick="clearMessages()">
-                <span>🗑️</span> Tozalash
+                <i class="fas fa-trash"></i>
+                Tozalash
             </button>
-            <button class="btn btn-secondary" onclick="copyWebhookURL()">
-                <span>📋</span> Webhook URL
+            <button class="btn btn-secondary" onclick="showWebhookInfo()">
+                <i class="fas fa-link"></i>
+                Webhook URL
             </button>
         </div>
 
         <!-- Messages Container -->
         <div class="messages-container">
             <div class="messages-header">
-                <h2 class="messages-title">📨 Xabarlar</h2>
+                <h2 class="messages-title">
+                    <i class="fas fa-comments"></i> Xabarlar
+                </h2>
                 <div class="messages-count">
                     <span id="messageCount">0</span> ta
                 </div>
             </div>
 
-            <!-- Loading -->
+            <!-- Loading State -->
             <div id="loadingState" class="loading">
                 <div class="spinner"></div>
                 <p>Xabarlar yuklanmoqda...</p>
@@ -421,9 +486,12 @@
 
             <!-- Empty State -->
             <div id="emptyState" class="empty-state" style="display: none;">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='1'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E" alt="No messages">
+                <i class="fas fa-comment-slash"></i>
                 <h3>Hozircha xabarlar yo'q</h3>
-                <p>Botga xabar yuboring yoki "Yuklash" tugmasini bosing</p>
+                <p>Botga xabar, rasm yoki fayl yuboring va u shu yerda ko'rinadi</p>
+                <p style="margin-top: 20px; font-size: 14px; color: var(--primary);">
+                    <i class="fas fa-info-circle"></i> Bot token: 7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE
+                </p>
             </div>
 
             <!-- Messages List -->
@@ -431,92 +499,198 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <button class="nav-btn active" onclick="showSection('messages')">
-            <span>💬</span>
-            Xabarlar
-        </button>
-        <button class="nav-btn" onclick="showSection('info')">
-            <span>ℹ️</span>
-            Info
-        </button>
-        <button class="nav-btn" onclick="loadMessages()">
-            <span>🔄</span>
-            Yangilash
-        </button>
-        <button class="nav-btn" onclick="showWebhookInfo()">
-            <span>🔗</span>
-            Webhook
-        </button>
-    </div>
-
     <script>
         // ====== KONFIGURATSIYA ======
-        const API_BASE_URL = window.location.origin; // Vercel URL avtomatik
-        let autoRefreshInterval = null;
+        const BOT_TOKEN = "7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE";
+        const API_BASE_URL = "https://hydroline.vercel.app";
+        const SAVE_MESSAGE_URL = `${API_BASE_URL}/api/save-message`;
+        const GET_MESSAGES_URL = `${API_BASE_URL}/api/get-messages`;
+        const CLEAR_MESSAGES_URL = `${API_BASE_URL}/api/clear-messages`;
+
+        // ====== O'ZGARUVCHILAR ======
         let messages = [];
+        let autoRefreshInterval = null;
 
-        // ====== FUNKSIYALAR ======
+        // ====== YORDAMCHI FUNKSIYALAR ======
 
-        // Alert ko'rsatish
-        function showAlert(message, type = 'info') {
+        function showAlert(message, type = 'info', duration = 5000) {
             const container = document.getElementById('alertContainer');
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
-            alert.innerHTML = `
-                <span>${getIcon(type)}</span>
-                <span>${message}</span>
-            `;
 
-            container.insertBefore(alert, container.firstChild);
-
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
-        function getIcon(type) {
-            return {
+            const icons = {
                 success: '✅',
                 error: '❌',
                 info: 'ℹ️',
                 warning: '⚠️'
-            }[type] || '💡';
+            };
+
+            alert.innerHTML = `
+                <span style="font-size: 20px;">${icons[type] || '💡'}</span>
+                <div style="flex: 1;">
+                    <strong>${type === 'success' ? 'Muvaffaqiyat!' : type === 'error' ? 'Xatolik!' : 'Ma\'lumot:'}</strong>
+                    <div style="margin-top: 5px; font-size: 14px;">${message}</div>
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #666; cursor: pointer; font-size: 20px;">×</button>
+            `;
+
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, duration);
         }
 
-        // Status yangilash
         function updateStatus(text) {
             document.getElementById('statusText').textContent = text;
         }
 
-        // Xabarlarni yuklash
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Noma\'lum vaqt';
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('uz-UZ', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }) + ' ' + date.toLocaleDateString('uz-UZ');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function getUserInitial(name) {
+            return name ? name.charAt(0).toUpperCase() : '?';
+        }
+
+        function getFileIcon(type) {
+            const icons = {
+                'text': '📝',
+                'photo': '🖼️',
+                'video': '🎬',
+                'audio': '🎵',
+                'voice': '🎤',
+                'document': '📄',
+                'sticker': '🎭',
+                'animation': '🎞️'
+            };
+            return icons[type] || '📎';
+        }
+
+        function getFileTypeName(type) {
+            const names = {
+                'text': 'Matn',
+                'photo': 'Rasm',
+                'video': 'Video',
+                'audio': 'Audio',
+                'voice': 'Ovozli xabar',
+                'document': 'Hujjat',
+                'sticker': 'Sticker',
+                'animation': 'GIF'
+            };
+            return names[type] || type;
+        }
+
+        function getFileUrl(fileId) {
+            if (!fileId) return '';
+            return `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileId}`;
+        }
+
+        // ====== ASOSIY FUNKSIYALAR ======
+
         async function loadMessages() {
             updateStatus('Xabarlar yuklanmoqda...');
             document.getElementById('loadingState').style.display = 'block';
             document.getElementById('emptyState').style.display = 'none';
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/get-messages`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                console.log('📡 GET so\'rovi:', GET_MESSAGES_URL);
 
-                const data = await response.json();
-                messages = data.messages || [];
+                // CORS proxy ishlatamiz
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const targetUrl = GET_MESSAGES_URL;
+
+                const response = await fetch(proxyUrl + targetUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                console.log('📥 Response status:', response.status);
+
+                if (!response.ok) {
+                    // Proxy ishlamasa, to'g'ridan urinib ko'ramiz
+                    console.log('🔄 Proxy ishlamadi, to\'g\'ridan urinib ko\'ramiz...');
+                    const directResponse = await fetch(targetUrl);
+
+                    if (!directResponse.ok) {
+                        throw new Error(`HTTP ${directResponse.status}`);
+                    }
+
+                    const data = await directResponse.json();
+                    messages = data.messages || [];
+                } else {
+                    const data = await response.json();
+                    messages = data.messages || [];
+                }
+
+                console.log('📊 Yuklangan xabarlar:', messages.length);
+
+                if (messages.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    showAlert('📭 Hozircha xabarlar yo\'q. Botga xabar yuboring!', 'info');
+                } else {
+                    showAlert(`✅ ${messages.length} ta xabar yuklandi`, 'success');
+                }
 
                 displayMessages();
                 updateStatus(`✅ ${messages.length} ta xabar yuklandi`);
-                showAlert(`📊 ${messages.length} ta xabar yuklandi`, 'success');
 
             } catch (error) {
-                console.error('Xatolik:', error);
-                updateStatus('❌ Xabarlarni yuklab boʻlmadi');
-                showAlert(`Xatolik: ${error.message}`, 'error');
+                console.error('❌ Xatolik:', error);
+
+                // Test ma'lumotlari (agar server ishlamasa)
+                messages = [{
+                    id: '1',
+                    type: 'text',
+                    user_id: '123456789',
+                    user_name: 'Test Foydalanuvchi',
+                    content: {
+                        text: 'Bu test xabari. Bot ishlayapti!'
+                    },
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleString('uz-UZ')
+                }, {
+                    id: '2',
+                    type: 'photo',
+                    user_id: '123456789',
+                    user_name: 'Test Foydalanuvchi',
+                    content: {
+                        caption: 'Test rasm',
+                        width: 800,
+                        height: 600,
+                        file_size: 1024000
+                    },
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleString('uz-UZ')
+                }];
+
+                displayMessages();
+                updateStatus('⚠️ Test ma\'lumotlari ko\'rsatilmoqda');
+                showAlert('ℹ️ Serverga ulanib bo\'lmadi. Test ma\'lumotlari ko\'rsatilmoqda.', 'info');
             } finally {
                 document.getElementById('loadingState').style.display = 'none';
             }
         }
 
-        // Xabarlarni ko'rsatish
         function displayMessages() {
             const container = document.getElementById('messagesList');
             const emptyState = document.getElementById('emptyState');
@@ -531,28 +705,31 @@
             emptyState.style.display = 'none';
 
             let html = '';
-            messages.forEach(msg => {
-                const time = new Date(msg.timestamp).toLocaleTimeString('uz-UZ');
-                const date = new Date(msg.timestamp).toLocaleDateString('uz-UZ');
-                const userInitial = msg.user_name.charAt(0).toUpperCase();
+
+            // Xabarlarni teskari tartibda (yangidan eski)
+            [...messages].reverse().forEach((msg, index) => {
+                const messageNumber = messages.length - index;
+                const isFile = msg.type !== 'text';
 
                 html += `
-                    <div class="message-item">
+                    <div class="message-item ${isFile ? 'file-message' : ''}">
+                        <div class="message-type">${getFileTypeName(msg.type)}</div>
+                        
                         <div class="message-header">
                             <div class="message-user">
-                                <div class="user-avatar">${userInitial}</div>
+                                <div class="user-avatar">${getUserInitial(msg.user_name)}</div>
                                 <div class="user-info">
-                                    <h4>${msg.user_name}</h4>
-                                    <div class="user-id">ID: ${msg.user_id}</div>
+                                    <h4>${msg.user_name || 'Foydalanuvchi'}</h4>
+                                    <div class="user-id">ID: ${msg.user_id} • #${messageNumber}</div>
                                 </div>
                             </div>
                             <div class="message-time">
-                                <div>${time}</div>
-                                <div>${date}</div>
+                                ${formatTime(msg.timestamp)}
                             </div>
                         </div>
+                        
                         <div class="message-content">
-                            ${escapeHtml(msg.message)}
+                            ${renderMessageContent(msg)}
                         </div>
                     </div>
                 `;
@@ -560,22 +737,118 @@
 
             container.innerHTML = html;
             document.getElementById('messageCount').textContent = messages.length;
+
+            // Yangi xabarlarga animatsiya
+            const messageItems = container.querySelectorAll('.message-item');
+            messageItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
         }
 
-        // Xabarlarni tozalash
+        function renderMessageContent(msg) {
+            const content = msg.content || {};
+
+            switch (msg.type) {
+                case 'text':
+                    return `<p>${escapeHtml(content.text || '')}</p>`;
+
+                case 'photo':
+                    const caption = content.caption ? `<p><strong>Izoh:</strong> ${escapeHtml(content.caption)}</p>` : '';
+                    const sizeInfo = content.width && content.height ?
+                        `<p><strong>O'lchami:</strong> ${content.width}x${content.height}</p>` : '';
+                    const fileSize = content.file_size ?
+                        `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : '';
+
+                    return `
+                        <div class="file-content">
+                            <div class="file-header">
+                                <div class="file-icon">${getFileIcon(msg.type)}</div>
+                                <div class="file-info">
+                                    <h4>Rasm</h4>
+                                    <div class="file-details">
+                                        ${sizeInfo}${fileSize}
+                                    </div>
+                                </div>
+                            </div>
+                            ${caption}
+                            <div class="file-preview">
+                                <p><i>Telegram API orqali rasm ko'rsatish mumkin</i></p>
+                            </div>
+                        </div>
+                    `;
+
+                case 'video':
+                    return `
+                        <div class="file-content">
+                            <div class="file-header">
+                                <div class="file-icon">${getFileIcon(msg.type)}</div>
+                                <div class="file-info">
+                                    <h4>Video</h4>
+                                    <div class="file-details">
+                                        ${content.file_name ? `<p><strong>Fayl:</strong> ${escapeHtml(content.file_name)}</p>` : ''}
+                                        ${content.duration ? `<p><strong>Davomiylik:</strong> ${content.duration} soniya</p>` : ''}
+                                        ${content.file_size ? `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            ${content.caption ? `<p><strong>Izoh:</strong> ${escapeHtml(content.caption)}</p>` : ''}
+                        </div>
+                    `;
+                
+                case 'audio':
+                    return `
+                        <div class="file-content">
+                            <div class="file-header">
+                                <div class="file-icon">${getFileIcon(msg.type)}</div>
+                                <div class="file-info">
+                                    <h4>Audio</h4>
+                                    <div class="file-details">
+                                        ${content.title ? `<p><strong>Nomi:</strong> ${escapeHtml(content.title)}</p>` : ''}
+                                        ${content.performer ? `<p><strong>Ijrochi:</strong> ${escapeHtml(content.performer)}</p>` : ''}
+                                        ${content.duration ? `<p><strong>Davomiylik:</strong> ${content.duration} soniya</p>` : ''}
+                                        ${content.file_size ? `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                
+                case 'document':
+                    return `
+                        <div class="file-content">
+                            <div class="file-header">
+                                <div class="file-icon">${getFileIcon(msg.type)}</div>
+                                <div class="file-info">
+                                    <h4>Hujjat</h4>
+                                    <div class="file-details">
+                                        ${content.file_name ? `<p><strong>Fayl:</strong> ${escapeHtml(content.file_name)}</p>` : ''}
+                                        ${content.file_size ? `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : ''}
+                                        ${content.mime_type ? `<p><strong>Format:</strong> ${content.mime_type}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            ${content.caption ? `<p><strong>Izoh:</strong> ${escapeHtml(content.caption)}</p>` : ''}
+                        </div>
+                    `;
+                
+                default:
+                    return `<p><i>${getFileIcon(msg.type)} ${getFileTypeName(msg.type)} turidagi xabar</i></p>`;
+            }
+        }
+        
         async function clearMessages() {
             if (messages.length === 0) {
-                showAlert('📭 Tozalash uchun xabar yoʻq', 'info');
+                showAlert('📭 Tozalash uchun xabar yo\'q', 'info');
                 return;
             }
-
-            if (!confirm(`${messages.length} ta xabarni oʻchirishni istaysizmi?`)) return;
-
+            
+            if (!confirm(`${messages.length} ta xabarni o'chirishni istaysizmi?`)) return;
+            
             try {
-                const response = await fetch(`${API_BASE_URL}/api/clear-messages`, {
+                const response = await fetch(CLEAR_MESSAGES_URL, {
                     method: 'POST'
                 });
-
+                
                 if (response.ok) {
                     messages = [];
                     displayMessages();
@@ -588,101 +861,70 @@
                 showAlert(`❌ Tozalashda xatolik: ${error.message}`, 'error');
             }
         }
-
-        // Avtomatik yangilash
+        
         function startAutoRefresh() {
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
-            }
-
-            autoRefreshInterval = setInterval(async() => {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/get-messages`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        const newCount = data.messages ? .length || 0;
-                        const oldCount = messages.length;
-
-                        if (newCount > oldCount) {
-                            messages = data.messages;
-                            displayMessages();
-
-                            // Yangi xabar animatsiyasi
-                            const newMessages = messages.slice(0, newCount - oldCount);
-                            if (newMessages.length > 0) {
-                                showAlert(`📨 ${newMessages.length} ta yangi xabar`, 'success');
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.log('Auto refresh error:', error);
-                }
-            }, 3000); // Har 3 soniyada
-
-            showAlert('⚡ Avtomatik yangilash yoqildi (3 soniya)', 'success');
-        }
-
-        // Webhook URL ni ko'rsatish
-        function copyWebhookURL() {
-            const webhookURL = `${API_BASE_URL}/api/save-message`;
-            navigator.clipboard.writeText(webhookURL).then(() => {
-                showAlert('✅ Webhook URL nusxalandi: ' + webhookURL, 'success');
-            });
-        }
-
-        // Bo'limlarni ko'rsatish
-        function showSection(section) {
-            const buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            if (section === 'info') {
-                showAlert(`📱 Sahifa: ${window.location.hostname}<br>📊 Xabarlar: ${messages.length} ta<br>🔄 Avtoyangilash: ${autoRefreshInterval ? '✅' : '❌'}`, 'info');
+                showAlert('⏸️ Avtomatik yangilash to\'xtatildi', 'info');
+                updateStatus('Avtoyangilash to\'xtatildi');
+                autoRefreshInterval = null;
+            } else {
+                autoRefreshInterval = setInterval(() => {
+                    loadMessages();
+                }, 5000); // Har 5 soniyada
+                
+                showAlert('⚡ Avtomatik yangilash yoqildi (5 soniya)', 'success');
+                updateStatus('Avtoyangilash yoqildi');
             }
         }
-
-        // Webhook ma'lumotlari
+        
         function showWebhookInfo() {
-            const webhookURL = `${API_BASE_URL}/api/save-message`;
             const info = `
-                <strong>🔗 Webhook URL:</strong><br>
-                <code style="word-break: break-all; font-size: 0.9rem;">${webhookURL}</code><br><br>
-                <strong>📝 POST format:</strong><br>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;">
+                <strong>🔗 Bot Webhook URL:</strong><br>
+                <code style="word-break: break-all;">${SAVE_MESSAGE_URL}</code><br><br>
+                
+                <strong>📝 POST misoli:</strong><br>
+                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px;">
 {
   "user_id": "123456789",
   "user_name": "Foydalanuvchi",
-  "message": "Salom!",
+  "content": {
+    "type": "text",
+    "text": "Salom!"
+  },
   "chat_id": "123456789"
 }</pre>
             `;
-            showAlert(info, 'info');
+            showAlert(info, 'info', 10000);
         }
-
-        // HTML encoding
+        
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
-        // ====== DASTLABKI YUKLASH ======
+        
+        // ====== DASTLABKI ISHGA TUSHIRISH ======
         document.addEventListener('DOMContentLoaded', () => {
-            updateStatus('Vercel serverga ulanmoqda...');
-
-            // Sahifa yuklanganda avtomatik xabarlarni yuklash
+            console.log('🚀 Sahifa yuklandi');
+            console.log('🔧 Bot token:', BOT_TOKEN);
+            console.log('🌐 API URL:', API_BASE_URL);
+            
+            updateStatus('Bot token sozlandi...');
+            
+            // 2 soniyadan keyin avtomatik yuklash
             setTimeout(() => {
                 loadMessages();
                 startAutoRefresh();
-            }, 1000);
-
+            }, 2000);
+            
             // Onlayn/Offlayn detektsiya
             window.addEventListener('online', () => {
                 showAlert('🌐 Internetga ulandi', 'success');
                 updateStatus('Onlayn');
                 loadMessages();
             });
-
+            
             window.addEventListener('offline', () => {
                 showAlert('📴 Internet aloqasi uzildi', 'error');
                 updateStatus('Offlayn');

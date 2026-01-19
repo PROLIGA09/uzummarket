@@ -1,5 +1,8 @@
-// /api/save-message.js
-export default async function handler(req, res) {
+// api/save-message.js
+const fs = require('fs');
+const path = require('path');
+
+module.exports = async(req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -7,51 +10,44 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        return res.status(200).end();
     }
 
     if (req.method === 'POST') {
         try {
-            const { user_id, user_name, message, chat_id } = req.body;
+            const { user_id, user_name, content, chat_id, timestamp } = req.body;
 
-            console.log('📨 Yangi xabar:', { user_id, user_name, message });
+            console.log('📨 Yangi xabar:', { user_name, type: content ? .type });
 
-            if (!message || message.trim() === '') {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Xabar matni bo\'sh bo\'lishi mumkin emas'
-                });
-            }
-
-            // Faylga yozish (bepul Vercel uchun)
-            const fs = require('fs');
-            const path = require('path');
-
+            // Fayl yo'lini aniqlash
             const messagesPath = path.join(process.cwd(), 'messages.json');
 
             // Faylni o'qish yoki yaratish
             let messages = [];
             try {
-                const data = fs.readFileSync(messagesPath, 'utf8');
-                messages = JSON.parse(data);
+                if (fs.existsSync(messagesPath)) {
+                    const data = fs.readFileSync(messagesPath, 'utf8');
+                    messages = JSON.parse(data);
+                }
             } catch (error) {
-                // Fayl mavjud emas, yangisini yaratamiz
+                console.log('❌ Faylni o\'qishda xatolik:', error);
                 messages = [];
             }
 
             // Yangi xabarni qo'shish
             const newMessage = {
                 id: Date.now().toString(),
+                type: content ? .type || 'text',
                 user_id: user_id || 'unknown',
                 user_name: user_name || 'Foydalanuvchi',
-                message: message.trim(),
+                content: content || {},
                 chat_id: chat_id || 'unknown',
-                timestamp: new Date().toISOString(),
+                timestamp: timestamp || new Date().toISOString(),
                 date: new Date().toLocaleString('uz-UZ')
             };
 
-            messages.unshift(newMessage); // Yangisini boshiga
+            // Yangi xabarni boshiga qo'shish
+            messages.unshift(newMessage);
 
             // Faqat oxirgi 50 ta xabarni saqlash
             if (messages.length > 50) {
@@ -63,24 +59,24 @@ export default async function handler(req, res) {
 
             console.log(`✅ Xabar saqlandi. Jami: ${messages.length} ta`);
 
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
-                message: 'Xabar muvaffaqiyatli saqlandi',
+                message: 'Xabar saqlandi',
                 data: newMessage,
                 total: messages.length
             });
 
         } catch (error) {
             console.error('❌ Xatolik:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 error: 'Server xatosi: ' + error.message
             });
         }
-    } else {
-        res.status(405).json({
-            success: false,
-            error: 'Faqat POST metodiga ruxsat berilgan'
-        });
     }
-}
+
+    return res.status(405).json({
+        success: false,
+        error: 'Faqat POST metodiga ruxsat berilgan'
+    });
+};
