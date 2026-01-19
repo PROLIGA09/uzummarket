@@ -3,205 +3,110 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🤖 Telegram Xabarlar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Telegram Bot Xabarlari</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     <style>
-        /* MOBILE FIRST DESIGN */
-        
          :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --background: #f8fafc;
-            --text: #1f2937;
-            --text-light: #6b7280;
-            --card: #ffffff;
-            --border: #e5e7eb;
-            --success: #10b981;
-            --error: #ef4444;
-            --warning: #f59e0b;
+            --primary: #0088cc;
+            --primary-dark: #006699;
+            --secondary: #25d366;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-light: #666666;
+            --border-color: #dddddd;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        html {
-            font-size: 16px;
-            height: 100%;
-            -webkit-text-size-adjust: 100%;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 10px;
             min-height: 100vh;
-            color: var(--text);
-            line-height: 1.5;
-            padding: 0;
-            overflow-x: hidden;
-        }
-        /* HEADER */
-        
-        .app-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 20px 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        .header-content {
+        .container {
             max-width: 800px;
             margin: 0 auto;
         }
         
-        .app-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
         }
         
-        .app-subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            line-height: 1.4;
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
         }
-        /* STATUS BAR */
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
         
         .status-bar {
             background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
             border-radius: 10px;
-            padding: 12px 15px;
             margin-top: 15px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 10px;
-            flex-wrap: wrap;
         }
         
-        .status-dot {
-            width: 8px;
-            height: 8px;
+        .status-indicator {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #22c55e;
+            background: #4CAF50;
             animation: pulse 2s infinite;
         }
-        /* MAIN CONTAINER */
         
-        .main-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 15px;
-            padding-bottom: 80px;
-            /* Bottom nav uchun joy */
-        }
-        /* ALERTS */
-        
-        .alert {
-            padding: 12px 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideDown 0.3s ease;
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
         }
         
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-        
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-        
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
-        }
-        /* BOT INFO */
-        
-        .bot-info-card {
-            background: var(--card);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        
-        .bot-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .bot-avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-        
-        .bot-details h3 {
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .bot-details p {
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-        /* CONTROLS */
-        
-        .controls-grid {
+        .controls {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
         
-        .control-btn {
-            padding: 14px;
+        .btn {
+            padding: 12px 20px;
             border: none;
             border-radius: 10px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .control-btn:active {
-            transform: scale(0.98);
+            transition: all 0.3s;
         }
         
         .btn-primary {
@@ -209,75 +114,89 @@
             color: white;
         }
         
-        .btn-primary:active {
+        .btn-primary:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
         }
         
         .btn-secondary {
-            background: var(--card);
+            background: white;
             color: var(--primary);
-            border: 2px solid var(--border);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-danger {
+            background: #ff4444;
+            color: white;
         }
         
         .btn-success {
-            background: var(--success);
+            background: var(--secondary);
             color: white;
         }
-        /* MESSAGES */
         
-        .messages-section {
-            background: var(--card);
+        .messages-container {
+            background: var(--card-bg);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-top: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 80px;
         }
         
-        .section-header {
+        .messages-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid var(--border-color);
         }
         
-        .section-title {
-            font-size: 1.2rem;
+        .messages-title {
+            font-size: 1.3rem;
             color: var(--primary);
             font-weight: 600;
         }
         
-        .message-count {
+        .messages-count {
             background: var(--primary);
             color: white;
-            padding: 6px 12px;
+            padding: 5px 15px;
             border-radius: 20px;
-            font-size: 0.9rem;
             font-weight: 600;
         }
         
-        .messages-list {
-            max-height: 400px;
+        .message-list {
+            min-height: 300px;
+            max-height: 500px;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            /* iOS uchun smooth scroll */
+            padding-right: 10px;
         }
-        /* MESSAGE ITEM */
         
         .message-item {
-            background: var(--background);
-            border-radius: 12px;
+            background: var(--bg-color);
+            border-radius: 10px;
             padding: 15px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             border-left: 4px solid var(--primary);
-            animation: fadeIn 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .message-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 10px;
         }
         
@@ -288,46 +207,41 @@
         }
         
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
         }
         
         .user-info h4 {
-            font-size: 1rem;
             color: var(--primary);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         
         .user-id {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-light);
-            font-family: 'Courier New', monospace;
         }
         
         .message-time {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: var(--text-light);
             text-align: right;
         }
         
         .message-content {
-            font-size: 1rem;
+            font-size: 1.1rem;
             line-height: 1.5;
-            color: var(--text);
             padding: 10px 0;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-color);
             margin-top: 10px;
-            word-break: break-word;
         }
-        /* EMPTY STATE */
         
         .empty-state {
             text-align: center;
@@ -335,94 +249,20 @@
             color: var(--text-light);
         }
         
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+        .empty-state img {
+            width: 100px;
             opacity: 0.3;
+            margin-bottom: 20px;
         }
         
-        .empty-state h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: var(--text);
-        }
-        /* LOADING */
-        
-        .loading {
-            text-align: center;
-            padding: 30px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        /* BOTTOM NAVIGATION */
-        
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            padding: 10px 15px;
-            z-index: 1000;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .nav-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .nav-btn {
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            animation: slideDown 0.3s ease;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 10px 5px;
-            border: none;
-            background: none;
-            color: var(--text-light);
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-radius: 8px;
-        }
-        
-        .nav-btn:active {
-            background: var(--background);
-            color: var(--primary);
-        }
-        
-        .nav-btn.active {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .nav-icon {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
-        }
-        /* ANIMATIONS */
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            gap: 10px;
         }
         
         @keyframes slideDown {
@@ -436,6 +276,39 @@
             }
         }
         
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -445,220 +318,150 @@
             }
         }
         
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            z-index: 1000;
         }
-        /* MEDIA QUERIES */
         
-        @media (min-width: 768px) {
-            .app-title {
-                font-size: 1.8rem;
-            }
-            .controls-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            .message-content {
-                font-size: 1.1rem;
-            }
+        .nav-btn {
+            padding: 10px;
+            border: none;
+            background: none;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
-        /* DARK MODE SUPPORT */
         
-        @media (prefers-color-scheme: dark) {
-             :root {
-                --background: #1f2937;
-                --text: #f9fafb;
-                --text-light: #d1d5db;
-                --card: #374151;
-                --border: #4b5563;
-            }
-            body {
-                background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
-            }
-            .btn-secondary {
-                background: #4b5563;
-                border-color: #6b7280;
-            }
-            .message-item {
-                background: #4b5563;
-            }
+        .nav-btn.active {
+            color: var(--primary);
+            background: rgba(0, 136, 204, 0.1);
         }
-        /* IOS SAFARI FIXES */
         
-        @supports (-webkit-touch-callout: none) {
-            .main-container {
-                padding-bottom: 100px;
-                /* iOS bottom bar uchun */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
             }
-            .messages-list {
-                max-height: 50vh;
-                /* iOS da scroll uchun */
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                width: 100%;
+            }
+            .message-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .message-time {
+                text-align: left;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header class="app-header">
-        <div class="header-content">
-            <h1 class="app-title">
-                <span>🤖</span> Telegram Bot Xabarlari
-            </h1>
-            <p class="app-subtitle">
-                Botga yozgan xabarlaringiz shu yerda ko'rinadi
-            </p>
-
-            <div class="status-bar" id="statusBar">
-                <div class="status-dot"></div>
-                <span id="statusText">Telegram API ga ulanmoqda...</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- ALERTS CONTAINER -->
-    <div id="alertContainer" class="main-container"></div>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-container">
-        <!-- BOT INFO -->
-        <div class="bot-info-card" id="botInfoCard">
-            <div class="bot-header">
-                <div class="bot-avatar">B</div>
-                <div class="bot-details">
-                    <h3 id="botName">Telegram Bot</h3>
-                    <p id="botUsername">@username</p>
-                    <p id="botStatus" class="status-text">Yuklanmoqda...</p>
-                </div>
-            </div>
-
-            <!-- CONTROLS -->
-            <div class="controls-grid">
-                <button class="control-btn btn-primary" onclick="connectBot()">
-                    <span>🔗</span> Ulanish
-                </button>
-                <button class="control-btn btn-success" onclick="loadMessages()">
-                    <span>🔄</span> Yangilash
-                </button>
-                <button class="control-btn btn-secondary" onclick="clearMessages()">
-                    <span>🗑️</span> Tozalash
-                </button>
-                <button class="control-btn btn-secondary" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
-                    <span>⚡</span> Auto On
-                </button>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🤖 Telegram Bot Xabarlari</h1>
+            <p>Botga yozgan xabarlaringiz shu yerda ko'rinadi</p>
+            <div class="status-bar">
+                <div class="status-indicator"></div>
+                <span id="statusText">Vercel serverga ulanmoqda...</span>
             </div>
         </div>
 
-        <!-- MESSAGES SECTION -->
-        <section class="messages-section">
-            <div class="section-header">
-                <h2 class="section-title">📨 Xabarlar</h2>
-                <div class="message-count">
+        <!-- Alerts -->
+        <div id="alertContainer"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-primary" onclick="loadMessages()">
+                <span>🔄</span> Xabarlarni Yuklash
+            </button>
+            <button class="btn btn-success" onclick="startAutoRefresh()">
+                <span>⚡</span> Avtoyangilash
+            </button>
+            <button class="btn btn-danger" onclick="clearMessages()">
+                <span>🗑️</span> Tozalash
+            </button>
+            <button class="btn btn-secondary" onclick="copyWebhookURL()">
+                <span>📋</span> Webhook URL
+            </button>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="messages-container">
+            <div class="messages-header">
+                <h2 class="messages-title">📨 Xabarlar</h2>
+                <div class="messages-count">
                     <span id="messageCount">0</span> ta
                 </div>
             </div>
 
-            <!-- LOADING -->
+            <!-- Loading -->
             <div id="loadingState" class="loading">
                 <div class="spinner"></div>
                 <p>Xabarlar yuklanmoqda...</p>
             </div>
 
-            <!-- EMPTY STATE -->
+            <!-- Empty State -->
             <div id="emptyState" class="empty-state" style="display: none;">
-                <div class="empty-icon">💬</div>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='1'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E" alt="No messages">
                 <h3>Hozircha xabarlar yo'q</h3>
-                <p>Botga xabar yuboring yoki "Yangilash" tugmasini bosing</p>
+                <p>Botga xabar yuboring yoki "Yuklash" tugmasini bosing</p>
             </div>
 
-            <!-- MESSAGES LIST -->
-            <div class="messages-list" id="messagesList"></div>
-        </section>
-    </main>
-
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="bottom-nav">
-        <div class="nav-buttons">
-            <button class="nav-btn active" onclick="showSection('messages')">
-                <span class="nav-icon">💬</span>
-                Xabarlar
-            </button>
-            <button class="nav-btn" onclick="showSection('bot')">
-                <span class="nav-icon">🤖</span>
-                Bot
-            </button>
-            <button class="nav-btn" onclick="loadMessages()">
-                <span class="nav-icon">🔄</span>
-                Yangilash
-            </button>
-            <button class="nav-btn" onclick="showInfo()">
-                <span class="nav-icon">ℹ️</span>
-                Info
-            </button>
+            <!-- Messages List -->
+            <div class="message-list" id="messagesList"></div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="showSection('messages')">
+            <span>💬</span>
+            Xabarlar
+        </button>
+        <button class="nav-btn" onclick="showSection('info')">
+            <span>ℹ️</span>
+            Info
+        </button>
+        <button class="nav-btn" onclick="loadMessages()">
+            <span>🔄</span>
+            Yangilash
+        </button>
+        <button class="nav-btn" onclick="showWebhookInfo()">
+            <span>🔗</span>
+            Webhook
+        </button>
+    </div>
 
     <script>
         // ====== KONFIGURATSIYA ======
-        const BOT_TOKEN = "7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE";
-        const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
-
-        // CORS proxy - TELEFON UCHUN MUHIM!
-        const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
-        // Agar proxy ishlamasa, alternativ:
-        // const CORS_PROXY = "https://api.allorigins.win/raw?url=";
-
-        // ====== O'ZGARUVCHILAR ======
-        let messages = [];
+        const API_BASE_URL = window.location.origin; // Vercel URL avtomatik
         let autoRefreshInterval = null;
-        let botInfo = null;
-        let lastUpdateId = 0;
-        let isAutoRefresh = true;
-
-        // ====== TELEFON DETEKTSIYASI ======
-        function isMobile() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        // ====== YANGI: CORS MUAMMOSINI HAL QILISH ======
-        async function fetchWithCORS(url, options = {}) {
-            const isLocalhost = window.location.hostname === 'localhost' ||
-                window.location.hostname === '127.0.0.1';
-
-            // Localhost da yoki HTTPS da bo'lsa, to'g'ridan fetch
-            if (isLocalhost || window.location.protocol === 'https:') {
-                return await fetch(url, options);
-            }
-
-            // Aks holda CORS proxy orqali
-            try {
-                const proxyUrl = CORS_PROXY + encodeURIComponent(url);
-                const response = await fetch(proxyUrl, options);
-
-                // Agar proxy xatolik bersa, to'g'ridan urinib ko'ramiz
-                if (!response.ok) {
-                    console.warn('Proxy failed, trying direct...');
-                    return await fetch(url, options);
-                }
-
-                return response;
-            } catch (error) {
-                console.warn('CORS proxy error:', error);
-                // Proxy xatolik bersa, to'g'ridan urinib ko'ramiz
-                return await fetch(url, options);
-            }
-        }
+        let messages = [];
 
         // ====== FUNKSIYALAR ======
 
-        // Alert ko'rsatish (telefon uchun optimallashtirilgan)
+        // Alert ko'rsatish
         function showAlert(message, type = 'info') {
-            const alertContainer = document.getElementById('alertContainer');
+            const container = document.getElementById('alertContainer');
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.innerHTML = `
@@ -666,223 +469,54 @@
                 <span>${message}</span>
             `;
 
-            // Avvalgi alertlarni tozalash
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alert);
+            container.insertBefore(alert, container.firstChild);
 
-            // 4 soniyadan keyin o'chirish
             setTimeout(() => {
-                if (alert.parentNode) {
-                    alert.remove();
-                }
-            }, 4000);
+                alert.remove();
+            }, 5000);
         }
 
         function getIcon(type) {
-            const icons = {
+            return {
                 success: '✅',
                 error: '❌',
                 info: 'ℹ️',
                 warning: '⚠️'
-            };
-            return icons[type] || '💡';
+            }[type] || '💡';
         }
 
         // Status yangilash
-        function updateStatus(text, type = 'info') {
-            const statusText = document.getElementById('statusText');
-            const statusDot = document.querySelector('.status-dot');
-
-            statusText.textContent = text;
-
-            if (type === 'success') {
-                statusDot.style.background = '#22c55e';
-            } else if (type === 'error') {
-                statusDot.style.background = '#ef4444';
-            } else if (type === 'warning') {
-                statusDot.style.background = '#f59e0b';
-            }
+        function updateStatus(text) {
+            document.getElementById('statusText').textContent = text;
         }
 
-        // Bot ma'lumotlarini olish
-        async function getBotInfo() {
-            try {
-                updateStatus('Bot maʼlumotlari olinmoqda...');
-
-                const response = await fetchWithCORS(`${TELEGRAM_API}/getMe`);
-                const data = await response.json();
-
-                if (data.ok) {
-                    botInfo = data.result;
-
-                    // UI yangilash
-                    document.getElementById('botName').textContent = botInfo.first_name;
-                    document.getElementById('botUsername').textContent = '@' + (botInfo.username || 'nomaʼlum');
-                    document.getElementById('botStatus').textContent = '✅ Faol';
-
-                    updateStatus(`✅ ${botInfo.first_name} botiga ulandi`, 'success');
-                    showAlert(`<strong>${botInfo.first_name}</strong> botiga ulandi!`, 'success');
-
-                    return true;
-                } else {
-                    throw new Error(data.description || 'Nomaʼlum xatolik');
-                }
-            } catch (error) {
-                console.error('Bot info error:', error);
-                updateStatus(`❌ Xatolik: ${error.message}`, 'error');
-
-                // Telefon uchun maxsus xabar
-                if (isMobile()) {
-                    showAlert(
-                        `Telefon uchun qo'shimcha sozlamalar kerak. ` +
-                        `Iltimos, "Ulanish" tugmasini bosing.`,
-                        'warning'
-                    );
-                }
-
-                return false;
-            }
-        }
-
-        // Yangi xabarlarni olish
-        async function getNewMessages() {
-            try {
-                const url = `${TELEGRAM_API}/getUpdates?offset=${lastUpdateId + 1}&timeout=2`;
-                const response = await fetchWithCORS(url);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.ok && data.result.length > 0) {
-                    const newMessages = [];
-
-                    data.result.forEach(update => {
-                        if (update.message && update.message.text && update.message.from) {
-                            const message = {
-                                id: update.update_id,
-                                message_id: update.message.message_id,
-                                user_id: update.message.from.id,
-                                user_name: update.message.from.first_name || 'Foydalanuvchi',
-                                username: update.message.from.username,
-                                text: update.message.text,
-                                date: new Date(update.message.date * 1000),
-                                chat_id: update.message.chat.id
-                            };
-                            newMessages.push(message);
-                            lastUpdateId = update.update_id;
-                        }
-                    });
-
-                    if (newMessages.length > 0) {
-                        // Yangi xabarlarni boshiga qo'shish
-                        messages.unshift(...newMessages);
-
-                        // Faqat oxirgi 50 ta xabarni saqlash
-                        if (messages.length > 50) {
-                            messages = messages.slice(0, 50);
-                        }
-
-                        displayMessages();
-
-                        // Yangi xabar bildirishnomasi
-                        if (newMessages.length === 1) {
-                            showAlert(`📨 Yangi xabar: ${newMessages[0].user_name}`, 'success');
-                        } else {
-                            showAlert(`📨 ${newMessages.length} ta yangi xabar`, 'success');
-                        }
-
-                        // Vibration API (agar mavjud bo'lsa)
-                        if (navigator.vibrate && newMessages.length > 0) {
-                            navigator.vibrate(200);
-                        }
-                    }
-
-                    return newMessages.length;
-                }
-                return 0;
-            } catch (error) {
-                console.error('Get messages error:', error);
-                return 0;
-            }
-        }
-
-        // Barcha xabarlarni yuklash
+        // Xabarlarni yuklash
         async function loadMessages() {
-            // Loading holatini ko'rsatish
+            updateStatus('Xabarlar yuklanmoqda...');
             document.getElementById('loadingState').style.display = 'block';
             document.getElementById('emptyState').style.display = 'none';
 
-            updateStatus('Xabarlar yuklanmoqda...');
-
             try {
-                const url = `${TELEGRAM_API}/getUpdates?limit=50`;
-                const response = await fetchWithCORS(url);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
+                const response = await fetch(`${API_BASE_URL}/api/get-messages`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
+                messages = data.messages || [];
 
-                if (data.ok) {
-                    messages = [];
+                displayMessages();
+                updateStatus(`✅ ${messages.length} ta xabar yuklandi`);
+                showAlert(`📊 ${messages.length} ta xabar yuklandi`, 'success');
 
-                    data.result.forEach(update => {
-                        if (update.message && update.message.text && update.message.from) {
-                            const message = {
-                                id: update.update_id,
-                                message_id: update.message.message_id,
-                                user_id: update.message.from.id,
-                                user_name: update.message.from.first_name || 'Foydalanuvchi',
-                                username: update.message.from.username || 'nomaʼlum',
-                                text: update.message.text,
-                                date: new Date(update.message.date * 1000),
-                                chat_id: update.message.chat.id
-                            };
-                            messages.push(message);
-
-                            if (update.update_id > lastUpdateId) {
-                                lastUpdateId = update.update_id;
-                            }
-                        }
-                    });
-
-                    // Xabarlarni teskari tartibda (yangidan eski)
-                    messages.reverse();
-
-                    // UI yangilash
-                    document.getElementById('messageCount').textContent = messages.length;
-
-                    if (messages.length === 0) {
-                        document.getElementById('emptyState').style.display = 'block';
-                    }
-
-                    displayMessages();
-                    updateStatus(`✅ ${messages.length} ta xabar yuklandi`, 'success');
-
-                } else {
-                    throw new Error(data.description || 'Xabarlarni olishda xatolik');
-                }
             } catch (error) {
-                console.error('Load messages error:', error);
-
-                // Telefon uchun maxsus xabar
-                let errorMsg = error.message;
-                if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
-                    errorMsg = 'Internet aloqasi muammosi. Iltimos, internetingizni tekshiring.';
-                }
-
-                showAlert(`❌ ${errorMsg}`, 'error');
-                updateStatus(`❌ ${errorMsg}`, 'error');
+                console.error('Xatolik:', error);
+                updateStatus('❌ Xabarlarni yuklab boʻlmadi');
+                showAlert(`Xatolik: ${error.message}`, 'error');
             } finally {
                 document.getElementById('loadingState').style.display = 'none';
             }
         }
 
-        // Xabarlarni ekranga chiqarish
+        // Xabarlarni ko'rsatish
         function displayMessages() {
             const container = document.getElementById('messagesList');
             const emptyState = document.getElementById('emptyState');
@@ -890,23 +524,20 @@
             if (messages.length === 0) {
                 emptyState.style.display = 'block';
                 container.innerHTML = '';
+                document.getElementById('messageCount').textContent = '0';
                 return;
             }
 
             emptyState.style.display = 'none';
 
             let html = '';
-            messages.forEach((msg, index) => {
-                const time = msg.date.toLocaleTimeString('uz-UZ', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                const date = msg.date.toLocaleDateString('uz-UZ');
+            messages.forEach(msg => {
+                const time = new Date(msg.timestamp).toLocaleTimeString('uz-UZ');
+                const date = new Date(msg.timestamp).toLocaleDateString('uz-UZ');
                 const userInitial = msg.user_name.charAt(0).toUpperCase();
-                const messageText = escapeHtml(msg.text);
 
                 html += `
-                    <div class="message-item" id="message-${msg.id}">
+                    <div class="message-item">
                         <div class="message-header">
                             <div class="message-user">
                                 <div class="user-avatar">${userInitial}</div>
@@ -917,11 +548,11 @@
                             </div>
                             <div class="message-time">
                                 <div>${time}</div>
-                                <div style="font-size: 0.7rem;">${date}</div>
+                                <div>${date}</div>
                             </div>
                         </div>
                         <div class="message-content">
-                            ${messageText}
+                            ${escapeHtml(msg.message)}
                         </div>
                     </div>
                 `;
@@ -929,106 +560,101 @@
 
             container.innerHTML = html;
             document.getElementById('messageCount').textContent = messages.length;
-
-            // Yangi xabarlarga animatsiya
-            setTimeout(() => {
-                const newMessages = container.querySelectorAll('.message-item');
-                if (newMessages.length > 0) {
-                    newMessages[0].style.animation = 'none';
-                    setTimeout(() => {
-                        newMessages[0].style.animation = 'fadeIn 0.3s ease';
-                    }, 10);
-                }
-            }, 100);
         }
 
         // Xabarlarni tozalash
-        function clearMessages() {
+        async function clearMessages() {
             if (messages.length === 0) {
                 showAlert('📭 Tozalash uchun xabar yoʻq', 'info');
                 return;
             }
 
-            if (confirm(`${messages.length} ta xabarni oʻchirishni istaysizmi?`)) {
-                messages = [];
-                displayMessages();
-                showAlert('🗑️ Barcha xabarlar tozalandi', 'success');
-                updateStatus('Xabarlar tozalandi', 'info');
+            if (!confirm(`${messages.length} ta xabarni oʻchirishni istaysizmi?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/clear-messages`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    messages = [];
+                    displayMessages();
+                    showAlert('🗑️ Barcha xabarlar tozalandi', 'success');
+                    updateStatus('Xabarlar tozalandi');
+                } else {
+                    throw new Error('Server xatosi');
+                }
+            } catch (error) {
+                showAlert(`❌ Tozalashda xatolik: ${error.message}`, 'error');
             }
         }
 
-        // Avtomatik yangilashni yoqish/o'chirish
-        function toggleAutoRefresh() {
-            const btn = document.getElementById('autoRefreshBtn');
-
-            if (isAutoRefresh) {
-                stopAutoRefresh();
-                btn.innerHTML = '<span>⏸️</span> Auto Off';
-                showAlert('⏸️ Avtomatik yangilash oʻchirildi', 'info');
-            } else {
-                startAutoRefresh();
-                btn.innerHTML = '<span>⚡</span> Auto On';
-                showAlert('⚡ Avtomatik yangilash yoqildi', 'success');
-            }
-
-            isAutoRefresh = !isAutoRefresh;
-        }
-
+        // Avtomatik yangilash
         function startAutoRefresh() {
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
             }
 
             autoRefreshInterval = setInterval(async() => {
-                const count = await getNewMessages();
-                if (count > 0) {
-                    // Vibration (agar mavjud bo'lsa)
-                    if (navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/get-messages`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const newCount = data.messages ? .length || 0;
+                        const oldCount = messages.length;
+
+                        if (newCount > oldCount) {
+                            messages = data.messages;
+                            displayMessages();
+
+                            // Yangi xabar animatsiyasi
+                            const newMessages = messages.slice(0, newCount - oldCount);
+                            if (newMessages.length > 0) {
+                                showAlert(`📨 ${newMessages.length} ta yangi xabar`, 'success');
+                            }
+                        }
                     }
+                } catch (error) {
+                    console.log('Auto refresh error:', error);
                 }
-            }, 5000); // Har 5 soniyada
+            }, 3000); // Har 3 soniyada
+
+            showAlert('⚡ Avtomatik yangilash yoqildi (3 soniya)', 'success');
         }
 
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
-
-        // Botga ulanish
-        async function connectBot() {
-            updateStatus('Botga ulanmoqda...');
-            showAlert('🔗 Botga ulanmoqda...', 'info');
-
-            const connected = await getBotInfo();
-            if (connected) {
-                await loadMessages();
-                startAutoRefresh();
-            }
+        // Webhook URL ni ko'rsatish
+        function copyWebhookURL() {
+            const webhookURL = `${API_BASE_URL}/api/save-message`;
+            navigator.clipboard.writeText(webhookURL).then(() => {
+                showAlert('✅ Webhook URL nusxalandi: ' + webhookURL, 'success');
+            });
         }
 
         // Bo'limlarni ko'rsatish
         function showSection(section) {
-            const navBtns = document.querySelectorAll('.nav-btn');
-            navBtns.forEach(btn => btn.classList.remove('active'));
-
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Hozircha faqat xabarlar bo'limi
-            showAlert('📱 Mobil optimallashtirilgan interfeys', 'info');
+            if (section === 'info') {
+                showAlert(`📱 Sahifa: ${window.location.hostname}<br>📊 Xabarlar: ${messages.length} ta<br>🔄 Avtoyangilash: ${autoRefreshInterval ? '✅' : '❌'}`, 'info');
+            }
         }
 
-        // Info ko'rsatish
-        function showInfo() {
+        // Webhook ma'lumotlari
+        function showWebhookInfo() {
+            const webhookURL = `${API_BASE_URL}/api/save-message`;
             const info = `
-                <strong>📱 Mobil Versiya</strong><br>
-                • Token: ${BOT_TOKEN.substring(0, 15)}...<br>
-                • Xabarlar: ${messages.length} ta<br>
-                • Avtoyangilash: ${isAutoRefresh ? '✅' : '❌'}<br>
-                • Platforma: ${isMobile() ? '📱 Telefon' : '💻 Kompyuter'}<br>
-                • Brauzer: ${navigator.userAgent.substring(0, 50)}...
+                <strong>🔗 Webhook URL:</strong><br>
+                <code style="word-break: break-all; font-size: 0.9rem;">${webhookURL}</code><br><br>
+                <strong>📝 POST format:</strong><br>
+                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;">
+{
+  "user_id": "123456789",
+  "user_name": "Foydalanuvchi",
+  "message": "Salom!",
+  "chat_id": "123456789"
+}</pre>
             `;
             showAlert(info, 'info');
         }
@@ -1040,50 +666,28 @@
             return div.innerHTML;
         }
 
-        // ====== DASTLABKI ISHGA TUSHIRISH ======
-        document.addEventListener('DOMContentLoaded', async() => {
-            // Telefon yoki kompyuter ekanligini aniqlash
-            if (isMobile()) {
-                document.title = "📱 Bot Xabarlari";
-                showAlert('📱 Mobil rejimda ishlayapsiz', 'info');
-            }
+        // ====== DASTLABKI YUKLASH ======
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('Vercel serverga ulanmoqda...');
 
-            // Bot ma'lumotlarini olish
-            setTimeout(async() => {
-                const connected = await getBotInfo();
-                if (connected) {
-                    await loadMessages();
-                    startAutoRefresh();
-                }
+            // Sahifa yuklanganda avtomatik xabarlarni yuklash
+            setTimeout(() => {
+                loadMessages();
+                startAutoRefresh();
             }, 1000);
 
-            // Offline/Online detektsiya
+            // Onlayn/Offlayn detektsiya
             window.addEventListener('online', () => {
                 showAlert('🌐 Internetga ulandi', 'success');
-                updateStatus('Online', 'success');
+                updateStatus('Onlayn');
+                loadMessages();
             });
 
             window.addEventListener('offline', () => {
                 showAlert('📴 Internet aloqasi uzildi', 'error');
-                updateStatus('Offline', 'error');
+                updateStatus('Offlayn');
             });
-
-            // PWA uchun service worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').catch(console.error);
-            }
         });
-
-        // PWA uchun Service Worker fayli (agar kerak bo'lsa)
-        const serviceWorkerCode = `
-            self.addEventListener('install', (event) => {
-                self.skipWaiting();
-            });
-            
-            self.addEventListener('fetch', (event) => {
-                // Cache strategiyasi
-            });
-        `;
     </script>
 </body>
 

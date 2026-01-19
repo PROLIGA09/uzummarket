@@ -1,0 +1,23 @@
+{
+    "name": "telegram-bot-webview",
+    "version": "1.0.0",
+    "description": "Telegram bot xabarlarini ko'rsatish uchun veb sahifa",
+    "main": "index.html",
+    "scripts": {
+        "dev": "echo 'Open index.html in browser'",
+        "build": "echo 'Static site - no build required'",
+        "start": "npx serve ."
+    },
+    "dependencies": {
+        "mongodb": "^4.0.0"
+    },
+    "devDependencies": {
+        "serve": "^14.0.0"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "keywords": ["telegram", "bot", "webview"],
+    "author": "",
+    "license": "MIT"
+}
