@@ -1,936 +1,533 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Telegram Bot Xabarlari</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-         :root {
-            --primary: #0088cc;
-            --primary-dark: #006699;
-            --secondary: #25d366;
-            --bg-color: #f5f5f5;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-light: #666666;
-            --border-color: #dddddd;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: var(--text-color);
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            min-height: 90vh;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .status-bar {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #4CAF50;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-        
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            padding: 20px;
-            background: #f9f9f9;
-            border-bottom: 2px solid var(--border-color);
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-success {
-            background: var(--secondary);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: #ff4444;
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        
-        .messages-container {
-            padding: 25px;
-            min-height: 400px;
-        }
-        
-        .messages-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--border-color);
-        }
-        
-        .messages-title {
-            font-size: 22px;
-            color: var(--primary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .messages-count {
-            background: var(--primary);
-            color: white;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .message-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        
-        .message-item {
-            background: var(--bg-color);
-            border-radius: 15px;
-            padding: 20px;
-            animation: slideIn 0.3s ease;
-            border-left: 4px solid var(--primary);
-            position: relative;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-        
-        .message-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-        
-        .user-info h4 {
-            color: var(--primary);
-            margin-bottom: 5px;
-            font-size: 17px;
-        }
-        
-        .user-id {
-            font-size: 13px;
-            color: var(--text-light);
-            font-family: monospace;
-        }
-        
-        .message-time {
-            font-size: 13px;
-            color: var(--text-light);
-            text-align: right;
-            min-width: 120px;
-        }
-        
-        .message-content {
-            font-size: 16px;
-            line-height: 1.6;
-            padding: 15px 0;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
-            word-wrap: break-word;
-        }
-        
-        .file-message {
-            background: #f0f8ff;
-            border-left-color: #4f46e5;
-        }
-        
-        .file-content {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 10px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .file-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .file-icon {
-            font-size: 24px;
-        }
-        
-        .file-info h4 {
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .file-details {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-        
-        .file-preview {
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        .photo-preview {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-light);
-        }
-        
-        .empty-state i {
-            font-size: 80px;
-            opacity: 0.3;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-        
-        .empty-state h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-        
-        .alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 10px;
-            background: white;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            animation: slideInRight 0.3s ease;
-            max-width: 400px;
-        }
-        
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        .alert-success {
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .alert-error {
-            border-left: 4px solid #ff4444;
-        }
-        
-        .alert-info {
-            border-left: 4px solid var(--primary);
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--primary);
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-        
-        .message-type {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--primary);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            .container {
-                border-radius: 15px;
-            }
-            .header h1 {
-                font-size: 22px;
-            }
-            .controls {
-                grid-template-columns: 1fr;
-            }
-            .message-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .message-time {
-                text-align: left;
-                align-self: flex-start;
-            }
-            .alert {
-                left: 20px;
-                right: 20px;
-                max-width: none;
-            }
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hydroline - Onlayn Do'kon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div id="alertContainer"></div>
-
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>
-                <i class="fas fa-robot"></i> Telegram Bot Xabarlari
-            </h1>
-            <p>Botga yozgan xabarlaringiz, rasmlaringiz va fayllaringiz shu yerda ko'rinadi</p>
-
-            <div class="status-bar">
-                <div class="status-indicator"></div>
-                <span id="statusText">Serverga ulanmoqda...</span>
+    <!-- Kirish sahifasi (Ism kiritish) -->
+    <div class="page active" id="loginPage">
+        <div class="login-container">
+            <div class="login-header">
+                <h1><i class="fas fa-store"></i> Hydroline</h1>
+                <p>Onlayn do'koningizga xush kelibsiz</p>
             </div>
-        </div>
 
-        <!-- Controls -->
-        <div class="controls">
-            <button class="btn btn-primary" onclick="loadMessages()">
-                <i class="fas fa-sync-alt"></i>
-                Xabarlarni Yuklash
-            </button>
-            <button class="btn btn-success" onclick="startAutoRefresh()">
-                <i class="fas fa-bolt"></i>
-                Avtoyangilash
-            </button>
-            <button class="btn btn-danger" onclick="clearMessages()">
-                <i class="fas fa-trash"></i>
-                Tozalash
-            </button>
-            <button class="btn btn-secondary" onclick="showWebhookInfo()">
-                <i class="fas fa-link"></i>
-                Webhook URL
-            </button>
-        </div>
-
-        <!-- Messages Container -->
-        <div class="messages-container">
-            <div class="messages-header">
-                <h2 class="messages-title">
-                    <i class="fas fa-comments"></i> Xabarlar
-                </h2>
-                <div class="messages-count">
-                    <span id="messageCount">0</span> ta
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="userName">Ismingizni kiriting:</label>
+                    <input type="text" id="userName" placeholder="Misol: Aziz" required />
+                    <small>Sizga murojaat qilishimiz uchun ismingiz kerak</small>
                 </div>
+
+                <button class="btn btn-primary" onclick="startApp()">
+                    <i class="fas fa-sign-in-alt"></i> Do'konga kirish
+                </button>
             </div>
 
-            <!-- Loading State -->
-            <div id="loadingState" class="loading">
-                <div class="spinner"></div>
-                <p>Xabarlar yuklanmoqda...</p>
-            </div>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <i class="fas fa-comment-slash"></i>
-                <h3>Hozircha xabarlar yo'q</h3>
-                <p>Botga xabar, rasm yoki fayl yuboring va u shu yerda ko'rinadi</p>
-                <p style="margin-top: 20px; font-size: 14px; color: var(--primary);">
-                    <i class="fas fa-info-circle"></i> Bot token: 7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE
+            <div class="login-footer">
+                <p>
+                    <i class="fas fa-info-circle"></i> Ismingiz faqat siz bilan muloqot uchun ishlatiladi!
                 </p>
             </div>
-
-            <!-- Messages List -->
-            <div class="message-list" id="messagesList"></div>
         </div>
     </div>
 
-    <script>
-        // ====== KONFIGURATSIYA ======
-        const BOT_TOKEN = "7692859653:AAE_8ddxOhqdjiqV8nJMQCp1ud46jvSGlDE";
-        const API_BASE_URL = "https://hydroline.vercel.app";
-        const SAVE_MESSAGE_URL = `${API_BASE_URL}/api/save-message`;
-        const GET_MESSAGES_URL = `${API_BASE_URL}/api/get-messages`;
-        const CLEAR_MESSAGES_URL = `${API_BASE_URL}/api/clear-messages`;
+    <!-- Header -->
+    <div class="header" id="mainHeader">
+        <div class="logo">Hydro<span>line</span></div>
+        <div class="user-greeting" id="userGreeting">
+            Salom, <span id="currentUserName">Foydalanuvchi</span>
+        </div>
+    </div>
 
-        // ====== O'ZGARUVCHILAR ======
-        let messages = [];
-        let autoRefreshInterval = null;
+    <!-- Search Bar -->
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Izlash..." />
+        </div>
+    </div>
 
-        // ====== YORDAMCHI FUNKSIYALAR ======
-
-        function showAlert(message, type = 'info', duration = 5000) {
-            const container = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-
-            const icons = {
-                success: '✅',
-                error: '❌',
-                info: 'ℹ️',
-                warning: '⚠️'
-            };
-
-            alert.innerHTML = `
-                <span style="font-size: 20px;">${icons[type] || '💡'}</span>
-                <div style="flex: 1;">
-                    <strong>${type === 'success' ? 'Muvaffaqiyat!' : type === 'error' ? 'Xatolik!' : 'Ma\'lumot:'}</strong>
-                    <div style="margin-top: 5px; font-size: 14px;">${message}</div>
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Bosh sahifa -->
+        <div class="page" id="homePage">
+            <div class="categories">
+                <div class="category-card" onclick="showCategory('Barcha kategoriyalar')">
+                    <i class="fas fa-th-large"></i>
+                    <h3>Barcha kategoriyalar</h3>
                 </div>
-                <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #666; cursor: pointer; font-size: 20px;">×</button>
-            `;
+                <div class="category-card" onclick="showCategory('RAKOVINA UCHUN')">
+                    <i class="fas fa-faucet"></i>
+                    <h3>RAKOVINA UCHUN</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('DUSH UCHUN')">
+                    <i class="fas fa-shower"></i>
+                    <h3>DUSH UCHUN</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('OSHXONA UCHUN')">
+                    <i class="fas fa-chair"></i>
+                    <h3>OSHXONA UCHUN</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('RAKOVINA')">
+                    <i class="fas fa-bath"></i>
+                    <h3>RAKOVINA</h3>
+                </div>
+                <div class="category-card" onclick="showCategory('AKSESSUARLAR')">
+                    <i class="fas fa-th-large"></i>
+                    <h3>AKSESSUARLAR</h3>
+                </div>
+            </div>
+        </div>
 
-            container.appendChild(alert);
+        <!-- Katalog sahifasi -->
+        <div class="page" id="catalogPage">
+            <div class="catalog-container">
+                <h2 style="margin: 15px" id="catalogTitle">Barcha mahsulotlar</h2>
+                <div class="product-grid" id="productGrid">
+                    <!-- Mahsulotlar JavaScript orqali qo'shiladi -->
+                </div>
+            </div>
+        </div>
 
-            setTimeout(() => {
-                if (alert.parentNode) {
-                    alert.remove();
-                }
-            }, duration);
-        }
+        <!-- Savat sahifasi -->
+        <div class="page" id="cartPage">
+            <div id="cartItems">
+                <!-- Savatdagi mahsulotlar JavaScript orqali qo'shiladi -->
+            </div>
+            <div class="cart-total">
+                <span>Jami:</span>
+                <span id="totalPrice">0 so'm</span>
+            </div>
+            <div style="padding: 20px">
+                <button class="btn btn-primary" style="width: 100%; padding: 15px" onclick="showCheckoutPage()">
+                    <i class="fas fa-shopping-bag"></i> Buyurtma berish
+                </button>
+            </div>
+        </div>
 
-        function updateStatus(text) {
-            document.getElementById('statusText').textContent = text;
-        }
+        <!-- Profil sahifasi -->
+        <div class="page" id="profilePage">
+            <div class="profile-header">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h2 id="profileUserName">Foydalanuvchi</h2>
+                    <p id="profileUserPhone">Telefon raqam kiritilmagan</p>
+                </div>
+            </div>
 
-        function formatTime(timestamp) {
-            if (!timestamp) return 'Noma\'lum vaqt';
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('uz-UZ', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            }) + ' ' + date.toLocaleDateString('uz-UZ');
-        }
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-shopping-bag"></i> XARIDLAR
+                </div>
+                <div class="menu-item" onclick="showOrders()">
+                    <div><i class="fas fa-cog"></i> Mening buyurtmalarim</div>
+                    <div class="badge" id="ordersCount">0</div>
+                </div>
+                <div class="menu-item" onclick="showFavorites()">
+                    <div><i class="fas fa-heart"></i> Sevimlilar</div>
+                    <div class="badge" id="favoritesCount">0</div>
+                </div>
+                <div class="menu-item" onclick="showViewed()">
+                    <div><i class="fas fa-eye"></i> Ko'rilgan mahsulotlar</div>
+                    <div class="badge" id="viewedCount">0</div>
+                </div>
+            </div>
 
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-user-circle"></i> SHAXSIY KABINET
+                </div>
+                <div class="menu-item" onclick="editProfile()">
+                    <div><i class="fas fa-user-edit"></i> Mening profilim</div>
+                </div>
+                <div class="menu-item" onclick="showAddresses()">
+                    <div><i class="fas fa-map-marker-alt"></i> Mening manzillarim</div>
+                </div>
+                <div class="menu-item" onclick="showLoyalty()">
+                    <div><i class="fas fa-chart-line"></i> Loyallik dasturi</div>
+                    <div class="badge" id="loyaltyPoints">0</div>
+                </div>
+            </div>
 
-        function getUserInitial(name) {
-            return name ? name.charAt(0).toUpperCase() : '?';
-        }
+            <div class="section">
+                <div class="section-title"><i class="fas fa-cog"></i> SOZLAMALAR</div>
+                <div class="menu-item" onclick="changeName()">
+                    <div><i class="fas fa-exchange-alt"></i> Ismni o'zgartirish</div>
+                </div>
+                <div class="menu-item" onclick="logout()">
+                    <div><i class="fas fa-sign-out-alt"></i> Chiqish</div>
+                </div>
+            </div>
+        </div>
 
-        function getFileIcon(type) {
-            const icons = {
-                'text': '📝',
-                'photo': '🖼️',
-                'video': '🎬',
-                'audio': '🎵',
-                'voice': '🎤',
-                'document': '📄',
-                'sticker': '🎭',
-                'animation': '🎞️'
-            };
-            return icons[type] || '📎';
-        }
-
-        function getFileTypeName(type) {
-            const names = {
-                'text': 'Matn',
-                'photo': 'Rasm',
-                'video': 'Video',
-                'audio': 'Audio',
-                'voice': 'Ovozli xabar',
-                'document': 'Hujjat',
-                'sticker': 'Sticker',
-                'animation': 'GIF'
-            };
-            return names[type] || type;
-        }
-
-        function getFileUrl(fileId) {
-            if (!fileId) return '';
-            return `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileId}`;
-        }
-
-        // ====== ASOSIY FUNKSIYALAR ======
-
-        async function loadMessages() {
-            updateStatus('Xabarlar yuklanmoqda...');
-            document.getElementById('loadingState').style.display = 'block';
-            document.getElementById('emptyState').style.display = 'none';
-
-            try {
-                console.log('📡 GET so\'rovi:', GET_MESSAGES_URL);
-
-                // CORS proxy ishlatamiz
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const targetUrl = GET_MESSAGES_URL;
-
-                const response = await fetch(proxyUrl + targetUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Origin': window.location.origin,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                console.log('📥 Response status:', response.status);
-
-                if (!response.ok) {
-                    // Proxy ishlamasa, to'g'ridan urinib ko'ramiz
-                    console.log('🔄 Proxy ishlamadi, to\'g\'ridan urinib ko\'ramiz...');
-                    const directResponse = await fetch(targetUrl);
-
-                    if (!directResponse.ok) {
-                        throw new Error(`HTTP ${directResponse.status}`);
-                    }
-
-                    const data = await directResponse.json();
-                    messages = data.messages || [];
-                } else {
-                    const data = await response.json();
-                    messages = data.messages || [];
-                }
-
-                console.log('📊 Yuklangan xabarlar:', messages.length);
-
-                if (messages.length === 0) {
-                    document.getElementById('emptyState').style.display = 'block';
-                    showAlert('📭 Hozircha xabarlar yo\'q. Botga xabar yuboring!', 'info');
-                } else {
-                    showAlert(`✅ ${messages.length} ta xabar yuklandi`, 'success');
-                }
-
-                displayMessages();
-                updateStatus(`✅ ${messages.length} ta xabar yuklandi`);
-
-            } catch (error) {
-                console.error('❌ Xatolik:', error);
-
-                // Test ma'lumotlari (agar server ishlamasa)
-                messages = [{
-                    id: '1',
-                    type: 'text',
-                    user_id: '123456789',
-                    user_name: 'Test Foydalanuvchi',
-                    content: {
-                        text: 'Bu test xabari. Bot ishlayapti!'
-                    },
-                    timestamp: new Date().toISOString(),
-                    date: new Date().toLocaleString('uz-UZ')
-                }, {
-                    id: '2',
-                    type: 'photo',
-                    user_id: '123456789',
-                    user_name: 'Test Foydalanuvchi',
-                    content: {
-                        caption: 'Test rasm',
-                        width: 800,
-                        height: 600,
-                        file_size: 1024000
-                    },
-                    timestamp: new Date().toISOString(),
-                    date: new Date().toLocaleString('uz-UZ')
-                }];
-
-                displayMessages();
-                updateStatus('⚠️ Test ma\'lumotlari ko\'rsatilmoqda');
-                showAlert('ℹ️ Serverga ulanib bo\'lmadi. Test ma\'lumotlari ko\'rsatilmoqda.', 'info');
-            } finally {
-                document.getElementById('loadingState').style.display = 'none';
-            }
-        }
-
-        function displayMessages() {
-            const container = document.getElementById('messagesList');
-            const emptyState = document.getElementById('emptyState');
-
-            if (messages.length === 0) {
-                emptyState.style.display = 'block';
-                container.innerHTML = '';
-                document.getElementById('messageCount').textContent = '0';
-                return;
-            }
-
-            emptyState.style.display = 'none';
-
-            let html = '';
-
-            // Xabarlarni teskari tartibda (yangidan eski)
-            [...messages].reverse().forEach((msg, index) => {
-                const messageNumber = messages.length - index;
-                const isFile = msg.type !== 'text';
-
-                html += `
-                    <div class="message-item ${isFile ? 'file-message' : ''}">
-                        <div class="message-type">${getFileTypeName(msg.type)}</div>
-                        
-                        <div class="message-header">
-                            <div class="message-user">
-                                <div class="user-avatar">${getUserInitial(msg.user_name)}</div>
-                                <div class="user-info">
-                                    <h4>${msg.user_name || 'Foydalanuvchi'}</h4>
-                                    <div class="user-id">ID: ${msg.user_id} • #${messageNumber}</div>
-                                </div>
-                            </div>
-                            <div class="message-time">
-                                ${formatTime(msg.timestamp)}
-                            </div>
-                        </div>
-                        
-                        <div class="message-content">
-                            ${renderMessageContent(msg)}
-                        </div>
+        <!-- Buyurtmalar sahifasi -->
+        <div class="page" id="ordersPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Mening buyurtmalarim</div>
+                <div id="ordersList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <div>Sizda hali buyurtmalar yo'q</div>
                     </div>
-                `;
-            });
+                </div>
+            </div>
+        </div>
 
-            container.innerHTML = html;
-            document.getElementById('messageCount').textContent = messages.length;
+        <!-- Sevimlilar sahifasi -->
+        <div class="page" id="favoritesPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Sevimlilar</div>
+                <div id="favoritesList">
+                    <div class="empty-state">
+                        <div class="empty-icon">❤️</div>
+                        <div>Sevimlilarda hali hech narsa yo'q</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            // Yangi xabarlarga animatsiya
-            const messageItems = container.querySelectorAll('.message-item');
-            messageItems.forEach((item, index) => {
-                item.style.animationDelay = `${index * 0.1}s`;
-            });
-        }
+        <!-- Ko'rilganlar sahifasi -->
+        <div class="page" id="viewedPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Ko'rilgan mahsulotlar</div>
+                <div id="viewedList">
+                    <div class="empty-state">
+                        <div class="empty-icon">👁️</div>
+                        <div>Siz hali hech qanday mahsulotni ko'rmagansiz</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        function renderMessageContent(msg) {
-            const content = msg.content || {};
+        <!-- Manzillar sahifasi -->
+        <div class="page" id="addressesPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Mening manzillarim</div>
+                <div id="addressesList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📍</div>
+                        <div>Sizda hali manzillar yo'q</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px" onclick="openAddAddress()">
+                    <i class="fas fa-plus"></i> Yangi manzil qo'shish
+                </button>
+            </div>
+        </div>
 
-            switch (msg.type) {
-                case 'text':
-                    return `<p>${escapeHtml(content.text || '')}</p>`;
+        <!-- Loyallik sahifasi -->
 
-                case 'photo':
-                    const caption = content.caption ? `<p><strong>Izoh:</strong> ${escapeHtml(content.caption)}</p>` : '';
-                    const sizeInfo = content.width && content.height ?
-                        `<p><strong>O'lchami:</strong> ${content.width}x${content.height}</p>` : '';
-                    const fileSize = content.file_size ?
-                        `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : '';
+        <!-- Loyallik sahifasi -->
+        <div class="page" id="loyaltyPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="section">
+                <div class="section-title">Loyallik dasturi</div>
+                <div class="loyalty-content">
+                    <div class="loyalty-icon">🏆</div>
+                    <div class="loyalty-points" id="loyaltyPointsDisplay">0 ball</div>
+                    <div class="loyalty-subtitle">Ball qanday to'planadi:</div>
+                    <div class="loyalty-info">
+                        <ul class="loyalty-list">
+                            <li>Har $1 xarid uchun - 1 ball (12,500 so'm)</li>
+                            <li>Do'stni taklif qilish - 50 ball</li>
+                            <li>Har oy yangi mahsulot xaridi - 20 ball</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    return `
-                        <div class="file-content">
-                            <div class="file-header">
-                                <div class="file-icon">${getFileIcon(msg.type)}</div>
-                                <div class="file-info">
-                                    <h4>Rasm</h4>
-                                    <div class="file-details">
-                                        ${sizeInfo}${fileSize}
-                                    </div>
-                                </div>
-                            </div>
-                            ${caption}
-                            <div class="file-preview">
-                                <p><i>Telegram API orqali rasm ko'rsatish mumkin</i></p>
-                            </div>
-                        </div>
-                    `;
+        <!-- Mahsulot tafsilotlari sahifasi -->
+        <div class="page" id="productDetailPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+            <div class="product-detail-container">
+                <div class="product-detail-image" id="productDetailImage">
+                    <!-- Rasm JavaScript orqali yuklanadi -->
+                </div>
+                <div class="product-detail-info">
+                    <h2 id="productDetailName">Mahsulot nomi</h2>
+                    <div class="product-detail-price" id="productDetailPrice">
+                        0 so'm
+                    </div>
+                    <div class="product-detail-category" id="productDetailCategory">
+                        Kategoriya
+                    </div>
 
-                case 'video':
-                    return `
-                        <div class="file-content">
-                            <div class="file-header">
-                                <div class="file-icon">${getFileIcon(msg.type)}</div>
-                                <div class="file-info">
-                                    <h4>Video</h4>
-                                    <div class="file-details">
-                                        ${content.file_name ? `<p><strong>Fayl:</strong> ${escapeHtml(content.file_name)}</p>` : ''}
-                                        ${content.duration ? `<p><strong>Davomiylik:</strong> ${content.duration} soniya</p>` : ''}
-                                        ${content.file_size ? `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                            ${content.caption ? `<p><strong>Izoh:</strong> ${escapeHtml(content.caption)}</p>` : ''}
-                        </div>
-                    `;
-                
-                case 'audio':
-                    return `
-                        <div class="file-content">
-                            <div class="file-header">
-                                <div class="file-icon">${getFileIcon(msg.type)}</div>
-                                <div class="file-info">
-                                    <h4>Audio</h4>
-                                    <div class="file-details">
-                                        ${content.title ? `<p><strong>Nomi:</strong> ${escapeHtml(content.title)}</p>` : ''}
-                                        ${content.performer ? `<p><strong>Ijrochi:</strong> ${escapeHtml(content.performer)}</p>` : ''}
-                                        ${content.duration ? `<p><strong>Davomiylik:</strong> ${content.duration} soniya</p>` : ''}
-                                        ${content.file_size ? `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                
-                case 'document':
-                    return `
-                        <div class="file-content">
-                            <div class="file-header">
-                                <div class="file-icon">${getFileIcon(msg.type)}</div>
-                                <div class="file-info">
-                                    <h4>Hujjat</h4>
-                                    <div class="file-details">
-                                        ${content.file_name ? `<p><strong>Fayl:</strong> ${escapeHtml(content.file_name)}</p>` : ''}
-                                        ${content.file_size ? `<p><strong>Hajmi:</strong> ${formatFileSize(content.file_size)}</p>` : ''}
-                                        ${content.mime_type ? `<p><strong>Format:</strong> ${content.mime_type}</p>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                            ${content.caption ? `<p><strong>Izoh:</strong> ${escapeHtml(content.caption)}</p>` : ''}
-                        </div>
-                    `;
-                
-                default:
-                    return `<p><i>${getFileIcon(msg.type)} ${getFileTypeName(msg.type)} turidagi xabar</i></p>`;
-            }
-        }
-        
-        async function clearMessages() {
-            if (messages.length === 0) {
-                showAlert('📭 Tozalash uchun xabar yo\'q', 'info');
-                return;
-            }
-            
-            if (!confirm(`${messages.length} ta xabarni o'chirishni istaysizmi?`)) return;
-            
-            try {
-                const response = await fetch(CLEAR_MESSAGES_URL, {
-                    method: 'POST'
-                });
-                
-                if (response.ok) {
-                    messages = [];
-                    displayMessages();
-                    showAlert('🗑️ Barcha xabarlar tozalandi', 'success');
-                    updateStatus('Xabarlar tozalandi');
-                } else {
-                    throw new Error('Server xatosi');
-                }
-            } catch (error) {
-                showAlert(`❌ Tozalashda xatolik: ${error.message}`, 'error');
-            }
-        }
-        
-        function startAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                showAlert('⏸️ Avtomatik yangilash to\'xtatildi', 'info');
-                updateStatus('Avtoyangilash to\'xtatildi');
-                autoRefreshInterval = null;
-            } else {
-                autoRefreshInterval = setInterval(() => {
-                    loadMessages();
-                }, 5000); // Har 5 soniyada
-                
-                showAlert('⚡ Avtomatik yangilash yoqildi (5 soniya)', 'success');
-                updateStatus('Avtoyangilash yoqildi');
-            }
-        }
-        
-        function showWebhookInfo() {
-            const info = `
-                <strong>🔗 Bot Webhook URL:</strong><br>
-                <code style="word-break: break-all;">${SAVE_MESSAGE_URL}</code><br><br>
-                
-                <strong>📝 POST misoli:</strong><br>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px;">
-{
-  "user_id": "123456789",
-  "user_name": "Foydalanuvchi",
-  "content": {
-    "type": "text",
-    "text": "Salom!"
-  },
-  "chat_id": "123456789"
-}</pre>
-            `;
-            showAlert(info, 'info', 10000);
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // ====== DASTLABKI ISHGA TUSHIRISH ======
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Sahifa yuklandi');
-            console.log('🔧 Bot token:', BOT_TOKEN);
-            console.log('🌐 API URL:', API_BASE_URL);
-            
-            updateStatus('Bot token sozlandi...');
-            
-            // 2 soniyadan keyin avtomatik yuklash
-            setTimeout(() => {
-                loadMessages();
-                startAutoRefresh();
-            }, 2000);
-            
-            // Onlayn/Offlayn detektsiya
-            window.addEventListener('online', () => {
-                showAlert('🌐 Internetga ulandi', 'success');
-                updateStatus('Onlayn');
-                loadMessages();
-            });
-            
-            window.addEventListener('offline', () => {
-                showAlert('📴 Internet aloqasi uzildi', 'error');
-                updateStatus('Offlayn');
-            });
-        });
-    </script>
+                    <div class="product-detail-description">
+                        <h3>Ta'rif</h3>
+                        <p id="productDetailDesc">Mahsulot ta'rifi...</p>
+                    </div>
+
+                    <div class="product-detail-actions">
+                        <button class="btn btn-primary" onclick="addToCartFromDetail()">
+                            <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
+                        </button>
+                        <button class="btn btn-outline" onclick="addToFavorites()">
+                            <i class="fas fa-heart"></i> Sevimlilarga
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buyurtma berish sahifasi -->
+        <div class="page" id="checkoutPage">
+            <div class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-shopping-cart"></i> Savatdagi mahsulotlar
+                </div>
+                <div id="checkoutItems">
+                    <!-- Mahsulotlar JavaScript orqali ko'rsatiladi -->
+                </div>
+                <div class="checkout-total">
+                    <span>Umumiy summa:</span>
+                    <span id="checkoutTotal">0 so'm</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-user"></i> Ma'lumotlaringiz
+                </div>
+                <div class="checkout-user-info">
+                    <div class="info-row">
+                        <span>Ism:</span>
+                        <span id="checkoutUserName">Foydalanuvchi</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Telefon:</span>
+                        <span id="checkoutUserPhone">+998</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-map-marker-alt"></i> Yetkazib berish manzili
+                </div>
+                <div class="form-group">
+                    <label>Viloyat</label>
+                    <select id="regionSelect" onchange="updateDistricts()">
+                        <option value="">Viloyatni tanlang</option>
+                        <!-- JavaScript orqali to'ldiriladi -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tuman/Shahar</label>
+                    <select id="districtSelect" disabled>
+                        <option value="">Avval viloyatni tanlang</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>To'liq manzil</label>
+                    <textarea id="fullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Telefon raqamingiz</label>
+                    <input type="tel" id="userPhone" placeholder="+998901234567" required />
+                </div>
+                <div class="form-group">
+                    <label>Izoh (ixtiyoriy)</label>
+                    <textarea id="orderComment" rows="2" placeholder="Qo'shimcha izohlar..."></textarea>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-credit-card"></i> To'lov usuli
+                </div>
+                <div class="payment-methods">
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="cash" checked />
+                        <span>Naqd pul</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="card" />
+                        <span>Karta orqali</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="click" />
+                        <span>Click</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="payme" />
+                        <span>Payme</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="padding: 20px">
+                <button class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px" onclick="submitOrder()">
+                    <i class="fas fa-check-circle"></i> BUYURTMA TASDIQLASH
+                </button>
+            </div>
+        </div>
+
+        <!-- Buyurtma tasdiq sahifasi -->
+        <div class="page" id="orderConfirmationPage">
+            <div class="order-confirmation">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Buyurtmangiz qabul qilindi!</h2>
+                <p class="confirmation-text">
+                    Hurmatli <span id="confirmationUserName"></span>, buyurtmangiz muvaffaqiyatli qabul qilindi. Tez orada operatorlarimiz siz bilan bog'lanadi.
+                </p>
+
+                <div class="order-summary">
+                    <h3>Buyurtma ma'lumotlari:</h3>
+                    <div class="summary-item">
+                        <span>Buyurtma raqami:</span>
+                        <span id="orderNumber">#0001</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Umumiy summa:</span>
+                        <span id="summaryTotal">0 so'm</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Yetkazib berish:</span>
+                        <span id="summaryAddress">Manzil</span>
+                    </div>
+                </div>
+
+                <div class="confirmation-actions">
+                    <button class="btn btn-primary" onclick="continueShopping()">
+                        <i class="fas fa-shopping-cart"></i> Xaridni davom ettirish
+                    </button>
+                    <button class="btn btn-outline" onclick="viewOrders()">
+                        <i class="fas fa-list"></i> Buyurtmalarimni ko'rish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pastki navigatsiya -->
+    <div class="bottom-nav" id="bottomNav">
+        <a class="nav-item active" onclick="showHome()">
+            <i class="fas fa-home"></i>
+            <span>Bosh sahifa</span>
+        </a>
+        <a class="nav-item" onclick="showCatalog()">
+            <i class="fas fa-th-large"></i>
+            <span>Katalog</span>
+        </a>
+        <a class="nav-item" onclick="showCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Savatcha</span>
+        </a>
+        <a class="nav-item" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </div>
+
+    <!-- Profilni tahrirlash modali -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profilni tahrirlash</h2>
+                <span class="close-modal" onclick="closeModal('profileModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Telefon raqam</label>
+                <input type="text" id="editPhone" placeholder="+998901234567" />
+            </div>
+            <div class="form-group">
+                <label>Email (ixtiyoriy)</label>
+                <input type="email" id="editEmail" placeholder="email@example.com" />
+            </div>
+            <button class="btn btn-primary" style="width: 100%" onclick="saveProfile()">
+                Saqlash
+            </button>
+        </div>
+    </div>
+
+    <!-- Ism o'zgartirish modali -->
+    <div class="modal" id="nameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ismni o'zgartirish</h2>
+                <span class="close-modal" onclick="closeModal('nameModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Yangi ism</label>
+                <input type="text" id="newUserName" placeholder="Yangi ismingiz" />
+            </div>
+            <button class="btn btn-primary" style="width: 100%" onclick="saveNewName()">
+                Saqlash
+            </button>
+        </div>
+    </div>
+
+    <!-- Manzil qo'shish modali -->
+    <div class="modal" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Yangi manzil qo'shish</h2>
+                <span class="close-modal" onclick="closeModal('addressModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>Manzil nomi</label>
+                <input type="text" id="addressName" placeholder="Uy, Ish, Ota-ona uyi" />
+            </div>
+            <div class="form-group">
+                <label>Viloyat</label>
+                <select id="modalRegionSelect" onchange="updateModalDistricts()">
+                    <option value="">Viloyatni tanlang</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tuman/Shahar</label>
+                <select id="modalDistrictSelect" disabled>
+                    <option value="">Avval viloyatni tanlang</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>To'liq manzil</label>
+                <textarea id="modalFullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%" onclick="saveAddress()">
+                Saqlash
+            </button>
+        </div>
+    </div>
+
+    <!-- Xabarlar -->
+    <div class="notification" id="notification">
+        <span id="notificationText">Amal muvaffaqiyatli bajarildi!</span>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 
 </html>
