@@ -4,274 +4,222 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hydroline Pro - Premium Online Store</title>
+    <title>Hydroline - Premium Onlayn Do'kon</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <!-- Kirish sahifasi -->
-    <div class="page active" id="loginPage">
+    <!-- KIRISH SAHIFASI (alohida sahifa) -->
+    <div id="loginContainer" class="login-page">
         <div class="login-container">
             <div class="login-header">
-                <div class="logo-large">
-                    <i class="fas fa-water"></i>
-                    <h1>Hydroline<span>Pro</span></h1>
+                <div class="logo-big">
+                    <i class="fas fa-store"></i>
+                    <h1>Hydro<span>line</span></h1>
                 </div>
-                <p class="subtitle">Premium online savdo platformasi</p>
-                <div class="wave-animation">
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                </div>
+                <p>Premium onlayn do'koningizga xush kelibsiz</p>
             </div>
 
             <div class="login-form">
-                <div class="form-group floating-label">
-                    <input type="text" id="userName" placeholder=" " required />
-                    <label for="userName">Ismingizni kiriting</label>
-                    <div class="form-icon">
-                        <i class="fas fa-user"></i>
+                <div class="form-group">
+                    <label for="userName">
+                        <i class="fas fa-user"></i> Ismingizni kiriting:
+                    </label>
+                    <input type="text" id="userName" placeholder="Ismingiz" required />
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i> Ismingiz faqat siz bilan muloqot uchun
                     </div>
                 </div>
-                <small class="form-hint">
-                    <i class="fas fa-info-circle"></i>
-                    Ismingiz faqat siz bilan muloqot uchun ishlatiladi
-                </small>
 
-                <button class="btn btn-primary btn-lg btn-glow" onclick="startApp()">
-                    <i class="fas fa-arrow-right"></i>
-                    <span>Do'konga kirish</span>
+                <button class="btn btn-primary" onclick="startApp()">
+                    <i class="fas fa-sign-in-alt"></i> Do'konga kirish
                 </button>
             </div>
 
             <div class="login-features">
                 <div class="feature">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Tez yetkazib berish</span>
+                </div>
+                <div class="feature">
                     <i class="fas fa-shield-alt"></i>
-                    <span>Xavfsiz</span>
+                    <span>Xavfsiz to'lov</span>
                 </div>
                 <div class="feature">
-                    <i class="fas fa-bolt"></i>
-                    <span>Tezkor</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-star"></i>
-                    <span>Premium</span>
+                    <i class="fas fa-headset"></i>
+                    <span>24/7 qo'llab-quvvatlash</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
-    <div class="header" id="mainHeader">
-        <div class="header-content">
-            <div class="logo">
-                <i class="fas fa-water"></i>
-                <span>Hydro<span>Pro</span></span>
-            </div>
-            <div class="header-actions">
+    <!-- ASOSIY APLIKATSIYA (alohida sahifa) -->
+    <div id="mainApp" style="display: none;">
+        <!-- Asosiy header -->
+        <div class="header" id="mainHeader">
+            <div class="header-content">
+                <div class="logo">Hydro<span>line</span></div>
                 <div class="user-greeting" id="userGreeting">
                     <i class="fas fa-user-circle"></i>
                     <span id="currentUserName">Foydalanuvchi</span>
                 </div>
-                <div class="cart-indicator" onclick="showCart()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cartCount">0</span>
-                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Search Bar -->
-    <div class="search-container" id="searchContainer">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Mahsulotlarni izlash..." />
-            <button class="search-filter">
-                <i class="fas fa-sliders-h"></i>
-            </button>
+        <!-- Search Bar -->
+        <div class="search-container" id="searchContainer">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Mahsulotlarni izlash..." />
+                <button class="search-filter" onclick="toggleFilters()">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="content">
-        <!-- Bosh sahifa -->
-        <div class="page" id="homePage">
-            <div class="hero-section">
-                <h2 class="hero-title">Premium Santehnika Mahsulotlari</h2>
-                <p class="hero-subtitle">Eng yaxshi sifat va zamonaviy dizayn</p>
-                <div class="stats">
-                    <div class="stat-item">
-                        <i class="fas fa-boxes"></i>
-                        <div>
-                            <span class="stat-number">150+</span>
-                            <span class="stat-label">Mahsulot</span>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-users"></i>
-                        <div>
-                            <span class="stat-number">5K+</span>
-                            <span class="stat-label">Mijoz</span>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-truck"></i>
-                        <div>
-                            <span class="stat-number">24/7</span>
-                            <span class="stat-label">Yetkazish</span>
-                        </div>
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Bosh sahifa -->
+            <div class="page active" id="homePage">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h2>Premium mahsulotlar</h2>
+                        <p>Eng yaxshi sifat va arzon narxlar</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="categories">
-                <h3 class="section-title">Kategoriyalar</h3>
-                <div class="category-grid">
-                    <div class="category-card premium" onclick="showCategory('Barcha kategoriyalar')">
+                <div class="categories">
+                    <div class="category-card" onclick="showCategory('Barcha kategoriyalar')">
                         <div class="category-icon">
                             <i class="fas fa-th-large"></i>
                         </div>
-                        <h4>Barchasi</h4>
-                        <p>150+ mahsulot</p>
+                        <h3>Barcha kategoriyalar</h3>
+                        <p>Hamma mahsulotlar</p>
                     </div>
                     <div class="category-card" onclick="showCategory('RAKOVINA UCHUN')">
                         <div class="category-icon">
                             <i class="fas fa-faucet"></i>
                         </div>
-                        <h4>Rakovina</h4>
-                        <p>40 ta mahsulot</p>
+                        <h3>RAKOVINA UCHUN</h3>
+                        <p>Rakovina aksessuarlari</p>
                     </div>
                     <div class="category-card" onclick="showCategory('DUSH UCHUN')">
                         <div class="category-icon">
                             <i class="fas fa-shower"></i>
                         </div>
-                        <h4>Dush uchun</h4>
-                        <p>35 ta mahsulot</p>
+                        <h3>DUSH UCHUN</h3>
+                        <p>Dush jihozlari</p>
                     </div>
                     <div class="category-card" onclick="showCategory('OSHXONA UCHUN')">
                         <div class="category-icon">
-                            <i class="fas fa-sink"></i>
+                            <i class="fas fa-utensils"></i>
                         </div>
-                        <h4>Oshxona</h4>
-                        <p>25 ta mahsulot</p>
+                        <h3>OSHXONA UCHUN</h3>
+                        <p>Oshxona jihozlari</p>
                     </div>
                     <div class="category-card" onclick="showCategory('RAKOVINA')">
                         <div class="category-icon">
                             <i class="fas fa-bath"></i>
                         </div>
-                        <h4>Rakovinalar</h4>
-                        <p>30 ta mahsulot</p>
+                        <h3>RAKOVINA</h3>
+                        <p>Rakovina turlari</p>
                     </div>
                     <div class="category-card" onclick="showCategory('AKSESSUARLAR')">
                         <div class="category-icon">
-                            <i class="fas fa-tools"></i>
+                            <i class="fas fa-toolbox"></i>
                         </div>
-                        <h4>Aksessuarlar</h4>
-                        <p>20+ mahsulot</p>
+                        <h3>AKSESSUARLAR</h3>
+                        <p>Qo'shimcha aksessuarlar</p>
+                    </div>
+                </div>
+
+                <div class="featured-products">
+                    <h3 class="section-title">Ommabop mahsulotlar</h3>
+                    <div class="products-slider" id="featuredProducts">
+                        <!-- JavaScript orqali qo'shiladi -->
                     </div>
                 </div>
             </div>
 
-            <div class="featured-products">
-                <div class="section-header">
-                    <h3 class="section-title">Tavsiya etilganlar</h3>
-                    <a href="javascript:void(0)" onclick="showCatalog()" class="see-all">
-                        Hammasini ko'rish <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-                <div class="featured-grid" id="featuredProducts">
-                    <!-- JavaScript bilan to'ldiriladi -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Katalog sahifasi -->
-        <div class="page" id="catalogPage">
-            <div class="catalog-header">
-                <h2 id="catalogTitle">Barcha mahsulotlar</h2>
-                <div class="catalog-filters">
-                    <button class="filter-btn active" onclick="filterProducts('all')">
-                        <i class="fas fa-th-large"></i> Hammasi
-                    </button>
-                    <button class="filter-btn" onclick="filterProducts('popular')">
-                        <i class="fas fa-fire"></i> Mashhurlar
-                    </button>
-                    <button class="filter-btn" onclick="filterProducts('new')">
-                        <i class="fas fa-newspaper"></i> Yangiliklar
-                    </button>
-                </div>
-            </div>
-            <div class="product-grid" id="productGrid">
-                <!-- Mahsulotlar JavaScript orqali qo'shiladi -->
-            </div>
-        </div>
-
-        <!-- Savat sahifasi -->
-        <div class="page" id="cartPage">
-            <div class="cart-header">
-                <h2><i class="fas fa-shopping-cart"></i> Savatcha</h2>
-                <button class="btn-clear" onclick="clearCart()">
-                    <i class="fas fa-trash"></i> Tozalash
-                </button>
-            </div>
-            <div id="cartItems">
-                <!-- Savatdagi mahsulotlar -->
-            </div>
-            <div class="cart-summary">
-                <div class="summary-row">
-                    <span>Mahsulotlar:</span>
-                    <span id="itemsCount">0</span>
-                </div>
-                <div class="summary-row">
-                    <span>Yetkazish:</span>
-                    <span>Bepul</span>
-                </div>
-                <div class="summary-row total">
-                    <span>Jami:</span>
-                    <span id="totalPrice">0 so'm</span>
-                </div>
-                <button class="btn btn-primary btn-checkout" onclick="showCheckoutPage()">
-                    <i class="fas fa-shopping-bag"></i> Buyurtma berish
-                </button>
-            </div>
-        </div>
-
-        <!-- Profil sahifasi -->
-        <div class="page" id="profilePage">
-            <div class="profile-header">
-                <div class="avatar-large">
-                    <i class="fas fa-user"></i>
-                    <div class="status-indicator"></div>
-                </div>
-                <div class="user-info">
-                    <h2 id="profileUserName">Foydalanuvchi</h2>
-                    <p id="profileUserPhone">
-                        <i class="fas fa-phone"></i> Telefon raqam kiritilmagan
-                    </p>
-                    <div class="loyalty-badge">
-                        <i class="fas fa-crown"></i>
-                        <span id="loyaltyPoints">0</span> ball
+            <!-- Katalog sahifasi -->
+            <div class="page" id="catalogPage">
+                <div class="catalog-header">
+                    <h2 id="catalogTitle">Barcha mahsulotlar</h2>
+                    <div class="catalog-filters">
+                        <button class="filter-btn" onclick="toggleSort()">
+                            <i class="fas fa-sort"></i> Saralash
+                        </button>
+                        <button class="filter-btn" onclick="toggleFilter()">
+                            <i class="fas fa-filter"></i> Filtr
+                        </button>
                     </div>
                 </div>
+                <div class="product-grid" id="productGrid">
+                    <!-- Mahsulotlar JavaScript orqali qo'shiladi -->
+                </div>
             </div>
 
-            <div class="profile-sections">
-                <div class="section-card">
-                    <h3 class="section-title">
-                        <i class="fas fa-shopping-bag"></i> Xaridlar
-                    </h3>
-                    <div class="menu-list">
+            <!-- Savat sahifasi -->
+            <div class="page" id="cartPage">
+                <div class="cart-header">
+                    <h2>
+                        <i class="fas fa-shopping-cart"></i> Savatcham
+                    </h2>
+                    <button class="btn-clear" onclick="clearCart()">
+                        <i class="fas fa-trash"></i> Tozalash
+                    </button>
+                </div>
+                <div id="cartItems">
+                    <!-- Savatdagi mahsulotlar -->
+                </div>
+                <div class="cart-summary">
+                    <div class="summary-item">
+                        <span>Mahsulotlar:</span>
+                        <span id="itemsCount">0 ta</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Jami summa:</span>
+                        <span id="totalPrice">$0.00</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>To'lov:</span>
+                        <span id="finalPrice">$0.00</span>
+                    </div>
+                    <button class="btn btn-primary btn-checkout" onclick="showCheckoutPage()">
+                        <i class="fas fa-shopping-bag"></i> Buyurtma berish
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profil sahifasi -->
+            <div class="page" id="profilePage">
+                <div class="profile-header">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                        <div class="avatar-status"></div>
+                    </div>
+                    <div class="user-info">
+                        <h2 id="profileUserName">Foydalanuvchi</h2>
+                        <p id="profileUserPhone">Telefon raqam kiritilmagan</p>
+                        <div class="loyalty-badge">
+                            <i class="fas fa-crown"></i>
+                            <span id="loyaltyPoints">0 ball</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="menu-section">
+                        <h3><i class="fas fa-shopping-bag"></i> Mening buyurtmalarim</h3>
                         <div class="menu-item" onclick="showOrders()">
                             <div class="menu-icon">
-                                <i class="fas fa-clipboard-list"></i>
+                                <i class="fas fa-box"></i>
                             </div>
                             <div class="menu-content">
-                                <span>Mening buyurtmalarim</span>
-                                <small>Barcha xaridlaringiz</small>
+                                <span>Buyurtmalar</span>
+                                <small>Barcha buyurtmalar tarixi</small>
                             </div>
                             <div class="menu-badge" id="ordersCount">0</div>
                         </div>
@@ -281,7 +229,7 @@
                             </div>
                             <div class="menu-content">
                                 <span>Sevimlilar</span>
-                                <small>Saqlangan mahsulotlar</small>
+                                <small>Yoqtirgan mahsulotlar</small>
                             </div>
                             <div class="menu-badge" id="favoritesCount">0</div>
                         </div>
@@ -291,25 +239,21 @@
                             </div>
                             <div class="menu-content">
                                 <span>Ko'rilganlar</span>
-                                <small>Oxirgi ko'rganlar</small>
+                                <small>Oxirgi ko'rilganlar</small>
                             </div>
                             <div class="menu-badge" id="viewedCount">0</div>
                         </div>
                     </div>
-                </div>
 
-                <div class="section-card">
-                    <h3 class="section-title">
-                        <i class="fas fa-user-circle"></i> Shaxsiy kabinet
-                    </h3>
-                    <div class="menu-list">
+                    <div class="menu-section">
+                        <h3><i class="fas fa-user-cog"></i> Shaxsiy kabinet</h3>
                         <div class="menu-item" onclick="editProfile()">
                             <div class="menu-icon">
                                 <i class="fas fa-user-edit"></i>
                             </div>
                             <div class="menu-content">
-                                <span>Profilim</span>
-                                <small>Ma'lumotlarni tahrirlash</small>
+                                <span>Profilni tahrirlash</span>
+                                <small>Shaxsiy ma'lumotlar</small>
                             </div>
                         </div>
                         <div class="menu-item" onclick="showAddresses()">
@@ -318,7 +262,7 @@
                             </div>
                             <div class="menu-content">
                                 <span>Manzillarim</span>
-                                <small>Yetkazish manzillari</small>
+                                <small>Yetkazib berish manzillari</small>
                             </div>
                         </div>
                         <div class="menu-item" onclick="showLoyalty()">
@@ -327,37 +271,36 @@
                             </div>
                             <div class="menu-content">
                                 <span>Loyallik dasturi</span>
-                                <small>Ballar va mukofotlar</small>
+                                <small>Ballar va bonuslar</small>
                             </div>
                             <div class="menu-badge" id="loyaltyPointsBadge">0</div>
                         </div>
                     </div>
-                </div>
 
-                <div class="section-card">
-                    <h3 class="section-title">
-                        <i class="fas fa-cog"></i> Sozlamalar
-                    </h3>
-                    <div class="menu-list">
+                    <div class="menu-section">
+                        <h3><i class="fas fa-cog"></i> Sozlamalar</h3>
                         <div class="menu-item" onclick="changeName()">
                             <div class="menu-icon">
                                 <i class="fas fa-exchange-alt"></i>
                             </div>
                             <div class="menu-content">
                                 <span>Ismni o'zgartirish</span>
-                                <small>Shaxsiy ma'lumot</small>
+                                <small>Yangi ism kiriting</small>
                             </div>
                         </div>
-                        <div class="menu-item" onclick="toggleTheme()">
+                        <div class="menu-item" onclick="toggleNotifications()">
                             <div class="menu-icon">
-                                <i class="fas fa-moon"></i>
+                                <i class="fas fa-bell"></i>
                             </div>
                             <div class="menu-content">
-                                <span>Temani o'zgartirish</span>
-                                <small>Qora / Oq rejim</small>
+                                <span>Bildirishnomalar</span>
+                                <small>Xabarlarni boshqarish</small>
+                            </div>
+                            <div class="menu-toggle">
+                                <div class="toggle-switch"></div>
                             </div>
                         </div>
-                        <div class="menu-item" onclick="logout()">
+                        <div class="menu-item logout" onclick="logout()">
                             <div class="menu-icon">
                                 <i class="fas fa-sign-out-alt"></i>
                             </div>
@@ -369,53 +312,557 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Buyurtmalar sahifasi -->
+            <div class="page" id="ordersPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="page-header">
+                    <h2>Mening buyurtmalarim</h2>
+                    <div class="order-filters">
+                        <button class="filter-tab active" onclick="filterOrders('all')">Barchasi</button>
+                        <button class="filter-tab" onclick="filterOrders('active')">Faol</button>
+                        <button class="filter-tab" onclick="filterOrders('completed')">Tugallangan</button>
+                    </div>
+                </div>
+                <div class="orders-list" id="ordersList">
+                    <!-- Buyurtmalar -->
+                </div>
+            </div>
+
+            <!-- Sevimlilar sahifasi -->
+            <div class="page" id="favoritesPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="page-header">
+                    <h2>Sevimli mahsulotlar</h2>
+                    <button class="btn btn-outline" onclick="clearFavorites()">
+                        <i class="fas fa-trash"></i> Tozalash
+                    </button>
+                </div>
+                <div class="favorites-grid" id="favoritesList">
+                    <!-- Sevimlilar -->
+                </div>
+            </div>
+
+            <!-- Ko'rilganlar sahifasi -->
+            <div class="page" id="viewedPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="page-header">
+                    <h2>Oxirgi ko'rilganlar</h2>
+                </div>
+                <div class="viewed-list" id="viewedList">
+                    <!-- Ko'rilgan mahsulotlar -->
+                </div>
+            </div>
+
+            <!-- Manzillar sahifasi -->
+            <div class="page" id="addressesPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="page-header">
+                    <h2>Mening manzillarim</h2>
+                    <button class="btn btn-primary" onclick="openAddAddress()">
+                        <i class="fas fa-plus"></i> Yangi manzil
+                    </button>
+                </div>
+                <div class="addresses-list" id="addressesList">
+                    <!-- Manzillar -->
+                </div>
+            </div>
+
+            <!-- Loyallik sahifasi -->
+            <div class="page" id="loyaltyPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="loyalty-container">
+                    <div class="loyalty-header">
+                        <div class="loyalty-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="loyalty-points-display">
+                            <span class="points-label">Loyallik ballari</span>
+                            <span class="points-value" id="loyaltyPointsDisplay">0 ball</span>
+                        </div>
+                    </div>
+
+                    <div class="loyalty-info">
+                        <h3>Ball qanday to'planadi?</h3>
+                        <div class="loyalty-rules">
+                            <div class="rule">
+                                <div class="rule-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="rule-content">
+                                    <h4>Har bir xarid uchun</h4>
+                                    <p>Har $1 xarid uchun - 1 ball (12,500 so'm)</p>
+                                </div>
+                            </div>
+                            <div class="rule">
+                                <div class="rule-icon">
+                                    <i class="fas fa-user-friends"></i>
+                                </div>
+                                <div class="rule-content">
+                                    <h4>Do'stni taklif qilish</h4>
+                                    <p>Har bir taklif qilingan do'st uchun - 50 ball</p>
+                                </div>
+                            </div>
+                            <div class="rule">
+                                <div class="rule-icon">
+                                    <i class="fas fa-calendar-star"></i>
+                                </div>
+                                <div class="rule-content">
+                                    <h4>Oylik bonus</h4>
+                                    <p>Har oy yangi mahsulot xaridi - 20 ball</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="loyalty-benefits">
+                        <h3>Ballarni qanday ishlatish mumkin?</h3>
+                        <div class="benefits-list">
+                            <div class="benefit">
+                                <div class="benefit-value">100 ball</div>
+                                <div class="benefit-title">10% chegirma</div>
+                                <p>Keyingi xaridingiz uchun</p>
+                            </div>
+                            <div class="benefit">
+                                <div class="benefit-value">250 ball</div>
+                                <div class="benefit-title">Yetkazib berish bepul</div>
+                                <p>Har qanday buyurtma uchun</p>
+                            </div>
+                            <div class="benefit">
+                                <div class="benefit-value">500 ball</div>
+                                <div class="benefit-title">Sovg'a sertifikati</div>
+                                <p>$50 qiymatida</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="showProfile()">
+                        <i class="fas fa-arrow-left"></i> Profilga qaytish
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mahsulot tafsilotlari sahifasi -->
+            <div class="page" id="productDetailPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="product-detail-container">
+                    <div class="product-detail-image" id="productDetailImage">
+                        <div class="product-badge">
+                            <i class="fas fa-tag"></i>
+                            <span id="productBonus">0%</span> bonus
+                        </div>
+                    </div>
+                    <div class="product-detail-info">
+                        <h1 id="productDetailName">Mahsulot nomi</h1>
+                        <div class="product-meta">
+                            <span class="product-category" id="productDetailCategory">Kategoriya</span>
+                            <span class="product-rating">
+                                <i class="fas fa-star"></i> 4.5
+                            </span>
+                        </div>
+                        <div class="product-price-section">
+                            <div class="price-main" id="productDetailPrice">$0.00</div>
+                            <div class="price-old" id="productOldPrice"></div>
+                        </div>
+
+                        <div class="product-description">
+                            <h3><i class="fas fa-info-circle"></i> Ta'rif</h3>
+                            <p id="productDetailDesc">Mahsulot ta'rifi...</p>
+                        </div>
+
+                        <div class="product-specs">
+                            <h3><i class="fas fa-clipboard-list"></i> Xususiyatlar</h3>
+                            <div class="specs-grid" id="productSpecs">
+                                <!-- Xususiyatlar -->
+                            </div>
+                        </div>
+
+                        <div class="product-actions-sticky">
+                            <div class="quantity-selector">
+                                <button class="qty-btn" onclick="changeDetailQuantity(-1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="qty-value" id="detailQuantity">1</span>
+                                <button class="qty-btn" onclick="changeDetailQuantity(1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <button class="btn btn-primary btn-add-to-cart" onclick="addToCartFromDetail()">
+                                <i class="fas fa-cart-plus"></i> Savatchaga
+                            </button>
+                            <button class="btn btn-outline btn-favorite" onclick="toggleFavorite()">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buyurtma berish sahifasi -->
+            <div class="page" id="checkoutPage">
+                <div class="back-button" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="checkout-container">
+                    <div class="checkout-section">
+                        <h3><i class="fas fa-shopping-cart"></i> Savatdagi mahsulotlar</h3>
+                        <div class="checkout-items" id="checkoutItems">
+                            <!-- Mahsulotlar -->
+                        </div>
+                        <div class="checkout-summary">
+                            <div class="summary-row">
+                                <span>Mahsulotlar:</span>
+                                <span id="checkoutItemsCount">0 ta</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Yetkazib berish:</span>
+                                <span>$5.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Umumiy summa:</span>
+                                <span id="checkoutTotal">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3><i class="fas fa-user"></i> Ma'lumotlaringiz</h3>
+                        <div class="user-info-display">
+                            <div class="info-item">
+                                <span>Ism:</span>
+                                <span id="checkoutUserName">Foydalanuvchi</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Telefon:</span>
+                                <span id="checkoutUserPhone">+998</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Yetkazib berish manzili</h3>
+                        <div class="address-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="regionSelect">Viloyat</label>
+                                    <select id="regionSelect" onchange="updateDistricts()">
+                                        <option value="">Viloyatni tanlang</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="districtSelect">Tuman/Shahar</label>
+                                    <select id="districtSelect" disabled>
+                                        <option value="">Avval viloyatni tanlang</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="fullAddress">To'liq manzil</label>
+                                <textarea id="fullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="userPhone">Telefon raqamingiz</label>
+                                <input type="tel" id="userPhone" placeholder="+998901234567" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="orderComment">Izoh (ixtiyoriy)</label>
+                                <textarea id="orderComment" rows="2" placeholder="Qo'shimcha izohlar..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3><i class="fas fa-credit-card"></i> To'lov usuli</h3>
+                        <div class="payment-methods">
+                            <label class="payment-method selected">
+                                <input type="radio" name="payment" value="cash" checked />
+                                <div class="payment-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="payment-name">Naqd pul</span>
+                                    <small>Yetkazib berish vaqtida</small>
+                                </div>
+                                <div class="payment-check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="card" />
+                                <div class="payment-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="payment-name">Bank kartasi</span>
+                                    <small>Onlayn to'lov</small>
+                                </div>
+                                <div class="payment-check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="click" />
+                                <div class="payment-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="payment-name">Click</span>
+                                    <small>Click ilovasi orqali</small>
+                                </div>
+                                <div class="payment-check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="payme" />
+                                <div class="payment-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <span class="payment-name">Payme</span>
+                                    <small>Payme ilovasi orqali</small>
+                                </div>
+                                <div class="payment-check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="checkout-actions">
+                        <div class="terms-agreement">
+                            <input type="checkbox" id="agreeTerms" checked />
+                            <label for="agreeTerms">
+                                Men <a href="#">foydalanish shartlari</a> va 
+                                <a href="#">maxfiylik siyosati</a> bilan tanishdim va roziman
+                            </label>
+                        </div>
+                        <button class="btn btn-primary btn-submit-order" onclick="submitOrder()">
+                            <i class="fas fa-check-circle"></i> BUYURTMA TASDIQLASH
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buyurtma tasdiq sahifasi -->
+            <div class="page" id="orderConfirmationPage">
+                <div class="confirmation-container">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>Buyurtmangiz qabul qilindi!</h2>
+                    <p class="confirmation-message">
+                        Hurmatli <span id="confirmationUserName"></span>, buyurtmangiz muvaffaqiyatli qabul qilindi. Tez orada operatorlarimiz siz bilan bog'lanadi.
+                    </p>
+
+                    <div class="order-details">
+                        <h3>Buyurtma ma'lumotlari:</h3>
+                        <div class="detail-row">
+                            <span class="detail-label">Buyurtma raqami:</span>
+                            <span class="detail-value" id="orderNumber">#0001</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Umumiy summa:</span>
+                            <span class="detail-value" id="summaryTotal">$0.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Yetkazib berish:</span>
+                            <span class="detail-value" id="summaryAddress">Manzil</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">To'lov usuli:</span>
+                            <span class="detail-value" id="summaryPayment">Naqd pul</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Buyurtma vaqti:</span>
+                            <span class="detail-value" id="orderTime"></span>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-actions">
+                        <button class="btn btn-primary" onclick="continueShopping()">
+                            <i class="fas fa-shopping-cart"></i> Xaridni davom ettirish
+                        </button>
+                        <button class="btn btn-outline" onclick="viewOrders()">
+                            <i class="fas fa-list"></i> Buyurtmalarimni ko'rish
+                        </button>
+                    </div>
+
+                    <div class="confirmation-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Buyurtma holatini profil > Buyurtmalarim bo'limida kuzatishingiz mumkin</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Qolgan sahifalar (Orders, Favorites, Viewed, Addresses, Loyalty, Product Detail, Checkout, Order Confirmation) -->
-        <!-- Oldingi kabi qoladi, lekin premium classlar bilan -->
-        <!-- Xuddi shu struktura premium dizayn classlari bilan -->
-
-    </div>
-
-    <!-- Pastki navigatsiya -->
-    <div class="bottom-nav" id="bottomNav">
-        <div class="nav-container">
-            <a class="nav-item active" onclick="showHome()">
+        <!-- Pastki navigatsiya -->
+        <div class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" onclick="showHome()">
                 <div class="nav-icon">
                     <i class="fas fa-home"></i>
                 </div>
-                <span>Bosh sahifa</span>
-            </a>
-            <a class="nav-item" onclick="showCatalog()">
+                <span class="nav-label">Bosh sahifa</span>
+            </button>
+            <button class="nav-item" onclick="showCatalog()">
                 <div class="nav-icon">
                     <i class="fas fa-th-large"></i>
                 </div>
-                <span>Katalog</span>
-            </a>
-            <a class="nav-item" onclick="showCart()">
+                <span class="nav-label">Katalog</span>
+            </button>
+            <button class="nav-item" onclick="showCart()">
                 <div class="nav-icon">
                     <i class="fas fa-shopping-cart"></i>
+                    <span class="nav-badge" id="cartBadge">0</span>
                 </div>
-                <span>Savatcha</span>
-                <span class="nav-badge" id="navCartCount">0</span>
-            </a>
-            <a class="nav-item" onclick="showProfile()">
+                <span class="nav-label">Savatcha</span>
+            </button>
+            <button class="nav-item" onclick="showProfile()">
                 <div class="nav-icon">
                     <i class="fas fa-user"></i>
                 </div>
-                <span>Profil</span>
-            </a>
+                <span class="nav-label">Profil</span>
+            </button>
         </div>
     </div>
 
-    <!-- Modallar va boshqa elementlar -->
-    <!-- Premium dizayn bilan bir xil -->
+    <!-- Profilni tahrirlash modali -->
+    <div class="modal" id="profileModal">
+        <div class="modal-overlay" onclick="closeModal('profileModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Profilni tahrirlash</h3>
+                <button class="modal-close" onclick="closeModal('profileModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editPhone">
+                        <i class="fas fa-phone"></i> Telefon raqam
+                    </label>
+                    <input type="tel" id="editPhone" placeholder="+998901234567" />
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">
+                        <i class="fas fa-envelope"></i> Email (ixtiyoriy)
+                    </label>
+                    <input type="email" id="editEmail" placeholder="email@example.com" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('profileModal')">
+                    Bekor qilish
+                </button>
+                <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Notification -->
+    <!-- Ism o'zgartirish modali -->
+    <div class="modal" id="nameModal">
+        <div class="modal-overlay" onclick="closeModal('nameModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Ismni o'zgartirish</h3>
+                <button class="modal-close" onclick="closeModal('nameModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newUserName">
+                        <i class="fas fa-user-edit"></i> Yangi ism
+                    </label>
+                    <input type="text" id="newUserName" placeholder="Yangi ismingiz" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('nameModal')">
+                    Bekor qilish
+                </button>
+                <button class="btn btn-primary" onclick="saveNewName()">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manzil qo'shish modali -->
+    <div class="modal" id="addressModal">
+        <div class="modal-overlay" onclick="closeModal('addressModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Yangi manzil qo'shish</h3>
+                <button class="modal-close" onclick="closeModal('addressModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="addressName">
+                        <i class="fas fa-tag"></i> Manzil nomi
+                    </label>
+                    <input type="text" id="addressName" placeholder="Uy, Ish, Ota-ona uyi" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalRegionSelect">Viloyat</label>
+                        <select id="modalRegionSelect" onchange="updateModalDistricts()">
+                            <option value="">Viloyatni tanlang</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalDistrictSelect">Tuman/Shahar</label>
+                        <select id="modalDistrictSelect" disabled>
+                            <option value="">Avval viloyatni tanlang</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="modalFullAddress">
+                        <i class="fas fa-map-marker-alt"></i> To'liq manzil
+                    </label>
+                    <textarea id="modalFullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('addressModal')">
+                    Bekor qilish
+                </button>
+                <button class="btn btn-primary" onclick="saveAddress()">
+                    <i class="fas fa-save"></i> Saqlash
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Xabarlar -->
     <div class="notification" id="notification">
         <div class="notification-content">
-            <i class="fas fa-check-circle"></i>
+            <i class="notification-icon"></i>
             <span id="notificationText">Amal muvaffaqiyatli bajarildi!</span>
+        </div>
+    </div>
+
+    <!-- Yuklanish indikatori -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner">
+            <i class="fas fa-circle-notch"></i>
         </div>
     </div>
 
