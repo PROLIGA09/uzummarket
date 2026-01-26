@@ -2325,6 +2325,164 @@ a:hover {
 }
 
 
+/* === GEO-LOCATION STYLES === */
+
+.location-status {
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    margin: 0.5rem 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+    display: none;
+    animation: slideInDown 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.location-status.success {
+    background: rgba(6, 214, 160, 0.1);
+    color: var(--success);
+    border-left-color: var(--success);
+}
+
+.location-status.error {
+    background: rgba(239, 71, 111, 0.1);
+    color: var(--danger);
+    border-left-color: var(--danger);
+}
+
+.location-status.warning {
+    background: rgba(255, 209, 102, 0.1);
+    color: #d97706;
+    border-left-color: var(--warning);
+}
+
+.location-status.info {
+    background: rgba(17, 138, 178, 0.1);
+    color: var(--info);
+    border-left-color: var(--info);
+}
+
+
+/* Location marker styles */
+
+.current-location-marker {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
+/* Map controls additional styles */
+
+.map-controls {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--white);
+    border-top: 1px solid var(--gray-200);
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.map-controls .btn {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+}
+
+
+/* Accuracy indicator */
+
+.accuracy-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-light);
+    background: var(--gray-100);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-full);
+    margin-left: 0.5rem;
+}
+
+.accuracy-indicator.high {
+    background: rgba(6, 214, 160, 0.1);
+    color: var(--success);
+}
+
+.accuracy-indicator.medium {
+    background: rgba(255, 209, 102, 0.1);
+    color: #d97706;
+}
+
+.accuracy-indicator.low {
+    background: rgba(239, 71, 111, 0.1);
+    color: var(--danger);
+}
+
+
+/* Location loading modal specific */
+
+#locationLoadingModal .modal-content {
+    max-width: 320px;
+}
+
+#locationLoadingModal .loading-spinner {
+    animation: pulse 1.5s infinite;
+}
+
+
+/* Checkout page location button */
+
+.btn-location {
+    background: var(--accent);
+    color: var(--white);
+    margin-bottom: 1rem;
+}
+
+.btn-location:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+}
+
+.btn-location:active {
+    transform: translateY(0);
+}
+
+.btn-location i {
+    animation: spin 1.5s linear infinite;
+}
+
+.btn-location.active i {
+    animation: none;
+}
+
+
 /* === RESPONSIVE === */
 
 @media (max-width: 500px) {
@@ -2390,6 +2548,12 @@ a:hover {
     .products-slider .product-card {
         min-width: calc(25% - 0.3rem);
         flex: 0 0 calc(25% - 0.3rem);
+    }
+    .map-controls {
+        flex-wrap: wrap;
+    }
+    .map-controls .btn {
+        min-width: calc(50% - 0.25rem);
     }
 }
 

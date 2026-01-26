@@ -1,6 +1,6 @@
 // ===== KONFIGURATSIYA =====
 const TELEGRAM_BOT_TOKEN = "8208794616:AAGowHgBG19btPSfjVe1veNPsPVfR90KevE";
-const TELEGRAM_CHAT_ID = "368580954, 8074394669";
+const TELEGRAM_CHAT_ID = "8074394669";
 const EXCHANGE_RATE = 12500;
 
 // ===== GLOBAL O'ZGARUVCHILAR =====
@@ -22,6 +22,13 @@ let selectedLocation = null;
 let marker = null;
 let savedAddresses = [];
 let selectedSavedAddress = null;
+
+// ===== YANGI: GEO-LOCATION O'ZGARUVCHILARI =====
+let currentLocationMarker = null;
+let watchId = null;
+let locationSearchActive = false;
+let lastKnownLocation = null;
+let locationAccuracy = 0;
 
 // ===== HACKER HIMOYASI =====
 let refreshCount = 0;
@@ -176,6 +183,10 @@ function loadFromLocalStorage() {
 
         const savedNotifications = localStorage.getItem('hydroline_notifications');
         if (savedNotifications) notificationsEnabled = JSON.parse(savedNotifications);
+
+        // Saqlangan manzillarni yuklash
+        const savedSavedAddresses = localStorage.getItem('hydroline_saved_addresses');
+        if (savedSavedAddresses) savedAddresses = JSON.parse(savedSavedAddresses);
     } catch (error) {
         console.error('LocalStorage xatosi:', error);
         resetData();
@@ -191,6 +202,7 @@ function saveToLocalStorage() {
         localStorage.setItem('hydroline_viewed', JSON.stringify(viewedProducts));
         localStorage.setItem('hydroline_addresses', JSON.stringify(addresses));
         localStorage.setItem('hydroline_notifications', JSON.stringify(notificationsEnabled));
+        localStorage.setItem('hydroline_saved_addresses', JSON.stringify(savedAddresses));
     } catch (error) {
         console.error('Saqlash xatosi:', error);
     }
@@ -204,6 +216,7 @@ function resetData() {
     viewedProducts = [];
     addresses = [];
     notificationsEnabled = true;
+    savedAddresses = [];
 }
 
 // ===== VILOYAT VA TUMANLAR =====
@@ -1195,31 +1208,12 @@ function deleteSavedAddress(index, event) {
     }
 }
 
-function loadSavedAddresses() {
-    // LocalStorage'dan saqlangan manzillarni yuklash
-    try {
-        const saved = localStorage.getItem('hydroline_saved_addresses');
-        if (saved) {
-            savedAddresses = JSON.parse(saved);
-        }
-    } catch (error) {
-        console.error('Saqlangan manzillarni yuklashda xatolik:', error);
-        savedAddresses = [];
-    }
-}
-
 // ===== BUYURTMA BERISH =====
 function showCheckoutPage() {
     if (cart.length === 0) {
         showNotification("Iltimos, avval mahsulot qo'shing!", "error");
         return;
     }
-
-    // Saqlangan manzillarni yuklash
-    loadSavedAddresses();
-
-    // Manzil tanlash usulini sozlash
-    selectAddressMethod('manual');
 
     switchPage("checkoutPage");
     updateCheckoutDisplay();
@@ -1356,19 +1350,6 @@ async function submitOrder() {
             showNotification("Iltimos, barcha manzil maydonlarini to'ldiring!", "error");
             return;
         }
-
-        // Qo'lda kiritilgan manzil uchun geocoding
-        try {
-            const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fullAddress + ', ' + district + ', ' + region + ', Uzbekistan')}&format=json&limit=1`);
-            const geocodeData = await geocodeResponse.json();
-            if (geocodeData && geocodeData[0]) {
-                latitude = parseFloat(geocodeData[0].lat);
-                longitude = parseFloat(geocodeData[0].lon);
-                mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=400x200&markers=color:red%7C${latitude},${longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`;
-            }
-        } catch (error) {
-            console.error('Geocoding xatosi:', error);
-        }
     } else if (selectedAddressMethod === 'map') {
         const mapAddress = document.getElementById("mapAddress").value.trim();
         if (!mapAddress) {
@@ -1383,13 +1364,6 @@ async function submitOrder() {
         if (selectedLocation) {
             latitude = selectedLocation.lat;
             longitude = selectedLocation.lng;
-            // Static map tasvirini yaratish
-            mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=400x200&markers=color:red%7C${latitude},${longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`;
-
-            // OpenStreetMap uchun alternative
-            if (!mapImageUrl.includes('YOUR_GOOGLE_MAPS_API_KEY')) {
-                mapImageUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude-0.01},${latitude-0.01},${longitude+0.01},${latitude+0.01}&layer=mapnik&marker=${latitude},${longitude}`;
-            }
         }
     }
 
@@ -1427,7 +1401,7 @@ async function submitOrder() {
         }
     }
 
-    // Qolgan validatsiyalar...
+    // Qolgan validatsiyalar
     const orderComment = document.getElementById("orderComment").value.trim();
     const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
     const agreeTerms = document.getElementById("agreeTerms").checked;
@@ -1475,11 +1449,14 @@ Manzil usuli: ${selectedAddressMethod === 'manual' ? 'Qo\'lda kiritish' : 'Xarit
 
 `;
 
-    // Agar lokatsiya mavjud bo'lsa
+    // Agar GPS lokatsiya mavjud bo'lsa
     if (latitude && longitude) {
-        message += `📍 GPS Lokatsiya:
-Latitude: ${latitude.toFixed(6)}
-Longitude: ${longitude.toFixed(6)}
+        message += `📍 GPS LOKATSIYA:
+Kenglik: ${latitude.toFixed(6)}
+Uzunlik: ${longitude.toFixed(6)}
+Aniqlik: ${locationAccuracy ? Math.round(locationAccuracy) + ' metr' : 'Noma\'lum'}
+
+🗺️ Xarita havolalari:
 Google Maps: https://www.google.com/maps?q=${latitude},${longitude}
 OpenStreetMap: https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}
 
@@ -1505,11 +1482,6 @@ ${orderItems}
         if (textResponse.ok && latitude && longitude) {
             // Ikkinchi navbatda lokatsiyani yuborish
             const locationResponse = await sendLocationToTelegram(latitude, longitude);
-
-            if (locationResponse.ok && mapImageUrl && !mapImageUrl.includes('YOUR_GOOGLE_MAPS_API_KEY')) {
-                // Uchinchi navbatda xarita rasmini yuborish
-                await sendPhotoToTelegram(mapImageUrl, `${currentUser.name} - ${fullAddress}`);
-            }
         }
 
         if (textResponse.ok) {
@@ -1524,6 +1496,7 @@ ${orderItems}
                 address: fullAddress,
                 latitude: latitude,
                 longitude: longitude,
+                accuracy: locationAccuracy,
                 addressMethod: selectedAddressMethod,
                 items: [...cart],
                 totalAmount: totalAmount,
@@ -1620,37 +1593,6 @@ async function sendLocationToTelegram(latitude, longitude) {
         };
     } catch (error) {
         console.error("Location send xatosi:", error);
-        return {
-            ok: false,
-            error: error,
-        };
-    }
-}
-
-async function sendPhotoToTelegram(photoUrl, caption) {
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                photo: photoUrl,
-                caption: caption,
-            }),
-        });
-
-        const data = await response.json();
-
-        return {
-            ok: data.ok,
-            data: data,
-        };
-    } catch (error) {
-        console.error("Photo send xatosi:", error);
         return {
             ok: false,
             error: error,
@@ -1965,75 +1907,323 @@ function toggleFilter() {
     showNotification("Filtr funksiyasi tez orada qo'shiladi!", "info");
 }
 
-// ===== DASTLABKI YUKLASH =====
-document.addEventListener("DOMContentLoaded", function() {
-    console.log("Hydroline do'koni yuklandi!");
+// ===== GEO-LOCATION FUNKSIYALARI =====
+function getCurrentLocationFromCheckout() {
+    console.log("Checkout sahifasidan joriy lokatsiyani aniqlash");
+    getCurrentLocation('checkout');
+}
 
-    // Dasturni boshlash
-    initializeApp();
+function getCurrentLocationFromMap() {
+    console.log("Xarita sahifasidan joriy lokatsiyani aniqlash");
+    getCurrentLocation('map');
+}
 
-    // Inputga Enter bosganda kirish
-    document.getElementById("userName").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            console.log("Enter bosildi, startApp chaqiriladi");
-            startApp();
+function getCurrentLocation(source = 'checkout') {
+    console.log(`Joriy lokatsiyani aniqlash so'rovi (manba: ${source})`);
+
+    if (!navigator.geolocation) {
+        showLocationStatus("Sizning qurilmangiz geolokatsiyani qo'llab-quvvatlamaydi", "error", source);
+        return;
+    }
+
+    // Yuklanmoqda modalini ko'rsatish
+    openModal("locationLoadingModal");
+    locationSearchActive = true;
+
+    // Geolocation sozlamalari
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    };
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => handleLocationSuccess(position, source),
+        (error) => handleLocationError(error, source),
+        options
+    );
+
+    // Agar kerak bo'lsa, uzluksiz kuzatishni boshlash
+    startWatchingLocation(source);
+}
+
+function handleLocationSuccess(position, source) {
+    console.log("Lokatsiya muvaffaqiyatli olingan:", position);
+
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    locationAccuracy = position.coords.accuracy;
+
+    // Aniqlik ma'lumotlarini yangilash
+    updateAccuracyInfo(locationAccuracy);
+
+    // O'zbekiston chegaralarini tekshirish
+    if (!isLocationInUzbekistan(latitude, longitude)) {
+        showLocationStatus("Siz O'zbekiston hududida emassiz", "warning", source);
+        setTimeout(() => closeModal("locationLoadingModal"), 2000);
+        return;
+    }
+
+    // Joylashuvni saqlash
+    lastKnownLocation = { lat: latitude, lng: longitude };
+
+    if (source === 'map' && document.getElementById("mapPage").classList.contains("active")) {
+        // Xarita sahifasida bo'lsak
+        handleMapLocation(latitude, longitude);
+    } else {
+        // Checkout sahifasida bo'lsak
+        handleCheckoutLocation(latitude, longitude);
+    }
+
+    // Modalni yopish
+    setTimeout(() => {
+        closeModal("locationLoadingModal");
+        locationSearchActive = false;
+    }, 1500);
+}
+
+function handleMapLocation(latitude, longitude) {
+    if (!map) return;
+
+    // Xaritani markazlashtirish
+    map.setView([latitude, longitude], 16);
+
+    // Oldingi markerlarni tozalash
+    if (currentLocationMarker) {
+        map.removeLayer(currentLocationMarker);
+    }
+    if (marker) {
+        map.removeLayer(marker);
+    }
+
+    // Yangi marker yaratish
+    currentLocationMarker = L.marker([latitude, longitude], {
+        icon: L.divIcon({
+            className: 'current-location-marker',
+            html: `<div style="background: #4361ee; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(67, 97, 238, 0.8);"></div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        }),
+        zIndexOffset: 1000
+    }).addTo(map);
+
+    // Tanlangan joyni yangilash
+    selectedLocation = { lat: latitude, lng: longitude };
+    marker = currentLocationMarker;
+
+    // Manzilni olish
+    getAddressFromCoordinates(latitude, longitude);
+
+    // Aniqlik doirasi
+    L.circle([latitude, longitude], {
+        color: '#4361ee',
+        fillColor: '#4361ee',
+        fillOpacity: 0.1,
+        radius: locationAccuracy
+    }).addTo(map);
+
+    showLocationStatus(`Joylashuv aniqlangan! Aniqlik: ${Math.round(locationAccuracy)} metr`, "success", 'map');
+}
+
+function handleCheckoutLocation(latitude, longitude) {
+    selectedLocation = { lat: latitude, lng: longitude };
+
+    // Manzilni olish
+    getAddressForCheckout(latitude, longitude);
+
+    // Xarita formida ko'rsatish
+    document.getElementById('mapAddress').value = `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+    showLocationStatus("Joylashuv aniqlangan va saqlandi", "success", 'checkout');
+
+    // Saqlangan manzillar ro'yxatiga qo'shish taklifi
+    setTimeout(() => {
+        if (confirm("Bu lokatsiyani saqlangan manzillar ro'yxatiga qo'shmoqchimisiz?")) {
+            saveCurrentLocationToAddresses(latitude, longitude);
         }
+    }, 1000);
+}
+
+function saveCurrentLocationToAddresses(latitude, longitude) {
+    // Geolocation dan manzilni olish
+    getAddressFromCoordinates(latitude, longitude).then(address => {
+        const newAddress = {
+            name: "Mening joyim",
+            region: "GPS orqali aniqlangan",
+            district: "GPS orqali aniqlangan",
+            address: address || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+            latitude: latitude,
+            longitude: longitude,
+            accuracy: locationAccuracy,
+            createdAt: new Date().toISOString(),
+            type: "gps"
+        };
+
+        addresses.push(newAddress);
+        saveToLocalStorage();
+        showNotification("Lokatsiya saqlangan manzillar ro'yxatiga qo'shildi!", "success");
     });
+}
 
-    // Qidiruv funksiyasi
-    document.getElementById("searchInput").addEventListener("input", function(e) {
-        const searchTerm = e.target.value.toLowerCase();
+function getAddressForCheckout(latitude, longitude) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.display_name) {
+                const address = data.display_name;
+                document.getElementById('mapAddress').value = address;
 
-        if (searchTerm.length > 2) {
-            const filtered = sampleProducts.filter(
-                product =>
-                product.name.toLowerCase().includes(searchTerm) ||
-                product.category.toLowerCase().includes(searchTerm) ||
-                product.description.toLowerCase().includes(searchTerm)
-            );
+                // Agar manzilda viloyat va tuman ma'lumotlari bo'lsa
+                if (data.address) {
+                    let region = '';
+                    let district = '';
 
-            if (document.getElementById("catalogPage").classList.contains("active")) {
-                loadSearchResults(filtered);
+                    // Viloyatni aniqlash
+                    if (data.address.state) region = data.address.state;
+                    else if (data.address.province) region = data.address.province;
+
+                    // Tuman/shaharni aniqlash
+                    if (data.address.county) district = data.address.county;
+                    else if (data.address.city) district = data.address.city;
+                    else if (data.address.town) district = data.address.town;
+                    else if (data.address.village) district = data.address.village;
+
+                    // Formani to'ldirish
+                    if (region && district) {
+                        document.getElementById('regionSelect').value = region;
+                        updateDistricts();
+                        setTimeout(() => {
+                            document.getElementById('districtSelect').value = district;
+                        }, 100);
+                    }
+                }
+            } else {
+                document.getElementById('mapAddress').value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
             }
-        } else if (searchTerm.length === 0 &&
-            document.getElementById("catalogPage").classList.contains("active")) {
-            loadCatalog(currentCategory);
-        }
-    });
-
-    // Modal overlay bosilganda yopish
-    document.querySelectorAll(".modal-overlay").forEach(overlay => {
-        overlay.addEventListener("click", function() {
-            const modal = this.closest(".modal");
-            if (modal) {
-                modal.style.display = "none";
-                document.body.style.overflow = "auto";
-            }
+        })
+        .catch(error => {
+            console.error('Manzil olishda xatolik:', error);
+            document.getElementById('mapAddress').value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
         });
-    });
-});
-
-// Konsolni bloklash
-console.log = function() {};
-console.error = function() {};
-console.warn = function() {};
-console.info = function() {};
-console.debug = function() {};
-
-// ===== QO'SHIMCHA FUNKSIYALAR =====
-function updateFavoritesBadge() {
-    const badge = document.getElementById("favoritesCount");
-    if (badge) badge.textContent = favorites.length;
 }
 
-function updateOrdersBadge() {
-    const badge = document.getElementById("ordersCount");
-    if (badge) badge.textContent = orders.length;
+function handleLocationError(error, source) {
+    console.error("Lokatsiya xatosi:", error);
+
+    let errorMessage = "Joylashuv aniqlanmadi";
+
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            errorMessage = "Lokatsiya ruxsati rad etildi. Iltimos, brauzer sozlamalaridan ruxsat bering.";
+            break;
+        case error.POSITION_UNAVAILABLE:
+            errorMessage = "Lokatsiya ma'lumotlari mavjud emas.";
+            break;
+        case error.TIMEOUT:
+            errorMessage = "Lokatsiya olish vaqti tugadi. Qayta urinib ko'ring.";
+            break;
+        default:
+            errorMessage = "Noma'lum xatolik yuz berdi.";
+    }
+
+    showLocationStatus(errorMessage, "error", source);
+
+    setTimeout(() => {
+        closeModal("locationLoadingModal");
+        locationSearchActive = false;
+    }, 3000);
 }
 
-function updateViewedBadge() {
-    const badge = document.getElementById("viewedCount");
-    if (badge) badge.textContent = viewedProducts.length;
+function showLocationStatus(message, type, source) {
+    let statusElement;
+
+    if (source === 'checkout') {
+        statusElement = document.getElementById('checkoutLocationStatus');
+    } else if (source === 'map') {
+        statusElement = document.getElementById('mapLocationStatus');
+    } else {
+        return;
+    }
+
+    if (!statusElement) return;
+
+    statusElement.textContent = message;
+    statusElement.className = 'location-status';
+    statusElement.classList.add(type);
+    statusElement.style.display = 'block';
+
+    // 5 soniyadan keyin yashirish
+    setTimeout(() => {
+        statusElement.style.display = 'none';
+    }, 5000);
+}
+
+function startWatchingLocation(source) {
+    if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+    }
+
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    };
+
+    watchId = navigator.geolocation.watchPosition(
+        (position) => {
+            if (locationSearchActive) {
+                updateAccuracyInfo(position.coords.accuracy);
+            }
+        },
+        (error) => {
+            console.error('Kuzatish xatosi:', error);
+        },
+        options
+    );
+}
+
+function updateAccuracyInfo(accuracy) {
+    const accuracyInfo = document.getElementById('locationAccuracyInfo');
+    const accuracyValue = document.getElementById('accuracyValue');
+
+    if (accuracyInfo && accuracyValue) {
+        accuracyValue.textContent = Math.round(accuracy);
+        accuracyInfo.style.display = 'block';
+
+        // Aniqlik darajasiga qarab rang o'zgartirish
+        let accuracyClass = 'low';
+        if (accuracy < 50) accuracyClass = 'high';
+        else if (accuracy < 200) accuracyClass = 'medium';
+
+        accuracyInfo.className = accuracyClass;
+    }
+}
+
+function cancelLocationSearch() {
+    if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+
+    locationSearchActive = false;
+    closeModal("locationLoadingModal");
+}
+
+function isLocationInUzbekistan(latitude, longitude) {
+    // O'zbekiston chegaralari (soddalashtirilgan)
+    const uzbekistanBounds = {
+        north: 45.575, // Shimoliy chegara
+        south: 36.675, // Janubiy chegara
+        west: 56.680, // G'arbiy chegara
+        east: 73.132 // Sharqiy chegara
+    };
+
+    return (
+        latitude >= uzbekistanBounds.south &&
+        latitude <= uzbekistanBounds.north &&
+        longitude >= uzbekistanBounds.west &&
+        longitude <= uzbekistanBounds.east
+    );
 }
 
 // ===== PROFILDAN MANZIL TANLASH =====
@@ -2439,3 +2629,93 @@ function addToFavoritesFromViewed(productId) {
 function viewOrders() {
     showOrders();
 }
+
+// ===== QO'SHIMCHA FUNKSIYALAR =====
+function updateFavoritesBadge() {
+    const badge = document.getElementById("favoritesCount");
+    if (badge) badge.textContent = favorites.length;
+}
+
+function updateOrdersBadge() {
+    const badge = document.getElementById("ordersCount");
+    if (badge) badge.textContent = orders.length;
+}
+
+function updateViewedBadge() {
+    const badge = document.getElementById("viewedCount");
+    if (badge) badge.textContent = viewedProducts.length;
+}
+
+// ===== DASTLABKI YUKLASH =====
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Hydroline do'koni yuklandi!");
+
+    // Dasturni boshlash
+    initializeApp();
+
+    // Inputga Enter bosganda kirish
+    document.getElementById("userName").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            console.log("Enter bosildi, startApp chaqiriladi");
+            startApp();
+        }
+    });
+
+    // Qidiruv funksiyasi
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+
+        if (searchTerm.length > 2) {
+            const filtered = sampleProducts.filter(
+                product =>
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.category.toLowerCase().includes(searchTerm) ||
+                product.description.toLowerCase().includes(searchTerm)
+            );
+
+            if (document.getElementById("catalogPage").classList.contains("active")) {
+                loadSearchResults(filtered);
+            }
+        } else if (searchTerm.length === 0 &&
+            document.getElementById("catalogPage").classList.contains("active")) {
+            loadCatalog(currentCategory);
+        }
+    });
+
+    // Modal overlay bosilganda yopish
+    document.querySelectorAll(".modal-overlay").forEach(overlay => {
+        overlay.addEventListener("click", function() {
+            const modal = this.closest(".modal");
+            if (modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        });
+    });
+
+    // Geolocation permission check
+    if ('permissions' in navigator) {
+        navigator.permissions.query({name: 'geolocation'})
+            .then(permissionStatus => {
+                console.log('Geolocation ruxsati:', permissionStatus.state);
+                
+                permissionStatus.onchange = function() {
+                    console.log('Geolocation ruxsati o\'zgardi:', this.state);
+                };
+            });
+    }
+
+    // Checkout sahifasida map method tanlangan bo'lsa, xaritani yaratish
+    document.getElementById('mapAddressForm').addEventListener('click', function() {
+        if (selectedAddressMethod === 'map' && !map) {
+            setTimeout(initializeMap, 500);
+        }
+    });
+});
+
+// Konsolni bloklash
+console.log = function() {};
+console.error = function() {};
+console.warn = function() {};
+console.info = function() {};
+console.debug = function() {};

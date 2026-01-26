@@ -600,6 +600,15 @@
                         <!-- Xaritadan belgilash -->
                         <div class="map-form" id="mapAddressForm" style="display: none;">
                             <div id="mapContainer" style="height: 300px; border-radius: var(--radius); margin-bottom: 1rem; background: var(--gray-100);"></div>
+
+                            <!-- YANGI: Mening joyim tugmasi -->
+                            <button class="btn btn-location" onclick="getCurrentLocationFromCheckout()" style="width: 100%; margin-bottom: 1rem;">
+                                <i class="fas fa-location-crosshairs"></i> Mening turgan joyimni aniqlash
+                            </button>
+
+                            <!-- Lokatsiya statusi -->
+                            <div class="location-status" id="checkoutLocationStatus"></div>
+
                             <div class="form-group">
                                 <label for="mapAddress">Tanlangan manzil:</label>
                                 <textarea id="mapAddress" rows="2" placeholder="Manzilni xaritadan belgilang" readonly></textarea>
@@ -706,8 +715,15 @@
                 <div class="page-header">
                     <h2>Manzilni belgilash</h2>
                 </div>
-                <div id="fullScreenMap" style="height: calc(100vh - 120px); width: 100%;"></div>
+
+                <!-- YANGI: Lokatsiya statusi -->
+                <div class="location-status" id="mapLocationStatus"></div>
+
+                <div id="fullScreenMap" style="height: calc(100vh - 200px); width: 100%;"></div>
                 <div class="map-controls">
+                    <button class="btn btn-primary" onclick="getCurrentLocationFromMap()">
+                        <i class="fas fa-location-crosshairs"></i> Mening joyim
+                    </button>
                     <button class="btn btn-primary" onclick="confirmMapLocation()">
                         <i class="fas fa-check"></i> Manzilni tanlash
                     </button>
@@ -935,6 +951,43 @@
                     <h4>Saqlangan manzillar:</h4>
                     <div id="addressesSelectionList"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- YANGI: Lokatsiya yuklash modali -->
+    <div class="modal" id="locationLoadingModal">
+        <div class="modal-overlay" onclick="cancelLocationSearch()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Lokatsiya aniqlanmoqda</h3>
+                <button class="modal-close" onclick="cancelLocationSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 2rem;">
+                <div class="loading-spinner" style="margin: 1rem auto; width: 60px; height: 60px;">
+                    <i class="fas fa-location-crosshairs fa-spin" style="font-size: 2rem;"></i>
+                </div>
+                <p style="margin: 1rem 0; font-weight: 500;">Iltimos, kutib turing...</p>
+                <p style="font-size: 0.9rem; color: var(--text-light); line-height: 1.4;">
+                    <i class="fas fa-info-circle"></i> Sizning joriy joylashuvingiz aniqlanmoqda. Bu bir necha soniya vaqt olishi mumkin.
+                </p>
+
+                <!-- Aniqlik ma'lumotlari -->
+                <div id="locationAccuracyInfo" style="display: none; margin-top: 1rem; padding: 0.75rem; background: var(--gray-100); border-radius: var(--radius);">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 0.25rem;">
+                        <i class="fas fa-bullseye"></i> Aniqlik ma'lumotlari
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                        Aniqlik: <span id="accuracyValue">0</span> metr
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="cancelLocationSearch()" style="width: 100%;">
+                    <i class="fas fa-times"></i> Bekor qilish
+                </button>
             </div>
         </div>
     </div>
