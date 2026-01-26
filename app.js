@@ -346,7 +346,7 @@ const sampleProducts = [{
     }
 ];
 
-// ===== ASOSIY FUNKSIYALAR =====
+// ===== ASOSIY FUNKSIYALARI =====
 function initializeApp() {
     console.log("Hydroline dasturi boshlanmoqda...");
 
@@ -1020,7 +1020,7 @@ function updateCartBadge() {
     }
 }
 
-// ===== YANGI: MANZIL TANLASH FUNKSIYALARI =====
+// ===== MANZIL TANLASH FUNKSIYALARI =====
 function selectAddressMethod(method) {
     selectedAddressMethod = method;
 
@@ -1343,6 +1343,9 @@ function getPaymentMethodName(method) {
 async function submitOrder() {
     // Manzilni tekshirish
     let region, district, fullAddress;
+    let latitude = null;
+    let longitude = null;
+    let mapImageUrl = null;
 
     if (selectedAddressMethod === 'manual') {
         region = document.getElementById("regionSelect").value;
@@ -1353,6 +1356,19 @@ async function submitOrder() {
             showNotification("Iltimos, barcha manzil maydonlarini to'ldiring!", "error");
             return;
         }
+
+        // Qo'lda kiritilgan manzil uchun geocoding
+        try {
+            const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(fullAddress + ', ' + district + ', ' + region + ', Uzbekistan')}&format=json&limit=1`);
+            const geocodeData = await geocodeResponse.json();
+            if (geocodeData && geocodeData[0]) {
+                latitude = parseFloat(geocodeData[0].lat);
+                longitude = parseFloat(geocodeData[0].lon);
+                mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=400x200&markers=color:red%7C${latitude},${longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+            }
+        } catch (error) {
+            console.error('Geocoding xatosi:', error);
+        }
     } else if (selectedAddressMethod === 'map') {
         const mapAddress = document.getElementById("mapAddress").value.trim();
         if (!mapAddress) {
@@ -1362,6 +1378,19 @@ async function submitOrder() {
         region = "Xaritadan belgilangan";
         district = "Xaritadan belgilangan";
         fullAddress = mapAddress;
+
+        // Agar xarita lokatsiyasi tanlangan bo'lsa
+        if (selectedLocation) {
+            latitude = selectedLocation.lat;
+            longitude = selectedLocation.lng;
+            // Static map tasvirini yaratish
+            mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=400x200&markers=color:red%7C${latitude},${longitude}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+
+            // OpenStreetMap uchun alternative
+            if (!mapImageUrl.includes('YOUR_GOOGLE_MAPS_API_KEY')) {
+                mapImageUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude-0.01},${latitude-0.01},${longitude+0.01},${latitude+0.01}&layer=mapnik&marker=${latitude},${longitude}`;
+            }
+        }
     }
 
     // Telefon raqamni tekshirish
@@ -1387,6 +1416,8 @@ async function submitOrder() {
                 region: region,
                 district: district,
                 address: fullAddress,
+                latitude: latitude,
+                longitude: longitude,
                 createdAt: new Date().toISOString()
             };
 
@@ -1428,8 +1459,8 @@ async function submitOrder() {
         orderItems += `\n`;
     });
 
-    // Telegram xabari
-    const message = `
+    // Telegram xabari tayyorlash
+    let message = `
 🛒 YANGI BUYURTMA
 
 👤 Mijoz: ${currentUser.name}
@@ -1442,6 +1473,20 @@ Tuman: ${district}
 To'liq manzil: ${fullAddress}
 Manzil usuli: ${selectedAddressMethod === 'manual' ? 'Qo\'lda kiritish' : 'Xaritadan belgilash'}
 
+`;
+
+    // Agar lokatsiya mavjud bo'lsa
+    if (latitude && longitude) {
+        message += `📍 GPS Lokatsiya:
+Latitude: ${latitude.toFixed(6)}
+Longitude: ${longitude.toFixed(6)}
+Google Maps: https://www.google.com/maps?q=${latitude},${longitude}
+OpenStreetMap: https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}
+
+`;
+    }
+
+    message += `
 📦 Mahsulotlar:
 ${orderItems}
 
@@ -1454,9 +1499,20 @@ ${orderItems}
     `;
 
     try {
-        const response = await sendToTelegram(message);
+        // Birinchi navbatda matnli xabarni yuborish
+        const textResponse = await sendToTelegram(message);
 
-        if (response.ok) {
+        if (textResponse.ok && latitude && longitude) {
+            // Ikkinchi navbatda lokatsiyani yuborish
+            const locationResponse = await sendLocationToTelegram(latitude, longitude);
+
+            if (locationResponse.ok && mapImageUrl && !mapImageUrl.includes('YOUR_GOOGLE_MAPS_API_KEY')) {
+                // Uchinchi navbatda xarita rasmini yuborish
+                await sendPhotoToTelegram(mapImageUrl, `${currentUser.name} - ${fullAddress}`);
+            }
+        }
+
+        if (textResponse.ok) {
             currentOrder = {
                 id: Date.now(),
                 date: new Date().toLocaleString("uz-UZ"),
@@ -1466,6 +1522,8 @@ ${orderItems}
                 region: region,
                 district: district,
                 address: fullAddress,
+                latitude: latitude,
+                longitude: longitude,
                 addressMethod: selectedAddressMethod,
                 items: [...cart],
                 totalAmount: totalAmount,
@@ -1531,6 +1589,68 @@ async function sendToTelegram(message) {
         };
     } catch (error) {
         console.error("Fetch xatosi:", error);
+        return {
+            ok: false,
+            error: error,
+        };
+    }
+}
+
+async function sendLocationToTelegram(latitude, longitude) {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendLocation`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                latitude: latitude,
+                longitude: longitude,
+            }),
+        });
+
+        const data = await response.json();
+
+        return {
+            ok: data.ok,
+            data: data,
+        };
+    } catch (error) {
+        console.error("Location send xatosi:", error);
+        return {
+            ok: false,
+            error: error,
+        };
+    }
+}
+
+async function sendPhotoToTelegram(photoUrl, caption) {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                photo: photoUrl,
+                caption: caption,
+            }),
+        });
+
+        const data = await response.json();
+
+        return {
+            ok: data.ok,
+            data: data,
+        };
+    } catch (error) {
+        console.error("Photo send xatosi:", error);
         return {
             ok: false,
             error: error,
