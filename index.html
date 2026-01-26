@@ -3,11 +3,12 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hydroline - Premium Onlayn Do'kon</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 
 <body>
@@ -548,12 +549,34 @@
                                 <span>Telefon:</span>
                                 <span id="checkoutUserPhone">+998</span>
                             </div>
+                            <div class="info-item">
+                                <span>Email:</span>
+                                <span id="checkoutUserEmail">email@example.com</span>
+                            </div>
                         </div>
+                        <button class="btn btn-outline" onclick="editProfileFromCheckout()" style="margin-top: 1rem; width: 100%;">
+                            <i class="fas fa-edit"></i> Ma'lumotlarni tahrirlash
+                        </button>
                     </div>
 
                     <div class="checkout-section">
                         <h3><i class="fas fa-map-marker-alt"></i> Yetkazib berish manzili</h3>
-                        <div class="address-form">
+
+                        <!-- Manzil tanlash usuli -->
+                        <div class="address-method-selector">
+                            <h4>Manzil kiritish usulini tanlang:</h4>
+                            <div class="method-buttons">
+                                <button class="btn method-btn active" data-method="manual" onclick="selectAddressMethod('manual')">
+                                    <i class="fas fa-keyboard"></i> Qo'lda kiritish
+                                </button>
+                                <button class="btn method-btn" data-method="map" onclick="selectAddressMethod('map')">
+                                    <i class="fas fa-map"></i> Xaritadan belgilash
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Qo'lda kiritish formasi -->
+                        <div class="address-form manual-form" id="manualAddressForm">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="regionSelect">Viloyat</label>
@@ -572,14 +595,33 @@
                                 <label for="fullAddress">To'liq manzil</label>
                                 <textarea id="fullAddress" rows="3" placeholder="Ko'cha, uy, kvartira..."></textarea>
                             </div>
+                        </div>
+
+                        <!-- Xaritadan belgilash -->
+                        <div class="map-form" id="mapAddressForm" style="display: none;">
+                            <div id="mapContainer" style="height: 300px; border-radius: var(--radius); margin-bottom: 1rem; background: var(--gray-100);"></div>
                             <div class="form-group">
-                                <label for="userPhone">Telefon raqamingiz</label>
-                                <input type="tel" id="userPhone" placeholder="+998901234567" required />
+                                <label for="mapAddress">Tanlangan manzil:</label>
+                                <textarea id="mapAddress" rows="2" placeholder="Manzilni xaritadan belgilang" readonly></textarea>
                             </div>
-                            <div class="form-group">
-                                <label for="orderComment">Izoh (ixtiyoriy)</label>
-                                <textarea id="orderComment" rows="2" placeholder="Qo'shimcha izohlar..."></textarea>
-                            </div>
+                            <button class="btn btn-outline" onclick="openMapSelector()" style="width: 100%;">
+                                <i class="fas fa-map-marker-alt"></i> Xaritada manzilni belgilash
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userPhone">Telefon raqamingiz</label>
+                            <input type="tel" id="userPhone" placeholder="+998901234567" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="orderComment">Izoh (ixtiyoriy)</label>
+                            <textarea id="orderComment" rows="2" placeholder="Qo'shimcha izohlar..."></textarea>
+                        </div>
+
+                        <!-- Saqlangan manzillar -->
+                        <div class="saved-addresses" id="savedAddressesSection" style="display: none;">
+                            <h4>Saqlangan manzillar:</h4>
+                            <div class="saved-addresses-list" id="savedAddressesList"></div>
                         </div>
                     </div>
 
@@ -653,6 +695,25 @@
                             <i class="fas fa-check-circle"></i> BUYURTMA TASDIQLASH
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Xarita sahifasi -->
+            <div class="page" id="mapPage">
+                <div class="back-button" onclick="goBackToCheckout()">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </div>
+                <div class="page-header">
+                    <h2>Manzilni belgilash</h2>
+                </div>
+                <div id="fullScreenMap" style="height: calc(100vh - 120px); width: 100%;"></div>
+                <div class="map-controls">
+                    <button class="btn btn-primary" onclick="confirmMapLocation()">
+                        <i class="fas fa-check"></i> Manzilni tanlash
+                    </button>
+                    <button class="btn btn-outline" onclick="resetMapLocation()">
+                        <i class="fas fa-redo"></i> Qayta belgilash
+                    </button>
                 </div>
             </div>
 
@@ -851,6 +912,33 @@
         </div>
     </div>
 
+    <!-- Manzil tanlash modali -->
+    <div class="modal" id="addressSelectionModal">
+        <div class="modal-overlay" onclick="closeModal('addressSelectionModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Manzilni tanlang</h3>
+                <button class="modal-close" onclick="closeModal('addressSelectionModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="address-options">
+                    <button class="btn address-option" onclick="useSavedAddress()">
+                        <i class="fas fa-bookmark"></i> Saqlangan manzildan foydalanish
+                    </button>
+                    <button class="btn address-option" onclick="useNewAddress()">
+                        <i class="fas fa-plus-circle"></i> Yangi manzil kiritish
+                    </button>
+                </div>
+                <div id="savedAddressesSelection" style="margin-top: 1rem; display: none;">
+                    <h4>Saqlangan manzillar:</h4>
+                    <div id="addressesSelectionList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Xabarlar -->
     <div class="notification" id="notification">
         <div class="notification-content">
@@ -865,7 +953,7 @@
             <i class="fas fa-circle-notch"></i>
         </div>
     </div>
-    <!-- Himoya overlay -->
+
     <!-- Himoya overlay -->
     <div id="securityOverlay" style="display: none;">
         <div class="security-message">⚠️ XAVFSIZLIK OGOHLANTIRISHI ⚠️</div>
@@ -874,6 +962,8 @@
             Ushbu veb-sayt himoyalangan. Siz dasturiy ta'minotni buzish yoki tahlil qilishga urinayapsiz.<br> Buning uchun siz 3 soniya bloklanasiz.
         </div>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
 </body>
 

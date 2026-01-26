@@ -2266,6 +2266,24 @@ a:hover {
 }
 
 
+/* === XARITA STYLES === */
+
+#addressMap {
+    border-radius: var(--radius);
+    overflow: hidden;
+    z-index: 1;
+}
+
+.leaflet-container {
+    font-family: var(--font-sans);
+}
+
+.leaflet-control-zoom {
+    display: none !important;
+    /* Zoom boshqaruvlarini yashirish */
+}
+
+
 /* === HACKER HIMOYASI === */
 
 #securityOverlay {

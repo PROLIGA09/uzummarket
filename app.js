@@ -15,15 +15,36 @@ let viewedProducts = [];
 let addresses = [];
 let notificationsEnabled = true;
 
+// ===== YANGI O'ZGARUVCHILAR =====
+let selectedAddressMethod = "manual";
+let map = null;
+let selectedLocation = null;
+let marker = null;
+let savedAddresses = [];
+let selectedSavedAddress = null;
+
 // ===== HACKER HIMOYASI =====
 let refreshCount = 0;
 let lastRefreshTime = Date.now();
 let blockedUser = false;
 let f12Pressed = false;
 
-// F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U bloklash
+// ===== ZOOM VA INSPECTOR BLOKLASH =====
+document.addEventListener('wheel', function(e) {
+    if (e.ctrlKey) {
+        e.preventDefault();
+        return false;
+    }
+}, { passive: false });
+
 document.addEventListener('keydown', function(e) {
-    // F12 ni bloklash
+    // Ctrl+ +/- bilan zoom bloklash
+    if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=')) {
+        e.preventDefault();
+        return false;
+    }
+
+    // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U bloklash
     if (e.key === 'F12') {
         e.preventDefault();
         f12Pressed = true;
@@ -31,27 +52,31 @@ document.addEventListener('keydown', function(e) {
         return false;
     }
 
-    // Ctrl+Shift+I (Chrome Developer Tools)
     if (e.ctrlKey && e.shiftKey && e.key === 'I') {
         e.preventDefault();
         showSecurityWarning();
         return false;
     }
 
-    // Ctrl+Shift+J (Chrome Console)
     if (e.ctrlKey && e.shiftKey && e.key === 'J') {
         e.preventDefault();
         showSecurityWarning();
         return false;
     }
 
-    // Ctrl+U (View Source)
     if (e.ctrlKey && e.key === 'u') {
         e.preventDefault();
         showSecurityWarning();
         return false;
     }
 });
+
+// Touch eventlarda zoom bloklash
+document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) {
+        e.preventDefault();
+    }
+}, { passive: false });
 
 // O'ng tugma bosilishini bloklash
 document.addEventListener('contextmenu', function(e) {
@@ -114,7 +139,7 @@ function showSecurityWarning() {
 // Yangilashni monitoring qilish
 window.addEventListener('beforeunload', function() {
     const currentTime = Date.now();
-    if (currentTime - lastRefreshTime < 3000) { // 3 soniya ichida
+    if (currentTime - lastRefreshTime < 3000) {
         refreshCount++;
         lastRefreshTime = currentTime;
 
@@ -323,26 +348,54 @@ const sampleProducts = [{
 
 // ===== ASOSIY FUNKSIYALAR =====
 function initializeApp() {
+    console.log("Hydroline dasturi boshlanmoqda...");
+
+    // LocalStorage'dan ma'lumotlarni yuklash
     loadFromLocalStorage();
 
+    // Debug ma'lumotlari
+    console.log("Current User:", currentUser);
+    console.log("Cart:", cart);
+    console.log("Favorites:", favorites);
+
     if (currentUser && currentUser.name) {
+        console.log("Foydalanuvchi mavjud, asosiy app ko'rsatiladi");
         showMainApp();
-        showNotification(`Xush kelibsiz, ${currentUser.name}!`, "success");
+        setTimeout(() => {
+            showNotification(`Xush kelibsiz, ${currentUser.name}!`, "success");
+        }, 500);
     } else {
+        console.log("Foydalanuvchi mavjud emas, login sahifasi ko'rsatiladi");
         showLoginPage();
     }
 
+    // Viloyat va tumanlarni yuklash
     populateRegions();
+
+    // Bosh sahifa mahsulotlarini yuklash
     loadFeaturedProducts();
+
+    // Savat badge'ini yangilash
     updateCartBadge();
+
+    console.log("Dastur muvaffaqiyatli yuklandi!");
 }
 
 function startApp() {
-    const userName = document.getElementById("userName").value.trim();
+    console.log("startApp funksiyasi chaqirildi");
+
+    const userNameInput = document.getElementById("userName");
+    if (!userNameInput) {
+        console.error("userName input topilmadi!");
+        return;
+    }
+
+    const userName = userNameInput.value.trim();
+    console.log("Kiritilgan ism:", userName);
 
     if (!userName) {
         showNotification("Iltimos, ismingizni kiriting!", "error");
-        document.getElementById("userName").focus();
+        userNameInput.focus();
         return;
     }
 
@@ -354,56 +407,116 @@ function startApp() {
         joinDate: new Date().toISOString()
     };
 
+    console.log("Yangi foydalanuvchi yaratildi:", currentUser);
+
+    // Ma'lumotlarni saqlash
     saveToLocalStorage();
+
+    // Asosiy appga o'tish
     showMainApp();
-    showNotification(`Xush kelibsiz, ${userName}!`, "success");
+
+    // Xush kelibsiz xabarini ko'rsatish
+    setTimeout(() => {
+        showNotification(`Xush kelibsiz, ${userName}!`, "success");
+    }, 300);
 }
 
 function showMainApp() {
+    console.log("showMainApp funksiyasi chaqirildi");
+
     // Kirish sahifasini yashirish
-    document.getElementById("loginContainer").style.display = "none";
+    const loginContainer = document.getElementById("loginContainer");
+    if (loginContainer) {
+        console.log("Login container yashirilmoqda");
+        loginContainer.style.display = "none";
+    } else {
+        console.error("Login container topilmadi!");
+    }
 
     // Asosiy aplikatsiyani ko'rsatish
-    document.getElementById("mainApp").style.display = "block";
+    const mainApp = document.getElementById("mainApp");
+    if (mainApp) {
+        console.log("Main app ko'rsatilmoqda");
+        mainApp.style.display = "block";
+    } else {
+        console.error("Main app topilmadi!");
+    }
 
+    // Foydalanuvchi ma'lumotlarini yangilash
     updateUserDisplay();
+
+    // Bosh sahifani ko'rsatish
     showHome();
+
+    // Barcha badge'larni yangilash
     updateAllBadges();
 }
 
 function showLoginPage() {
+    console.log("showLoginPage funksiyasi chaqirildi");
+
     // Asosiy aplikatsiyani yashirish
-    document.getElementById("mainApp").style.display = "none";
+    const mainApp = document.getElementById("mainApp");
+    if (mainApp) {
+        console.log("Main app yashirilmoqda");
+        mainApp.style.display = "none";
+    } else {
+        console.error("Main app topilmadi!");
+    }
 
     // Kirish sahifasini ko'rsatish
-    document.getElementById("loginContainer").style.display = "flex";
+    const loginContainer = document.getElementById("loginContainer");
+    if (loginContainer) {
+        console.log("Login container ko'rsatilmoqda");
+        loginContainer.style.display = "flex";
+    } else {
+        console.error("Login container topilmadi!");
+    }
 
     // Inputni tozalash va fokus qilish
-    document.getElementById("userName").value = "";
-    document.getElementById("userName").focus();
+    const userNameInput = document.getElementById("userName");
+    if (userNameInput) {
+        userNameInput.value = "";
+        userNameInput.focus();
+    }
 }
 
 function updateUserDisplay() {
     if (!currentUser) return;
 
-    const elements = [
-        "currentUserName", "profileUserName", "checkoutUserName", "confirmationUserName"
+    console.log("Foydalanuvchi ma'lumotlari yangilanmoqda:", currentUser.name);
+
+    // Ismni barcha joylarda yangilash
+    const userNameElements = [
+        "currentUserName",
+        "profileUserName",
+        "checkoutUserName",
+        "confirmationUserName"
     ];
 
-    elements.forEach(id => {
+    userNameElements.forEach(id => {
         const element = document.getElementById(id);
-        if (element) element.textContent = currentUser.name;
+        if (element) {
+            element.textContent = currentUser.name;
+        }
     });
 
+    // Telefon raqamni yangilash
     const phoneElements = ["profileUserPhone", "checkoutUserPhone"];
     if (currentUser.phone) {
         phoneElements.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.textContent = currentUser.phone;
         });
-        document.getElementById("userPhone").value = currentUser.phone;
+
+        // Checkout sahifasidagi telefon inputini to'ldirish
+        const userPhoneInput = document.getElementById("userPhone");
+        if (userPhoneInput) {
+            userPhoneInput.value = currentUser.phone;
+        }
     }
 
+    // Loyallik ballarini yangilash
     document.getElementById("loyaltyPoints").textContent = `${currentUser.loyaltyPoints || 0} ball`;
     document.getElementById("loyaltyPointsBadge").textContent = currentUser.loyaltyPoints || 0;
 }
@@ -417,19 +530,27 @@ function updateAllBadges() {
 
 // ===== SAHIFA NAVIGATSIYASI =====
 function switchPage(pageId) {
+    console.log(`Sahifa o'zgartirilmoqda: ${pageId}`);
+
     if (!["profilePage", "homePage", "catalogPage", "cartPage"].includes(pageId)) {
         lastPage = pageId;
     }
 
+    // Barcha sahifalarni yashirish
     document.querySelectorAll(".page").forEach(page => {
         page.classList.remove("active");
     });
 
+    // Tanlangan sahifani ko'rsatish
     const targetPage = document.getElementById(pageId);
     if (targetPage) {
         targetPage.classList.add("active");
+        console.log(`${pageId} sahifasi ko'rsatildi`);
+    } else {
+        console.error(`${pageId} sahifasi topilmadi!`);
     }
 
+    // Navigatsiyani yangilash
     updateNavigation(pageId);
 }
 
@@ -450,12 +571,14 @@ function updateNavigation(pageId) {
     };
 
     const index = pageMap[pageId];
-    if (index !== undefined) {
+    if (index !== undefined && navItems[index]) {
         navItems[index].classList.add("active");
     }
 }
 
 function goBack() {
+    console.log("Orqaga qaytish, oldingi sahifa:", lastPage);
+
     if (["profilePage", "homePage", "catalogPage", "cartPage"].includes(lastPage)) {
         switchPage(lastPage);
     } else {
@@ -464,24 +587,28 @@ function goBack() {
 }
 
 function showHome() {
+    console.log("Bosh sahifa ko'rsatilmoqda");
     switchPage("homePage");
     lastPage = "homePage";
     loadFeaturedProducts();
 }
 
 function showCatalog() {
+    console.log("Katalog sahifasi ko'rsatilmoqda");
     switchPage("catalogPage");
     lastPage = "catalogPage";
     loadCatalog("all");
 }
 
 function showCart() {
+    console.log("Savat sahifasi ko'rsatilmoqda");
     switchPage("cartPage");
     lastPage = "cartPage";
     updateCartDisplay();
 }
 
 function showProfile() {
+    console.log("Profil sahifasi ko'rsatilmoqda");
     switchPage("profilePage");
     lastPage = "profilePage";
 }
@@ -489,7 +616,10 @@ function showProfile() {
 // ===== MAHSULOT FUNKSIYALARI =====
 function loadFeaturedProducts() {
     const container = document.getElementById("featuredProducts");
-    if (!container) return;
+    if (!container) {
+        console.error("featuredProducts container topilmadi!");
+        return;
+    }
 
     const featured = sampleProducts.slice(0, 4);
     container.innerHTML = "";
@@ -532,6 +662,7 @@ function loadFeaturedProducts() {
 }
 
 function showCategory(category) {
+    console.log(`Kategoriya tanlandi: ${category}`);
     switchPage("catalogPage");
     loadCatalog(category);
 }
@@ -541,7 +672,10 @@ function loadCatalog(category) {
     const productGrid = document.getElementById("productGrid");
     const catalogTitle = document.getElementById("catalogTitle");
 
-    if (!productGrid || !catalogTitle) return;
+    if (!productGrid || !catalogTitle) {
+        console.error("Product grid yoki catalog title topilmadi!");
+        return;
+    }
 
     catalogTitle.textContent = category === "all" ? "Barcha mahsulotlar" : category;
 
@@ -598,7 +732,7 @@ function loadCatalog(category) {
     });
 }
 
-// ===== KO'RISH TUGMASI FUNKSIYASI (TO'G'IRLANGAN) =====
+// ===== MAHSULOT TAFSILOTLARI =====
 function showProductDetail(productId) {
     console.log("showProductDetail chaqirildi, productId:", productId);
 
@@ -652,85 +786,11 @@ function showProductDetail(productId) {
     const isInFavorites = favorites.some(item => item.id === productId);
     updateFavoriteButton(isInFavorites);
 
-    // Tegishli mahsulotlarni yuklash
-    loadRelatedProducts(productId, product.category);
-
     // Sahifani o'zgartirish
     switchPage("productDetailPage");
     lastPage = "catalogPage";
 
     console.log("Mahsulot tafsilotlari sahifasi ko'rsatildi");
-}
-
-// Tegishli mahsulotlarni yuklash funksiyasi
-function loadRelatedProducts(currentProductId, category) {
-    const container = document.querySelector(".related-products-grid");
-    if (!container) return;
-
-    // Xuddi shu kategoriyadagi boshqa mahsulotlar (joriy mahsulotdan tashqari)
-    const relatedProducts = sampleProducts.filter(p =>
-        p.category === category && p.id !== currentProductId
-    ).slice(0, 4);
-
-    if (relatedProducts.length === 0) {
-        // Agar tegishli mahsulot bo'lmasa, boshqa kategoriyadagi mahsulotlarni ko'rsatish
-        const otherProducts = sampleProducts.filter(p =>
-            p.id !== currentProductId
-        ).slice(0, 4);
-
-        displayProductsInGrid(otherProducts, container);
-        return;
-    }
-
-    displayProductsInGrid(relatedProducts, container);
-}
-
-// Mahsulotlarni grid shaklida ko'rsatish
-function displayProductsInGrid(products, container) {
-    container.innerHTML = "";
-
-    if (products.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 1rem; color: var(--text-light); font-size: 0.85rem;">
-                Tegishli mahsulotlar yo'q
-            </div>
-        `;
-        return;
-    }
-
-    products.forEach(product => {
-        const productElement = document.createElement("div");
-        productElement.className = "product-card";
-        productElement.style.cssText = `
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        `;
-
-        productElement.onclick = () => showProductDetail(product.id);
-        productElement.innerHTML = `
-            <div class="product-image" style="background-image: url('${product.image}')">
-                <div class="product-badge">${product.bonus}% bonus</div>
-            </div>
-            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
-                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
-                    ${product.name}
-                </div>
-                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
-                    $${product.price.toFixed(2)}
-                </div>
-                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
-                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
-                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
-                    </button>
-                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
-                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        container.appendChild(productElement);
-    });
 }
 
 function updateFavoriteButton(isFavorite) {
@@ -960,30 +1020,608 @@ function updateCartBadge() {
     }
 }
 
-// ===== SEVIMLILAR FUNKSIYALARI =====
-function updateFavoritesBadge() {
-    const badge = document.getElementById("favoritesCount");
-    if (badge) badge.textContent = favorites.length;
+// ===== YANGI: MANZIL TANLASH FUNKSIYALARI =====
+function selectAddressMethod(method) {
+    selectedAddressMethod = method;
+
+    // Tugmalarni yangilash
+    document.querySelectorAll('.method-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.method === method) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Formani ko'rsatish/yashirish
+    document.getElementById('manualAddressForm').style.display = method === 'manual' ? 'block' : 'none';
+    document.getElementById('mapAddressForm').style.display = method === 'map' ? 'block' : 'none';
+
+    // Saqlangan manzillarni ko'rsatish
+    if (savedAddresses.length > 0) {
+        document.getElementById('savedAddressesSection').style.display = 'block';
+        updateSavedAddressesList();
+    } else {
+        document.getElementById('savedAddressesSection').style.display = 'none';
+    }
 }
 
-function showFavorites() {
-    switchPage("favoritesPage");
-    updateFavoritesList();
+function openMapSelector() {
+    // Xarita sahifasiga o'tish
+    switchPage('mapPage');
+    initializeMap();
 }
 
-function updateFavoritesList() {
-    const container = document.getElementById("favoritesList");
+function goBackToCheckout() {
+    switchPage('checkoutPage');
+    updateCheckoutDisplay();
+}
+
+function initializeMap() {
+    // Leaflet xaritasini yaratish
+    if (!map) {
+        const mapContainer = document.getElementById('fullScreenMap');
+        if (!mapContainer) return;
+
+        map = L.map('fullScreenMap').setView([41.311081, 69.240562], 13); // Toshkent markazi
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18,
+            minZoom: 8
+        }).addTo(map);
+
+        // O'zbekiston chegaralarini belgilash
+        L.polygon([
+            [45.575, 56.680], // shimoli-g'arb
+            [45.575, 73.132], // shimoli-sharq
+            [36.675, 73.132], // janubi-sharq
+            [36.675, 56.680], // janubi-g'arb
+        ], {
+            color: 'red',
+            weight: 2,
+            fillOpacity: 0.1
+        }).addTo(map);
+
+        // Xaritada klik qilganda marker qo'yish
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker(e.latlng).addTo(map);
+            selectedLocation = e.latlng;
+
+            // Manzilni topish uchun reverse geocoding
+            getAddressFromCoordinates(e.latlng.lat, e.latlng.lng);
+        });
+    }
+}
+
+function getAddressFromCoordinates(lat, lng) {
+    // Nominatim API yordamida manzilni olish
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.display_name) {
+                document.getElementById('mapAddress').value = data.display_name;
+            } else {
+                document.getElementById('mapAddress').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+        })
+        .catch(error => {
+            console.error('Manzil olishda xatolik:', error);
+            document.getElementById('mapAddress').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        });
+}
+
+function confirmMapLocation() {
+    if (selectedLocation) {
+        // Checkout sahifasiga qaytish
+        switchPage('checkoutPage');
+        updateCheckoutDisplay();
+
+        // Map form ichidagi textareani to'ldirish
+        document.getElementById('mapAddress').value = document.getElementById('mapAddress').value ||
+            `${selectedLocation.lat.toFixed(6)}, ${selectedLocation.lng.toFixed(6)}`;
+    } else {
+        showNotification("Iltimos, avval xaritada manzilni belgilang!", "error");
+    }
+}
+
+function resetMapLocation() {
+    if (marker) {
+        map.removeLayer(marker);
+        marker = null;
+        selectedLocation = null;
+        document.getElementById('mapAddress').value = "";
+    }
+}
+
+function updateSavedAddressesList() {
+    const container = document.getElementById('savedAddressesList');
     if (!container) return;
 
-    if (favorites.length === 0) {
+    container.innerHTML = '';
+
+    savedAddresses.forEach((address, index) => {
+        const addressItem = document.createElement('div');
+        addressItem.className = 'saved-address-item';
+        addressItem.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <input type="radio" name="savedAddress" id="address${index}" ${selectedSavedAddress === index ? 'checked' : ''} 
+                       onchange="selectSavedAddress(${index})">
+                <label for="address${index}" style="flex: 1; cursor: pointer;">
+                    <div style="font-weight: 600;">${address.name}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-light);">${address.region}, ${address.district}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${address.address}</div>
+                </label>
+                <button class="btn btn-danger" onclick="deleteSavedAddress(${index}, event)" style="padding: 0.3rem; font-size: 0.8rem;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(addressItem);
+    });
+}
+
+function selectSavedAddress(index) {
+    selectedSavedAddress = index;
+    const address = savedAddresses[index];
+
+    if (address) {
+        // Formani to'ldirish
+        document.getElementById('regionSelect').value = address.region;
+        updateDistricts();
+        setTimeout(() => {
+            document.getElementById('districtSelect').value = address.district;
+            document.getElementById('fullAddress').value = address.address;
+        }, 100);
+
+        showNotification(`"${address.name}" manzili tanlandi`, "success");
+    }
+}
+
+function deleteSavedAddress(index, event) {
+    event.stopPropagation();
+
+    if (confirm("Bu manzilni o'chirishni istaysizmi?")) {
+        savedAddresses.splice(index, 1);
+        if (selectedSavedAddress === index) {
+            selectedSavedAddress = null;
+        }
+        updateSavedAddressesList();
+        saveToLocalStorage();
+        showNotification("Manzil o'chirildi", "success");
+    }
+}
+
+function loadSavedAddresses() {
+    // LocalStorage'dan saqlangan manzillarni yuklash
+    try {
+        const saved = localStorage.getItem('hydroline_saved_addresses');
+        if (saved) {
+            savedAddresses = JSON.parse(saved);
+        }
+    } catch (error) {
+        console.error('Saqlangan manzillarni yuklashda xatolik:', error);
+        savedAddresses = [];
+    }
+}
+
+// ===== BUYURTMA BERISH =====
+function showCheckoutPage() {
+    if (cart.length === 0) {
+        showNotification("Iltimos, avval mahsulot qo'shing!", "error");
+        return;
+    }
+
+    // Saqlangan manzillarni yuklash
+    loadSavedAddresses();
+
+    // Manzil tanlash usulini sozlash
+    selectAddressMethod('manual');
+
+    switchPage("checkoutPage");
+    updateCheckoutDisplay();
+}
+
+function updateCheckoutDisplay() {
+    const checkoutItems = document.getElementById("checkoutItems");
+    const checkoutTotal = document.getElementById("checkoutTotal");
+    const checkoutItemsCount = document.getElementById("checkoutItemsCount");
+    const checkoutUserEmail = document.getElementById("checkoutUserEmail");
+
+    if (!checkoutItems || !checkoutTotal || !checkoutItemsCount || !checkoutUserEmail) return;
+
+    // Emailni ko'rsatish
+    if (currentUser && currentUser.email) {
+        checkoutUserEmail.textContent = currentUser.email;
+    } else {
+        checkoutUserEmail.textContent = "Kiritilmagan";
+    }
+
+    // Savatdagi mahsulotlarni ko'rsatish
+    let totalItems = 0;
+    let totalPrice = 0;
+
+    checkoutItems.innerHTML = "";
+
+    cart.forEach(item => {
+        totalItems += item.quantity;
+        const itemTotal = item.price * item.quantity;
+        totalPrice += itemTotal;
+
+        const itemElement = document.createElement("div");
+        itemElement.className = "menu-item";
+        itemElement.innerHTML = `
+            <div>
+                <div style="font-weight: 600; color: var(--text-primary); font-size: 0.85rem;">${item.name}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${item.quantity} × $${item.price.toFixed(2)}</div>
+            </div>
+            <div style="font-weight: 700; color: var(--primary); font-size: 0.9rem;">$${itemTotal.toFixed(2)}</div>
+        `;
+        checkoutItems.appendChild(itemElement);
+    });
+
+    checkoutTotal.textContent = `$${totalPrice.toFixed(2)}`;
+    checkoutItemsCount.textContent = `${totalItems} ta`;
+}
+
+// ===== VILOYAT VA TUMANLAR =====
+function populateRegions() {
+    const regionSelect = document.getElementById("regionSelect");
+    const modalRegionSelect = document.getElementById("modalRegionSelect");
+
+    if (regionSelect) {
+        regionSelect.innerHTML = '<option value="">Viloyatni tanlang</option>';
+        Object.keys(regions).forEach(region => {
+            regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+        });
+    }
+
+    if (modalRegionSelect) {
+        modalRegionSelect.innerHTML = '<option value="">Viloyatni tanlang</option>';
+        Object.keys(regions).forEach(region => {
+            modalRegionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+        });
+    }
+}
+
+function updateDistricts() {
+    const regionSelect = document.getElementById("regionSelect");
+    const districtSelect = document.getElementById("districtSelect");
+
+    if (!regionSelect || !districtSelect) return;
+
+    const selectedRegion = regionSelect.value;
+
+    if (selectedRegion && regions[selectedRegion]) {
+        districtSelect.disabled = false;
+        districtSelect.innerHTML = '<option value="">Tuman/Shaharni tanlang</option>';
+
+        regions[selectedRegion].forEach(district => {
+            districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
+        });
+    } else {
+        districtSelect.disabled = true;
+        districtSelect.innerHTML = '<option value="">Avval viloyatni tanlang</option>';
+    }
+}
+
+function updateModalDistricts() {
+    const modalRegionSelect = document.getElementById("modalRegionSelect");
+    const modalDistrictSelect = document.getElementById("modalDistrictSelect");
+
+    if (!modalRegionSelect || !modalDistrictSelect) return;
+
+    const selectedRegion = modalRegionSelect.value;
+
+    if (selectedRegion && regions[selectedRegion]) {
+        modalDistrictSelect.disabled = false;
+        modalDistrictSelect.innerHTML = '<option value="">Tuman/Shaharni tanlang</option>';
+
+        regions[selectedRegion].forEach(district => {
+            modalDistrictSelect.innerHTML += `<option value="${district}">${district}</option>`;
+        });
+    } else {
+        modalDistrictSelect.disabled = true;
+        modalDistrictSelect.innerHTML = '<option value="">Avval viloyatni tanlang</option>';
+    }
+}
+
+// ===== BUYURTMA BERISH FUNKSIYALARI =====
+function getPaymentMethodName(method) {
+    const methods = {
+        cash: "Naqd pul",
+        card: "Bank kartasi",
+        click: "Click",
+        payme: "Payme"
+    };
+    return methods[method] || method;
+}
+
+async function submitOrder() {
+    // Manzilni tekshirish
+    let region, district, fullAddress;
+
+    if (selectedAddressMethod === 'manual') {
+        region = document.getElementById("regionSelect").value;
+        district = document.getElementById("districtSelect").value;
+        fullAddress = document.getElementById("fullAddress").value.trim();
+
+        if (!region || !district || !fullAddress) {
+            showNotification("Iltimos, barcha manzil maydonlarini to'ldiring!", "error");
+            return;
+        }
+    } else if (selectedAddressMethod === 'map') {
+        const mapAddress = document.getElementById("mapAddress").value.trim();
+        if (!mapAddress) {
+            showNotification("Iltimos, xaritadan manzil belgilang!", "error");
+            return;
+        }
+        region = "Xaritadan belgilangan";
+        district = "Xaritadan belgilangan";
+        fullAddress = mapAddress;
+    }
+
+    // Telefon raqamni tekshirish
+    const userPhone = document.getElementById("userPhone").value.trim();
+    if (!userPhone) {
+        showNotification("Iltimos, telefon raqamingizni kiriting!", "error");
+        return;
+    }
+
+    const phoneRegex = /^\+998\d{9}$/;
+    if (!phoneRegex.test(userPhone)) {
+        showNotification("Iltimos, to'g'ri telefon raqam kiriting (+998901234567 formatida)", "error");
+        return;
+    }
+
+    // Saqlangan manzilni taklif qilish
+    const saveAddress = confirm("Bu manzilni saqlab qo'ymoqchimisiz? Keyingi buyurtmalarda foydalanishingiz mumkin.");
+    if (saveAddress) {
+        const addressName = prompt("Manzil nomini kiriting (masalan: Uy, Ish):", "Uy");
+        if (addressName) {
+            const newAddress = {
+                name: addressName,
+                region: region,
+                district: district,
+                address: fullAddress,
+                createdAt: new Date().toISOString()
+            };
+
+            savedAddresses.push(newAddress);
+            localStorage.setItem('hydroline_saved_addresses', JSON.stringify(savedAddresses));
+            showNotification("Manzil saqlandi!", "success");
+        }
+    }
+
+    // Qolgan validatsiyalar...
+    const orderComment = document.getElementById("orderComment").value.trim();
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    const agreeTerms = document.getElementById("agreeTerms").checked;
+
+    if (!agreeTerms) {
+        showNotification("Iltimos, foydalanish shartlari bilan roziligingizni bildiring!", "error");
+        return;
+    }
+
+    // Yuklanmoqda bildirishnomasi
+    showNotification("Buyurtma yuborilmoqda...", "warning");
+
+    // Buyurtma ma'lumotlarini tayyorlash
+    let orderItems = "";
+    let totalAmount = 0;
+    let totalBonusAmount = 0;
+
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        totalAmount += itemTotal;
+
+        const bonusAmount = (itemTotal * (item.bonus || 0)) / 100;
+        totalBonusAmount += bonusAmount;
+
+        orderItems += `• ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${itemTotal.toFixed(2)}`;
+        if (item.bonus && item.bonus > 0) {
+            orderItems += ` (${item.bonus}% bonus: +$${bonusAmount.toFixed(2)})`;
+        }
+        orderItems += `\n`;
+    });
+
+    // Telegram xabari
+    const message = `
+🛒 YANGI BUYURTMA
+
+👤 Mijoz: ${currentUser.name}
+📞 Telefon: ${userPhone}
+📧 Email: ${currentUser.email || "Kiritilmagan"}
+
+📍 Manzil:
+Viloyat: ${region}
+Tuman: ${district}
+To'liq manzil: ${fullAddress}
+Manzil usuli: ${selectedAddressMethod === 'manual' ? 'Qo\'lda kiritish' : 'Xaritadan belgilash'}
+
+📦 Mahsulotlar:
+${orderItems}
+
+💰 Umumiy summa: $${totalAmount.toFixed(2)}
+🎁 Umumiy bonus: $${totalBonusAmount.toFixed(2)} (${totalBonusAmount > 0 ? ((totalBonusAmount / totalAmount) * 100).toFixed(1) : 0}%)
+💳 To'lov usuli: ${getPaymentMethodName(paymentMethod)}
+📝 Izoh: ${orderComment || "Yo'q"}
+
+⏰ Buyurtma vaqti: ${new Date().toLocaleString("uz-UZ")}
+    `;
+
+    try {
+        const response = await sendToTelegram(message);
+
+        if (response.ok) {
+            currentOrder = {
+                id: Date.now(),
+                date: new Date().toLocaleString("uz-UZ"),
+                customerName: currentUser.name,
+                customerPhone: userPhone,
+                customerEmail: currentUser.email || "",
+                region: region,
+                district: district,
+                address: fullAddress,
+                addressMethod: selectedAddressMethod,
+                items: [...cart],
+                totalAmount: totalAmount,
+                totalBonus: totalBonusAmount,
+                paymentMethod: paymentMethod,
+                comment: orderComment,
+                status: "Yangi",
+            };
+
+            orders.unshift(currentOrder);
+            currentUser.phone = userPhone;
+            updateUserDisplay();
+
+            const newPoints = Math.floor(totalAmount);
+            currentUser.loyaltyPoints += newPoints;
+
+            cart = [];
+            updateCartDisplay();
+            updateCartBadge();
+            updateOrdersBadge();
+            updateAllBadges();
+            saveToLocalStorage();
+
+            showNotification("Buyurtma muvaffaqiyatli qabul qilindi!", "success");
+
+            if (newPoints > 0) {
+                setTimeout(() => {
+                    showNotification(`Sizga ${newPoints} ball qo'shildi! Jami: ${currentUser.loyaltyPoints} ball`, "success");
+                }, 1000);
+            }
+
+            showOrderConfirmation();
+        } else {
+            throw new Error("Telegram API xatosi");
+        }
+    } catch (error) {
+        console.error("Xatolik:", error);
+        showNotification("Buyurtma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.", "error");
+    }
+}
+
+async function sendToTelegram(message) {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: "HTML",
+            }),
+        });
+
+        const data = await response.json();
+
+        return {
+            ok: data.ok,
+            data: data,
+        };
+    } catch (error) {
+        console.error("Fetch xatosi:", error);
+        return {
+            ok: false,
+            error: error,
+        };
+    }
+}
+
+function showOrderConfirmation() {
+    if (!currentOrder) return;
+
+    document.getElementById("orderNumber").textContent = `#${currentOrder.id.toString().slice(-6)}`;
+    document.getElementById("summaryTotal").textContent = `$${currentOrder.totalAmount.toFixed(2)}`;
+    document.getElementById("summaryAddress").textContent = `${currentOrder.region}, ${currentOrder.district}`;
+    document.getElementById("summaryPayment").textContent = getPaymentMethodName(currentOrder.paymentMethod);
+    document.getElementById("orderTime").textContent = currentOrder.date;
+
+    switchPage("orderConfirmationPage");
+}
+
+function continueShopping() {
+    showHome();
+}
+
+// ===== PROFIL FUNKSIYALARI =====
+function editProfile() {
+    if (!currentUser) return;
+
+    document.getElementById("editPhone").value = currentUser.phone || "";
+    document.getElementById("editEmail").value = currentUser.email || "";
+    openModal("profileModal");
+}
+
+function saveProfile() {
+    const phone = document.getElementById("editPhone").value.trim();
+    const email = document.getElementById("editEmail").value.trim();
+
+    if (phone && !phone.match(/^\+998\d{9}$/)) {
+        showNotification("Iltimos, to'g'ri telefon raqam kiriting!", "error");
+        return;
+    }
+
+    currentUser.phone = phone;
+    currentUser.email = email;
+
+    updateUserDisplay();
+    saveToLocalStorage();
+    closeModal("profileModal");
+    showNotification("Profil ma'lumotlari yangilandi!", "success");
+}
+
+function editProfileFromCheckout() {
+    editProfile();
+}
+
+function changeName() {
+    if (!currentUser) return;
+
+    document.getElementById("newUserName").value = currentUser.name;
+    openModal("nameModal");
+}
+
+function saveNewName() {
+    const newName = document.getElementById("newUserName").value.trim();
+
+    if (!newName) {
+        showNotification("Iltimos, yangi ism kiriting!", "error");
+        return;
+    }
+
+    currentUser.name = newName;
+    updateUserDisplay();
+    saveToLocalStorage();
+    closeModal("nameModal");
+    showNotification("Ism muvaffaqiyatli o'zgartirildi!", "success");
+}
+
+function showAddresses() {
+    switchPage("addressesPage");
+    updateAddressesList();
+}
+
+function updateAddressesList() {
+    const container = document.getElementById("addressesList");
+    if (!container) return;
+
+    if (addresses.length === 0) {
         container.innerHTML = `
             <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
-                <i class="fas fa-heart" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3; color: red;"></i>
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Sevimlilar bo'sh</h3>
-                <p style="font-size: 0.85rem;">Yoqtirgan mahsulotlaringizni bu yerda saqlashingiz mumkin</p>
-                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
-                    <i class="fas fa-th-large"></i> Mahsulotlarni ko'rish
-                </button>
+                <i class="fas fa-map-marker-alt" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Manzillar yo'q</h3>
+                <p style="font-size: 0.85rem;">Sizda hali saqlangan manzillar yo'q</p>
             </div>
         `;
         return;
@@ -991,96 +1629,286 @@ function updateFavoritesList() {
 
     container.innerHTML = "";
 
-    favorites.forEach((item, index) => {
-        const favoriteItem = document.createElement("div");
-        favoriteItem.className = "product-card";
-        favoriteItem.style.cssText = `
+    addresses.forEach((address, index) => {
+        const addressItem = document.createElement("div");
+        addressItem.className = "section";
+        addressItem.style.marginBottom = "0.75rem";
+        addressItem.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <div>
+                    <h4 style="margin-bottom: 0.2rem; color: var(--text-primary); font-size: 0.9rem;">${address.name}</h4>
+                    <div style="font-size: 0.75rem; color: var(--text-light);">
+                        ${address.region}, ${address.district}
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="deleteAddress(${index})" style="padding: 0.4rem; font-size: 0.8rem;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                ${address.address}
+            </div>
+        `;
+        container.appendChild(addressItem);
+    });
+}
+
+function openAddAddress() {
+    openModal("addressModal");
+}
+
+function saveAddress() {
+    const name = document.getElementById("addressName").value.trim();
+    const region = document.getElementById("modalRegionSelect").value;
+    const district = document.getElementById("modalDistrictSelect").value;
+    const fullAddress = document.getElementById("modalFullAddress").value.trim();
+
+    if (!name || !region || !district || !fullAddress) {
+        showNotification("Iltimos, barcha maydonlarni to'ldiring!", "error");
+        return;
+    }
+
+    const newAddress = {
+        name: name,
+        region: region,
+        district: district,
+        address: fullAddress,
+        createdAt: new Date().toISOString()
+    };
+
+    addresses.push(newAddress);
+    saveToLocalStorage();
+    closeModal("addressModal");
+    updateAddressesList();
+
+    // Formani tozalash
+    document.getElementById("addressName").value = "";
+    document.getElementById("modalRegionSelect").value = "";
+    document.getElementById("modalDistrictSelect").value = "";
+    document.getElementById("modalDistrictSelect").disabled = true;
+    document.getElementById("modalFullAddress").value = "";
+
+    showNotification("Yangi manzil qo'shildi!", "success");
+}
+
+function deleteAddress(index) {
+    if (confirm("Bu manzilni o'chirishni istaysizmi?")) {
+        addresses.splice(index, 1);
+        saveToLocalStorage();
+        updateAddressesList();
+        showNotification("Manzil o'chirildi", "success");
+    }
+}
+
+function showLoyalty() {
+    switchPage("loyaltyPage");
+    updateLoyaltyDisplay();
+}
+
+function updateLoyaltyDisplay() {
+    if (currentUser) {
+        document.getElementById("loyaltyPointsDisplay").textContent = `${currentUser.loyaltyPoints || 0} ball`;
+        const dollarsValue = (currentUser.loyaltyPoints || 0).toFixed(2);
+    }
+}
+
+function toggleNotifications() {
+    notificationsEnabled = !notificationsEnabled;
+    saveToLocalStorage();
+
+    const toggleSwitch = document.querySelector(".toggle-switch");
+    if (toggleSwitch) {
+        toggleSwitch.style.transform = notificationsEnabled ? "translateX(22px)" : "translateX(2px)";
+    }
+
+    showNotification(
+        notificationsEnabled ? "Bildirishnomalar yoqildi" : "Bildirishnomalar o'chirildi",
+        notificationsEnabled ? "success" : "warning"
+    );
+}
+
+function logout() {
+    if (confirm("Haqiqatan ham chiqmoqchimisiz?")) {
+        resetData();
+        showLoginPage();
+        showNotification("Siz tizimdan chiqdingiz", "success");
+    }
+}
+
+// ===== MODAL FUNKSIYALARI =====
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+}
+
+// ===== XABAR FUNKSIYALARI =====
+function showNotification(message, type = "success") {
+    const notification = document.getElementById("notification");
+    const notificationText = document.getElementById("notificationText");
+    const notificationIcon = document.querySelector(".notification-icon");
+
+    if (!notification || !notificationText || !notificationIcon) return;
+
+    notificationText.textContent = message;
+
+    // Oldingi klasslarni olib tashlash
+    notification.className = "notification";
+    notificationIcon.className = "notification-icon";
+
+    // Yangi klass qo'shish
+    notification.classList.add(type);
+    notificationIcon.classList.add(type);
+
+    notification.style.display = "flex";
+
+    setTimeout(() => {
+        notification.style.display = "none";
+    }, 5000);
+}
+
+// ===== QIDIRUV FUNKSIYASI =====
+function loadSearchResults(filteredProducts) {
+    const productGrid = document.getElementById("productGrid");
+    const catalogTitle = document.getElementById("catalogTitle");
+
+    if (!productGrid || !catalogTitle) return;
+
+    catalogTitle.textContent = `Qidiruv natijalari (${filteredProducts.length})`;
+
+    productGrid.innerHTML = "";
+
+    if (filteredProducts.length === 0) {
+        productGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Natija topilmadi</h3>
+                <p style="font-size: 0.85rem;">"${document.getElementById("searchInput").value}" uchun hech narsa topilmadi</p>
+            </div>
+        `;
+        return;
+    }
+
+    filteredProducts.forEach(product => {
+        const productCard = document.createElement("div");
+        productCard.className = "product-card";
+        productCard.style.cssText = `
             height: 100%;
             display: flex;
             flex-direction: column;
         `;
-        favoriteItem.innerHTML = `
-            <div class="product-image" style="background-image: url('${item.image}')">
-                <div class="product-badge">${item.bonus}% bonus</div>
+        productCard.onclick = () => showProductDetail(product.id);
+        productCard.innerHTML = `
+            <div class="product-image" style="background-image: url('${product.image}')">
+                <div class="product-badge">${product.bonus}% bonus</div>
             </div>
             <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
                 <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
-                    ${item.name}
+                    ${product.name}
                 </div>
                 <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
-                    $${item.price.toFixed(2)}
+                    $${product.price.toFixed(2)}
                 </div>
                 <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
-                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
-                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
-                    </button>
-                    <button class="btn btn-outline" onclick="addToCart(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
                         <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-danger" onclick="removeFromFavorites(${index})" style="padding: 0.2rem; font-size: 0.55rem; min-width: 22px; min-height: 22px;">
-                        <i class="fas fa-trash" style="font-size: 0.6rem;"></i>
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
-                </div>
-                <div style="font-size: 0.55rem; color: var(--text-light); margin-top: 0.3rem; text-align: center;">
-                    <i class="far fa-clock"></i> ${item.addedDate}
                 </div>
             </div>
         `;
-        container.appendChild(favoriteItem);
+        productGrid.appendChild(productCard);
     });
 }
 
-function removeFromFavorites(index) {
-    if (confirm("Bu mahsulotni sevimlilardan o'chirishni istaysizmi?")) {
-        favorites.splice(index, 1);
-        updateFavoritesList();
-        updateFavoritesBadge();
-        saveToLocalStorage();
-        showNotification("Mahsulot sevimlilardan o'chirildi", "success");
-    }
+function toggleFilters() {
+    showNotification("Filtr funksiyasi tez orada qo'shiladi!", "info");
 }
 
-function clearFavorites() {
-    if (favorites.length === 0) {
-        showNotification("Sevimlilar allaqachon bo'sh", "info");
-        return;
-    }
-
-    if (confirm("Barcha sevimlilarni o'chirishni istaysizmi?")) {
-        favorites = [];
-        updateFavoritesList();
-        updateFavoritesBadge();
-        saveToLocalStorage();
-        showNotification("Barcha sevimlilar tozalandi", "success");
-    }
+function toggleSort() {
+    showNotification("Saralash funksiyasi tez orada qo'shiladi!", "info");
 }
 
-// ===== KO'RILGAN MAHSULOTLAR =====
-function addToViewed(productId) {
-    const product = sampleProducts.find(p => p.id === productId);
-    if (!product) return;
+function toggleFilter() {
+    showNotification("Filtr funksiyasi tez orada qo'shiladi!", "info");
+}
 
-    const existingIndex = viewedProducts.findIndex(item => item.id === productId);
-    if (existingIndex !== -1) {
-        viewedProducts.splice(existingIndex, 1);
-    }
+// ===== DASTLABKI YUKLASH =====
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Hydroline do'koni yuklandi!");
 
-    viewedProducts.unshift({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        bonus: product.bonus,
-        image: product.image,
-        category: product.category,
-        viewedDate: new Date().toLocaleString("uz-UZ")
+    // Dasturni boshlash
+    initializeApp();
+
+    // Inputga Enter bosganda kirish
+    document.getElementById("userName").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            console.log("Enter bosildi, startApp chaqiriladi");
+            startApp();
+        }
     });
 
-    if (viewedProducts.length > 20) {
-        viewedProducts = viewedProducts.slice(0, 20);
-    }
+    // Qidiruv funksiyasi
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+        const searchTerm = e.target.value.toLowerCase();
 
-    updateViewedBadge();
-    saveToLocalStorage();
+        if (searchTerm.length > 2) {
+            const filtered = sampleProducts.filter(
+                product =>
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.category.toLowerCase().includes(searchTerm) ||
+                product.description.toLowerCase().includes(searchTerm)
+            );
+
+            if (document.getElementById("catalogPage").classList.contains("active")) {
+                loadSearchResults(filtered);
+            }
+        } else if (searchTerm.length === 0 &&
+            document.getElementById("catalogPage").classList.contains("active")) {
+            loadCatalog(currentCategory);
+        }
+    });
+
+    // Modal overlay bosilganda yopish
+    document.querySelectorAll(".modal-overlay").forEach(overlay => {
+        overlay.addEventListener("click", function() {
+            const modal = this.closest(".modal");
+            if (modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        });
+    });
+});
+
+// Konsolni bloklash
+console.log = function() {};
+console.error = function() {};
+console.warn = function() {};
+console.info = function() {};
+console.debug = function() {};
+
+// ===== QO'SHIMCHA FUNKSIYALAR =====
+function updateFavoritesBadge() {
+    const badge = document.getElementById("favoritesCount");
+    if (badge) badge.textContent = favorites.length;
+}
+
+function updateOrdersBadge() {
+    const badge = document.getElementById("ordersCount");
+    if (badge) badge.textContent = orders.length;
 }
 
 function updateViewedBadge() {
@@ -1088,101 +1916,64 @@ function updateViewedBadge() {
     if (badge) badge.textContent = viewedProducts.length;
 }
 
-function showViewed() {
-    switchPage("viewedPage");
-    updateViewedList();
+// ===== PROFILDAN MANZIL TANLASH =====
+function useSavedAddress() {
+    // Saqlangan manzillar ro'yxatini ko'rsatish
+    if (savedAddresses.length > 0) {
+        document.getElementById('savedAddressesSelection').style.display = 'block';
+        updateAddressesSelectionList();
+    } else {
+        showNotification("Sizda saqlangan manzillar yo'q!", "info");
+        useNewAddress();
+    }
 }
 
-function updateViewedList() {
-    const container = document.getElementById("viewedList");
+function updateAddressesSelectionList() {
+    const container = document.getElementById('addressesSelectionList');
     if (!container) return;
 
-    if (viewedProducts.length === 0) {
-        container.innerHTML = `
-            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
-                <i class="fas fa-eye" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Ko'rilganlar yo'q</h3>
-                <p style="font-size: 0.85rem;">Siz hali hech qanday mahsulotni ko'rmagansiz</p>
-                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
-                    <i class="fas fa-th-large"></i> Mahsulotlarni ko'rish
-                </button>
-            </div>
-        `;
-        return;
-    }
+    container.innerHTML = '';
 
-    container.innerHTML = "";
-
-    viewedProducts.forEach(item => {
-        const viewedItem = document.createElement("div");
-        viewedItem.className = "product-card";
-        viewedItem.style.cssText = `
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        `;
-        viewedItem.innerHTML = `
-            <div class="product-image" style="background-image: url('${item.image}')">
-                <div class="product-badge">${item.bonus}% bonus</div>
-            </div>
-            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
-                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
-                    ${item.name}
+    savedAddresses.forEach((address, index) => {
+        const addressItem = document.createElement('div');
+        addressItem.className = 'saved-address-item';
+        addressItem.innerHTML = `
+            <div style="padding: 0.75rem; border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 0.5rem; cursor: pointer;" 
+                 onclick="selectAddressForOrder(${index})">
+                <div style="font-weight: 600; margin-bottom: 0.3rem;">${address.name}</div>
+                <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.2rem;">
+                    ${address.region}, ${address.district}
                 </div>
-                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
-                    $${item.price.toFixed(2)}
-                </div>
-                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
-                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
-                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
-                    </button>
-                    <button class="btn btn-outline" onclick="addToCart(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
-                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
-                    </button>
-                    <button class="btn btn-outline" onclick="addToFavoritesFromViewed(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; min-width: 22px; min-height: 22px;">
-                        <i class="fas fa-heart" style="font-size: 0.6rem;"></i>
-                    </button>
-                </div>
-                <div style="font-size: 0.55rem; color: var(--text-light); margin-top: 0.3rem; text-align: center;">
-                    <i class="far fa-clock"></i> ${item.viewedDate}
-                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">${address.address}</div>
             </div>
         `;
-        container.appendChild(viewedItem);
+        container.appendChild(addressItem);
     });
 }
 
-function addToFavoritesFromViewed(productId) {
-    const product = sampleProducts.find(p => p.id === productId);
-    if (!product) return;
+function selectAddressForOrder(index) {
+    const address = savedAddresses[index];
+    if (address) {
+        // Formani to'ldirish
+        document.getElementById('regionSelect').value = address.region;
+        updateDistricts();
+        setTimeout(() => {
+            document.getElementById('districtSelect').value = address.district;
+            document.getElementById('fullAddress').value = address.address;
+        }, 100);
 
-    const existingIndex = favorites.findIndex(item => item.id === productId);
-    if (existingIndex !== -1) {
-        showNotification("Bu mahsulot allaqachon sevimlilarda", "warning");
-        return;
+        closeModal('addressSelectionModal');
+        showNotification(`"${address.name}" manzili tanlandi`, "success");
     }
+}
 
-    favorites.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        bonus: product.bonus,
-        image: product.image,
-        category: product.category,
-        addedDate: new Date().toLocaleString("uz-UZ")
-    });
-
-    updateFavoritesBadge();
-    saveToLocalStorage();
-    showNotification("Mahsulot sevimlilarga qo'shildi!", "success");
+function useNewAddress() {
+    closeModal('addressSelectionModal');
+    // Qo'lda kiritish usulini tanlash
+    selectAddressMethod('manual');
 }
 
 // ===== BUYURTMALAR FUNKSIYALARI =====
-function updateOrdersBadge() {
-    const badge = document.getElementById("ordersCount");
-    if (badge) badge.textContent = orders.length;
-}
-
 function showOrders() {
     switchPage("ordersPage");
     updateOrdersList();
@@ -1318,662 +2109,213 @@ function trackOrder(orderIndex) {
     showNotification("Bu buyurtmani kuzatish funksiyasi tez orada qo'shiladi!", "info");
 }
 
-// ===== VILOYAT VA TUMANLAR =====
-function populateRegions() {
-    const regionSelect = document.getElementById("regionSelect");
-    const modalRegionSelect = document.getElementById("modalRegionSelect");
-    
-    if (regionSelect) {
-        regionSelect.innerHTML = '<option value="">Viloyatni tanlang</option>';
-        Object.keys(regions).forEach(region => {
-            regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
-        });
-    }
-    
-    if (modalRegionSelect) {
-        modalRegionSelect.innerHTML = '<option value="">Viloyatni tanlang</option>';
-        Object.keys(regions).forEach(region => {
-            modalRegionSelect.innerHTML += `<option value="${region}">${region}</option>`;
-        });
-    }
+// ===== SEVIMLILAR FUNKSIYALARI =====
+function showFavorites() {
+    switchPage("favoritesPage");
+    updateFavoritesList();
 }
 
-function updateDistricts() {
-    const regionSelect = document.getElementById("regionSelect");
-    const districtSelect = document.getElementById("districtSelect");
-    
-    if (!regionSelect || !districtSelect) return;
-    
-    const selectedRegion = regionSelect.value;
-    
-    if (selectedRegion && regions[selectedRegion]) {
-        districtSelect.disabled = false;
-        districtSelect.innerHTML = '<option value="">Tuman/Shaharni tanlang</option>';
-        
-        regions[selectedRegion].forEach(district => {
-            districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
-        });
-    } else {
-        districtSelect.disabled = true;
-        districtSelect.innerHTML = '<option value="">Avval viloyatni tanlang</option>';
-    }
-}
-
-function updateModalDistricts() {
-    const modalRegionSelect = document.getElementById("modalRegionSelect");
-    const modalDistrictSelect = document.getElementById("modalDistrictSelect");
-    
-    if (!modalRegionSelect || !modalDistrictSelect) return;
-    
-    const selectedRegion = modalRegionSelect.value;
-    
-    if (selectedRegion && regions[selectedRegion]) {
-        modalDistrictSelect.disabled = false;
-        modalDistrictSelect.innerHTML = '<option value="">Tuman/Shaharni tanlang</option>';
-        
-        regions[selectedRegion].forEach(district => {
-            modalDistrictSelect.innerHTML += `<option value="${district}">${district}</option>`;
-        });
-    } else {
-        modalDistrictSelect.disabled = true;
-        modalDistrictSelect.innerHTML = '<option value="">Avval viloyatni tanlang</option>';
-    }
-}
-
-// ===== BUYURTMA BERISH FUNKSIYALARI =====
-function showCheckoutPage() {
-    if (cart.length === 0) {
-        showNotification("Iltimos, avval mahsulot qo'shing!", "error");
-        return;
-    }
-    
-    switchPage("checkoutPage");
-    updateCheckoutDisplay();
-}
-
-function updateCheckoutDisplay() {
-    const checkoutItems = document.getElementById("checkoutItems");
-    const checkoutTotal = document.getElementById("checkoutTotal");
-    const checkoutItemsCount = document.getElementById("checkoutItemsCount");
-    
-    if (!checkoutItems || !checkoutTotal || !checkoutItemsCount) return;
-    
-    let totalItems = 0;
-    let totalPrice = 0;
-    
-    checkoutItems.innerHTML = "";
-    
-    cart.forEach(item => {
-        totalItems += item.quantity;
-        const itemTotal = item.price * item.quantity;
-        totalPrice += itemTotal;
-        
-        const itemElement = document.createElement("div");
-        itemElement.className = "menu-item";
-        itemElement.innerHTML = `
-            <div>
-                <div style="font-weight: 600; color: var(--text-primary); font-size: 0.85rem;">${item.name}</div>
-                <div style="font-size: 0.75rem; color: var(--text-light);">${item.quantity} × $${item.price.toFixed(2)}</div>
-            </div>
-            <div style="font-weight: 700; color: var(--primary); font-size: 0.9rem;">$${itemTotal.toFixed(2)}</div>
-        `;
-        checkoutItems.appendChild(itemElement);
-    });
-    
-    checkoutTotal.textContent = `$${totalPrice.toFixed(2)}`;
-    checkoutItemsCount.textContent = `${totalItems} ta`;
-}
-
-function getPaymentMethodName(method) {
-    const methods = {
-        cash: "Naqd pul",
-        card: "Bank kartasi",
-        click: "Click",
-        payme: "Payme"
-    };
-    return methods[method] || method;
-}
-
-async function submitOrder() {
-    // Ma'lumotlarni tekshirish
-    const region = document.getElementById("regionSelect").value;
-    const district = document.getElementById("districtSelect").value;
-    const fullAddress = document.getElementById("fullAddress").value.trim();
-    const userPhone = document.getElementById("userPhone").value.trim();
-    const orderComment = document.getElementById("orderComment").value.trim();
-    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-    const agreeTerms = document.getElementById("agreeTerms").checked;
-    
-    // Validatsiya
-    if (!region) {
-        showNotification("Iltimos, viloyatni tanlang!", "error");
-        return;
-    }
-    
-    if (!district) {
-        showNotification("Iltimos, tuman/shaharni tanlang!", "error");
-        return;
-    }
-    
-    if (!fullAddress) {
-        showNotification("Iltimos, to'liq manzilni kiriting!", "error");
-        return;
-    }
-    
-    if (!userPhone) {
-        showNotification("Iltimos, telefon raqamingizni kiriting!", "error");
-        return;
-    }
-    
-    // Telefon raqamni tekshirish
-    const phoneRegex = /^\+998\d{9}$/;
-    if (!phoneRegex.test(userPhone)) {
-        showNotification("Iltimos, to'g'ri telefon raqam kiriting (+998901234567 formatida)", "error");
-        return;
-    }
-    
-    if (!agreeTerms) {
-        showNotification("Iltimos, foydalanish shartlari bilan roziligingizni bildiring!", "error");
-        return;
-    }
-    
-    // Yuklanmoqda bildirishnomasini ko'rsatish
-    showNotification("Buyurtma yuborilmoqda...", "warning");
-    
-    // Buyurtma ma'lumotlarini tayyorlash
-    let orderItems = "";
-    let totalAmount = 0;
-    let totalBonusAmount = 0;
-    
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        totalAmount += itemTotal;
-        
-        const bonusAmount = (itemTotal * (item.bonus || 0)) / 100;
-        totalBonusAmount += bonusAmount;
-        
-        orderItems += `• ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${itemTotal.toFixed(2)}`;
-        if (item.bonus && item.bonus > 0) {
-            orderItems += ` (${item.bonus}% bonus: +$${bonusAmount.toFixed(2)})`;
-        }
-        orderItems += `\n`;
-    });
-    
-    // Telegram xabari
-    const message = `
-🛒 YANGI BUYURTMA
-
-👤 Mijoz: ${currentUser.name}
-📞 Telefon: ${userPhone}
-
-📍 Manzil:
-Viloyat: ${region}
-Tuman: ${district}
-To'liq manzil: ${fullAddress}
-
-📦 Mahsulotlar:
-${orderItems}
-
-💰 Umumiy summa: $${totalAmount.toFixed(2)}
-🎁 Umumiy bonus: $${totalBonusAmount.toFixed(2)} (${totalBonusAmount > 0 ? ((totalBonusAmount / totalAmount) * 100).toFixed(1) : 0}%)
-💳 To'lov usuli: ${getPaymentMethodName(paymentMethod)}
-📝 Izoh: ${orderComment || "Yo'q"}
-
-⏰ Buyurtma vaqti: ${new Date().toLocaleString("uz-UZ")}
-    `;
-    
-    // Telegram botga xabar yuborish
-    try {
-        const response = await sendToTelegram(message);
-        
-        if (response.ok) {
-            // Muvaffaqiyatli yuborilgandan keyin
-            currentOrder = {
-                id: Date.now(),
-                date: new Date().toLocaleString("uz-UZ"),
-                customerName: currentUser.name,
-                customerPhone: userPhone,
-                region: region,
-                district: district,
-                address: fullAddress,
-                items: [...cart],
-                totalAmount: totalAmount,
-                totalBonus: totalBonusAmount,
-                paymentMethod: paymentMethod,
-                comment: orderComment,
-                status: "Yangi",
-            };
-            
-            // Buyurtmani buyurtmalar ro'yxatiga qo'shish
-            orders.unshift(currentOrder);
-            
-            // Foydalanuvchi telefon raqamini saqlash
-            currentUser.phone = userPhone;
-            updateUserDisplay();
-            
-            // Loyallik ballarini hisoblash
-            const newPoints = Math.floor(totalAmount);
-            currentUser.loyaltyPoints += newPoints;
-            
-            // Savatni tozalash
-            cart = [];
-            
-            // Barcha ma'lumotlarni yangilash
-            updateCartDisplay();
-            updateCartBadge();
-            updateOrdersBadge();
-            updateAllBadges();
-            
-            // Barcha ma'lumotlarni saqlash
-            saveToLocalStorage();
-            
-            // Xabarlar
-            showNotification("Buyurtma muvaffaqiyatli qabul qilindi!", "success");
-            
-            if (newPoints > 0) {
-                setTimeout(() => {
-                    showNotification(`Sizga ${newPoints} ball qo'shildi! Jami: ${currentUser.loyaltyPoints} ball`, "success");
-                }, 1000);
-            }
-            
-            // Buyurtma tasdiq sahifasiga o'tish
-            showOrderConfirmation();
-        } else {
-            throw new Error("Telegram API xatosi");
-        }
-    } catch (error) {
-        console.error("Xatolik:", error);
-        showNotification("Buyurtma yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.", "error");
-    }
-}
-
-async function sendToTelegram(message) {
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: "HTML",
-            }),
-        });
-        
-        const data = await response.json();
-        
-        return {
-            ok: data.ok,
-            data: data,
-        };
-    } catch (error) {
-        console.error("Fetch xatosi:", error);
-        return {
-            ok: false,
-            error: error,
-        };
-    }
-}
-
-function showOrderConfirmation() {
-    if (!currentOrder) return;
-    
-    document.getElementById("orderNumber").textContent = `#${currentOrder.id.toString().slice(-6)}`;
-    document.getElementById("summaryTotal").textContent = `$${currentOrder.totalAmount.toFixed(2)}`;
-    document.getElementById("summaryAddress").textContent = `${currentOrder.region}, ${currentOrder.district}`;
-    document.getElementById("summaryPayment").textContent = getPaymentMethodName(currentOrder.paymentMethod);
-    document.getElementById("orderTime").textContent = currentOrder.date;
-    
-    switchPage("orderConfirmationPage");
-}
-
-function continueShopping() {
-    showHome();
-}
-
-// ===== PROFIL FUNKSIYALARI =====
-function editProfile() {
-    if (!currentUser) return;
-    
-    document.getElementById("editPhone").value = currentUser.phone || "";
-    document.getElementById("editEmail").value = currentUser.email || "";
-    openModal("profileModal");
-}
-
-function saveProfile() {
-    const phone = document.getElementById("editPhone").value.trim();
-    const email = document.getElementById("editEmail").value.trim();
-    
-    if (phone && !phone.match(/^\+998\d{9}$/)) {
-        showNotification("Iltimos, to'g'ri telefon raqam kiriting!", "error");
-        return;
-    }
-    
-    currentUser.phone = phone;
-    currentUser.email = email;
-    
-    updateUserDisplay();
-    saveToLocalStorage();
-    closeModal("profileModal");
-    showNotification("Profil ma'lumotlari yangilandi!", "success");
-}
-
-function changeName() {
-    if (!currentUser) return;
-    
-    document.getElementById("newUserName").value = currentUser.name;
-    openModal("nameModal");
-}
-
-function saveNewName() {
-    const newName = document.getElementById("newUserName").value.trim();
-    
-    if (!newName) {
-        showNotification("Iltimos, yangi ism kiriting!", "error");
-        return;
-    }
-    
-    currentUser.name = newName;
-    updateUserDisplay();
-    saveToLocalStorage();
-    closeModal("nameModal");
-    showNotification("Ism muvaffaqiyatli o'zgartirildi!", "success");
-}
-
-function showAddresses() {
-    switchPage("addressesPage");
-    updateAddressesList();
-}
-
-function updateAddressesList() {
-    const container = document.getElementById("addressesList");
+function updateFavoritesList() {
+    const container = document.getElementById("favoritesList");
     if (!container) return;
-    
-    if (addresses.length === 0) {
+
+    if (favorites.length === 0) {
         container.innerHTML = `
             <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
-                <i class="fas fa-map-marker-alt" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Manzillar yo'q</h3>
-                <p style="font-size: 0.85rem;">Sizda hali saqlangan manzillar yo'q</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = "";
-    
-    addresses.forEach((address, index) => {
-        const addressItem = document.createElement("div");
-        addressItem.className = "section";
-        addressItem.style.marginBottom = "0.75rem";
-        addressItem.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                <div>
-                    <h4 style="margin-bottom: 0.2rem; color: var(--text-primary); font-size: 0.9rem;">${address.name}</h4>
-                    <div style="font-size: 0.75rem; color: var(--text-light);">
-                        ${address.region}, ${address.district}
-                    </div>
-                </div>
-                <button class="btn btn-danger" onclick="deleteAddress(${index})" style="padding: 0.4rem; font-size: 0.8rem;">
-                    <i class="fas fa-trash"></i>
+                <i class="fas fa-heart" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3; color: red;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Sevimlilar bo'sh</h3>
+                <p style="font-size: 0.85rem;">Yoqtirgan mahsulotlaringizni bu yerda saqlashingiz mumkin</p>
+                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <i class="fas fa-th-large"></i> Mahsulotlarni ko'rish
                 </button>
             </div>
-            <div style="color: var(--text-secondary); font-size: 0.8rem;">
-                ${address.address}
-            </div>
-        `;
-        container.appendChild(addressItem);
-    });
-}
-
-function openAddAddress() {
-    openModal("addressModal");
-}
-
-function saveAddress() {
-    const name = document.getElementById("addressName").value.trim();
-    const region = document.getElementById("modalRegionSelect").value;
-    const district = document.getElementById("modalDistrictSelect").value;
-    const fullAddress = document.getElementById("modalFullAddress").value.trim();
-    
-    if (!name || !region || !district || !fullAddress) {
-        showNotification("Iltimos, barcha maydonlarni to'ldiring!", "error");
-        return;
-    }
-    
-    const newAddress = {
-        name: name,
-        region: region,
-        district: district,
-        address: fullAddress,
-        createdAt: new Date().toISOString()
-    };
-    
-    addresses.push(newAddress);
-    saveToLocalStorage();
-    closeModal("addressModal");
-    updateAddressesList();
-    
-    // Formani tozalash
-    document.getElementById("addressName").value = "";
-    document.getElementById("modalRegionSelect").value = "";
-    document.getElementById("modalDistrictSelect").value = "";
-    document.getElementById("modalDistrictSelect").disabled = true;
-    document.getElementById("modalFullAddress").value = "";
-    
-    showNotification("Yangi manzil qo'shildi!", "success");
-}
-
-function deleteAddress(index) {
-    if (confirm("Bu manzilni o'chirishni istaysizmi?")) {
-        addresses.splice(index, 1);
-        saveToLocalStorage();
-        updateAddressesList();
-        showNotification("Manzil o'chirildi", "success");
-    }
-}
-
-function showLoyalty() {
-    switchPage("loyaltyPage");
-    updateLoyaltyDisplay();
-}
-
-function updateLoyaltyDisplay() {
-    if (currentUser) {
-        document.getElementById("loyaltyPointsDisplay").textContent = `${currentUser.loyaltyPoints || 0} ball`;
-        const dollarsValue = (currentUser.loyaltyPoints || 0).toFixed(2);
-        
-        const subtitle = document.querySelector(".loyalty-subtitle");
-        if (subtitle) {
-            subtitle.textContent = `Ball qanday to'planadi: ${currentUser.loyaltyPoints || 0} ball = $${dollarsValue} qiymatiga teng`;
-        }
-    }
-}
-
-function toggleNotifications() {
-    notificationsEnabled = !notificationsEnabled;
-    saveToLocalStorage();
-    
-    const toggleSwitch = document.querySelector(".toggle-switch");
-    if (toggleSwitch) {
-        toggleSwitch.style.transform = notificationsEnabled ? "translateX(22px)" : "translateX(2px)";
-    }
-    
-    showNotification(
-        notificationsEnabled ? "Bildirishnomalar yoqildi" : "Bildirishnomalar o'chirildi",
-        notificationsEnabled ? "success" : "warning"
-    );
-}
-
-function logout() {
-    if (confirm("Haqiqatan ham chiqmoqchimisiz?")) {
-        resetData();
-        showLoginPage();
-        showNotification("Siz tizimdan chiqdingiz", "success");
-    }
-}
-
-// ===== MODAL FUNKSIYALARI =====
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = "flex";
-        document.body.style.overflow = "hidden";
-    }
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = "none";
-        document.body.style.overflow = "auto";
-    }
-}
-
-// ===== XABAR FUNKSIYALARI =====
-function showNotification(message, type = "success") {
-    const notification = document.getElementById("notification");
-    const notificationText = document.getElementById("notificationText");
-    const notificationIcon = document.querySelector(".notification-icon");
-    
-    if (!notification || !notificationText || !notificationIcon) return;
-    
-    notificationText.textContent = message;
-    
-    // Oldingi klasslarni olib tashlash
-    notification.className = "notification";
-    notificationIcon.className = "notification-icon";
-    
-    // Yangi klass qo'shish
-    notification.classList.add(type);
-    notificationIcon.classList.add(type);
-    
-    notification.style.display = "flex";
-    
-    setTimeout(() => {
-        notification.style.display = "none";
-    }, 5000);
-}
-
-// ===== DASTLABKI SOZLAMALAR =====
-document.addEventListener("DOMContentLoaded", function() {
-    console.log("Hydroline do'koni yuklandi!");
-    
-    initializeApp();
-    
-    // Inputga Enter bosganda kirish
-    document.getElementById("userName").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            startApp();
-        }
-    });
-    
-    // Qidiruv funksiyasi
-    document.getElementById("searchInput").addEventListener("input", function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        
-        if (searchTerm.length > 2) {
-            const filtered = sampleProducts.filter(
-                product =>
-                    product.name.toLowerCase().includes(searchTerm) ||
-                    product.category.toLowerCase().includes(searchTerm) ||
-                    product.description.toLowerCase().includes(searchTerm)
-            );
-            
-            if (document.getElementById("catalogPage").classList.contains("active")) {
-                loadSearchResults(filtered);
-            }
-        } else if (searchTerm.length === 0 && 
-                   document.getElementById("catalogPage").classList.contains("active")) {
-            loadCatalog(currentCategory);
-        }
-    });
-    
-    // Modal overlay bosilganda yopish
-    document.querySelectorAll(".modal-overlay").forEach(overlay => {
-        overlay.addEventListener("click", function() {
-            const modal = this.closest(".modal");
-            if (modal) {
-                modal.style.display = "none";
-                document.body.style.overflow = "auto";
-            }
-        });
-    });
-});
-
-function loadSearchResults(filteredProducts) {
-    const productGrid = document.getElementById("productGrid");
-    const catalogTitle = document.getElementById("catalogTitle");
-    
-    if (!productGrid || !catalogTitle) return;
-    
-    catalogTitle.textContent = `Qidiruv natijalari (${filteredProducts.length})`;
-    
-    productGrid.innerHTML = "";
-    
-    if (filteredProducts.length === 0) {
-        productGrid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: var(--text-light);">
-                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Natija topilmadi</h3>
-                <p style="font-size: 0.85rem;">"${document.getElementById("searchInput").value}" uchun hech narsa topilmadi</p>
-            </div>
         `;
         return;
     }
-    
-    filteredProducts.forEach(product => {
-        const productCard = document.createElement("div");
-        productCard.className = "product-card";
-        productCard.style.cssText = `
+
+    container.innerHTML = "";
+
+    favorites.forEach((item, index) => {
+        const favoriteItem = document.createElement("div");
+        favoriteItem.className = "product-card";
+        favoriteItem.style.cssText = `
             height: 100%;
             display: flex;
             flex-direction: column;
         `;
-        productCard.onclick = () => showProductDetail(product.id);
-        productCard.innerHTML = `
-            <div class="product-image" style="background-image: url('${product.image}')">
-                <div class="product-badge">${product.bonus}% bonus</div>
+        favoriteItem.innerHTML = `
+            <div class="product-image" style="background-image: url('${item.image}')">
+                <div class="product-badge">${item.bonus}% bonus</div>
             </div>
             <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
                 <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
-                    ${product.name}
+                    ${item.name}
                 </div>
                 <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
-                    $${product.price.toFixed(2)}
+                    $${item.price.toFixed(2)}
                 </div>
                 <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
-                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
-                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
-                    </button>
-                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
                         <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
+                    <button class="btn btn-outline" onclick="addToCart(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="removeFromFavorites(${index})" style="padding: 0.2rem; font-size: 0.55rem; min-width: 22px; min-height: 22px;">
+                        <i class="fas fa-trash" style="font-size: 0.6rem;"></i>
+                    </button>
+                </div>
+                <div style="font-size: 0.55rem; color: var(--text-light); margin-top: 0.3rem; text-align: center;">
+                    <i class="far fa-clock"></i> ${item.addedDate}
                 </div>
             </div>
         `;
-        productGrid.appendChild(productCard);
+        container.appendChild(favoriteItem);
     });
 }
 
-function toggleFilters() {
-    showNotification("Filtr funksiyasi tez orada qo'shiladi!", "info");
+function removeFromFavorites(index) {
+    if (confirm("Bu mahsulotni sevimlilardan o'chirishni istaysizmi?")) {
+        favorites.splice(index, 1);
+        updateFavoritesList();
+        updateFavoritesBadge();
+        saveToLocalStorage();
+        showNotification("Mahsulot sevimlilardan o'chirildi", "success");
+    }
 }
 
-function toggleSort() {
-    showNotification("Saralash funksiyasi tez orada qo'shiladi!", "info");
+function clearFavorites() {
+    if (favorites.length === 0) {
+        showNotification("Sevimlilar allaqachon bo'sh", "info");
+        return;
+    }
+
+    if (confirm("Barcha sevimlilarni o'chirishni istaysizmi?")) {
+        favorites = [];
+        updateFavoritesList();
+        updateFavoritesBadge();
+        saveToLocalStorage();
+        showNotification("Barcha sevimlilar tozalandi", "success");
+    }
 }
 
-function toggleFilter() {
-    showNotification("Filtr funksiyasi tez orada qo'shiladi!", "info");
+// ===== KO'RILGAN MAHSULOTLAR =====
+function addToViewed(productId) {
+    const product = sampleProducts.find(p => p.id === productId);
+    if (!product) return;
+
+    const existingIndex = viewedProducts.findIndex(item => item.id === productId);
+    if (existingIndex !== -1) {
+        viewedProducts.splice(existingIndex, 1);
+    }
+
+    viewedProducts.unshift({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        bonus: product.bonus,
+        image: product.image,
+        category: product.category,
+        viewedDate: new Date().toLocaleString("uz-UZ")
+    });
+
+    if (viewedProducts.length > 20) {
+        viewedProducts = viewedProducts.slice(0, 20);
+    }
+
+    updateViewedBadge();
+    saveToLocalStorage();
 }
 
-// Konsolni bloklash
-console.log = function() {};
-console.error = function() {};
-console.warn = function() {};
-console.info = function() {};
-console.debug = function() {};
+function showViewed() {
+    switchPage("viewedPage");
+    updateViewedList();
+}
+
+function updateViewedList() {
+    const container = document.getElementById("viewedList");
+    if (!container) return;
+
+    if (viewedProducts.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-eye" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Ko'rilganlar yo'q</h3>
+                <p style="font-size: 0.85rem;">Siz hali hech qanday mahsulotni ko'rmagansiz</p>
+                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <i class="fas fa-th-large"></i> Mahsulotlarni ko'rish
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = "";
+
+    viewedProducts.forEach(item => {
+        const viewedItem = document.createElement("div");
+        viewedItem.className = "product-card";
+        viewedItem.style.cssText = `
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
+        viewedItem.innerHTML = `
+            <div class="product-image" style="background-image: url('${item.image}')">
+                <div class="product-badge">${item.bonus}% bonus</div>
+            </div>
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${item.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${item.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
+                    </button>
+                    <button class="btn btn-outline" onclick="addToCart(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
+                    </button>
+                    <button class="btn btn-outline" onclick="addToFavoritesFromViewed(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; min-width: 22px; min-height: 22px;">
+                        <i class="fas fa-heart" style="font-size: 0.6rem;"></i>
+                    </button>
+                </div>
+                <div style="font-size: 0.55rem; color: var(--text-light); margin-top: 0.3rem; text-align: center;">
+                    <i class="far fa-clock"></i> ${item.viewedDate}
+                </div>
+            </div>
+        `;
+        container.appendChild(viewedItem);
+    });
+}
+
+function addToFavoritesFromViewed(productId) {
+    const product = sampleProducts.find(p => p.id === productId);
+    if (!product) return;
+
+    const existingIndex = favorites.findIndex(item => item.id === productId);
+    if (existingIndex !== -1) {
+        showNotification("Bu mahsulot allaqachon sevimlilarda", "warning");
+        return;
+    }
+
+    favorites.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        bonus: product.bonus,
+        image: product.image,
+        category: product.category,
+        addedDate: new Date().toLocaleString("uz-UZ")
+    });
+
+    updateFavoritesBadge();
+    saveToLocalStorage();
+    showNotification("Mahsulot sevimlilarga qo'shildi!", "success");
+}
+
+function viewOrders() {
+    showOrders();
+}
