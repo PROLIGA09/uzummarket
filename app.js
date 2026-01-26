@@ -15,6 +15,119 @@ let viewedProducts = [];
 let addresses = [];
 let notificationsEnabled = true;
 
+// ===== HACKER HIMOYASI =====
+let refreshCount = 0;
+let lastRefreshTime = Date.now();
+let blockedUser = false;
+let f12Pressed = false;
+
+// F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U bloklash
+document.addEventListener('keydown', function(e) {
+    // F12 ni bloklash
+    if (e.key === 'F12') {
+        e.preventDefault();
+        f12Pressed = true;
+        showSecurityWarning();
+        return false;
+    }
+
+    // Ctrl+Shift+I (Chrome Developer Tools)
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        showSecurityWarning();
+        return false;
+    }
+
+    // Ctrl+Shift+J (Chrome Console)
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        showSecurityWarning();
+        return false;
+    }
+
+    // Ctrl+U (View Source)
+    if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        showSecurityWarning();
+        return false;
+    }
+});
+
+// O'ng tugma bosilishini bloklash
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    showSecurityWarning();
+    return false;
+});
+
+// Developer tools ochilishini aniqlash
+function detectDevTools() {
+    const widthThreshold = window.outerWidth - window.innerWidth > 160;
+    const heightThreshold = window.outerHeight - window.innerHeight > 160;
+
+    if (widthThreshold || heightThreshold) {
+        showSecurityWarning();
+    }
+}
+
+setInterval(detectDevTools, 1000);
+
+// Himoya xabarini ko'rsatish
+function showSecurityWarning() {
+    if (blockedUser) return;
+
+    const overlay = document.getElementById('securityOverlay');
+    if (!overlay) {
+        const securityHTML = `
+            <div id="securityOverlay">
+                <div class="security-message">⚠️ XAVFSIZLIK OGOHLANTIRISHI ⚠️</div>
+                <div class="security-countdown" id="securityCountdown">3</div>
+                <div class="security-warning">
+                    Ushbu veb-sayt himoyalangan. Siz dasturiy ta'minotni buzish yoki tahlil qilishga urinayapsiz.<br>
+                    Buning uchun siz 3 soniya bloklanasiz.
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', securityHTML);
+    }
+
+    const overlayElement = document.getElementById('securityOverlay');
+    overlayElement.style.display = 'flex';
+
+    let countdown = 3;
+    const countdownElement = document.getElementById('securityCountdown');
+
+    const timer = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(timer);
+            overlayElement.style.display = 'none';
+            blockedUser = false;
+        }
+    }, 1000);
+
+    blockedUser = true;
+}
+
+// Yangilashni monitoring qilish
+window.addEventListener('beforeunload', function() {
+    const currentTime = Date.now();
+    if (currentTime - lastRefreshTime < 3000) { // 3 soniya ichida
+        refreshCount++;
+        lastRefreshTime = currentTime;
+
+        if (refreshCount >= 3) {
+            showSecurityWarning();
+            refreshCount = 0;
+        }
+    } else {
+        refreshCount = 0;
+        lastRefreshTime = currentTime;
+    }
+});
+
 // ===== LOCAL STORAGE FUNKSIYALARI =====
 function loadFromLocalStorage() {
     try {
@@ -185,6 +298,26 @@ const sampleProducts = [{
         description: "Massajli dush golovkasi. 5 turdagi suv strusi, rezinali shlang, oson tozalash.",
         image: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
         specs: ["Strusa: 5 tur", "Material: Plastik", "Shlang: Rezina", "Kafolat: 2 yil"]
+    },
+    {
+        id: 11,
+        name: "Modern Rakovina",
+        price: 159.99,
+        bonus: 10,
+        category: "RAKOVINA UCHUN",
+        description: "Zamonaviy dizaynli rakovina, oson tozalash uchun silliq sirt.",
+        image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        specs: ["Material: Keramika", "Rang: Oq", "O'lcham: 60x40cm", "Kafolat: 7 yil"]
+    },
+    {
+        id: 12,
+        name: "Premium Dush Seti",
+        price: 199.99,
+        bonus: 15,
+        category: "DUSH UCHUN",
+        description: "Premium dush seti, 6 turdagi massage, suv tejash texnologiyasi.",
+        image: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        specs: ["Material: Zanglamas po'lat", "Massage: 6 tur", "Suv tejash: 30%", "Kafolat: 5 yil"]
     }
 ];
 
@@ -227,7 +360,10 @@ function startApp() {
 }
 
 function showMainApp() {
+    // Kirish sahifasini yashirish
     document.getElementById("loginContainer").style.display = "none";
+
+    // Asosiy aplikatsiyani ko'rsatish
     document.getElementById("mainApp").style.display = "block";
 
     updateUserDisplay();
@@ -236,8 +372,13 @@ function showMainApp() {
 }
 
 function showLoginPage() {
+    // Asosiy aplikatsiyani yashirish
     document.getElementById("mainApp").style.display = "none";
+
+    // Kirish sahifasini ko'rsatish
     document.getElementById("loginContainer").style.display = "flex";
+
+    // Inputni tozalash va fokus qilish
     document.getElementById("userName").value = "";
     document.getElementById("userName").focus();
 }
@@ -356,22 +497,32 @@ function loadFeaturedProducts() {
     featured.forEach(product => {
         const productElement = document.createElement("div");
         productElement.className = "product-card";
-        productElement.style.minWidth = "200px";
+        productElement.style.cssText = `
+            min-width: calc(25% - 0.3rem);
+            flex: 0 0 calc(25% - 0.3rem);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
+
         productElement.onclick = () => showProductDetail(product.id);
         productElement.innerHTML = `
             <div class="product-image" style="background-image: url('${product.image}')">
                 <div class="product-badge">${product.bonus}% bonus</div>
             </div>
-            <div class="product-info">
-                <div class="product-title">${product.name}</div>
-                <div class="product-price">$${product.price.toFixed(2)}</div>
-                <div class="product-category">${product.category}</div>
-                <div class="product-actions">
-                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})">
-                        <i class="fas fa-cart-plus"></i>
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${product.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${product.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})">
-                        <i class="fas fa-eye"></i>
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
                 </div>
             </div>
@@ -403,10 +554,10 @@ function loadCatalog(category) {
 
     if (filteredProducts.length === 0) {
         productGrid.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-box-open"></i>
-                <h3>Mahsulot topilmadi</h3>
-                <p>Bu kategoriyada hali mahsulotlar yo'q</p>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Mahsulot topilmadi</h3>
+                <p style="font-size: 0.85rem;">Bu kategoriyada hali mahsulotlar yo'q</p>
             </div>
         `;
         return;
@@ -415,21 +566,30 @@ function loadCatalog(category) {
     filteredProducts.forEach(product => {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
+        productCard.style.cssText = `
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
+
         productCard.onclick = () => showProductDetail(product.id);
         productCard.innerHTML = `
             <div class="product-image" style="background-image: url('${product.image}')">
                 <div class="product-badge">${product.bonus}% bonus</div>
             </div>
-            <div class="product-info">
-                <div class="product-title">${product.name}</div>
-                <div class="product-price">$${product.price.toFixed(2)}</div>
-                <div class="product-category">${product.category}</div>
-                <div class="product-actions">
-                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})">
-                        <i class="fas fa-cart-plus"></i> Savatchaga
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${product.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${product.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})">
-                        <i class="fas fa-eye"></i> Ko'rish
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
                 </div>
             </div>
@@ -438,28 +598,49 @@ function loadCatalog(category) {
     });
 }
 
+// ===== KO'RISH TUGMASI FUNKSIYASI (TO'G'IRLANGAN) =====
 function showProductDetail(productId) {
+    console.log("showProductDetail chaqirildi, productId:", productId);
+
     const product = sampleProducts.find(p => p.id === productId);
-    if (!product) return;
+    console.log("Topilgan mahsulot:", product);
+
+    if (!product) {
+        console.error("Mahsulot topilmadi!");
+        showNotification("Mahsulot topilmadi!", "error");
+        return;
+    }
 
     addToViewed(productId);
 
-    document.getElementById("productDetailImage").innerHTML = `
-        <div style="background-image: url('${product.image}'); width: 100%; height: 100%; background-size: cover; background-position: center;"></div>
-        <div class="product-badge">
-            <i class="fas fa-tag"></i>
-            <span>${product.bonus}%</span> bonus
-        </div>
-    `;
+    // Mahsulot tafsilotlari
+    const detailImage = document.getElementById("productDetailImage");
+    if (detailImage) {
+        detailImage.innerHTML = `
+            <div style="background-image: url('${product.image}'); width: 100%; height: 100%; background-size: cover; background-position: center;"></div>
+            <div class="product-badge" style="top: 1rem; right: 1rem; padding: 0.4rem 0.8rem; font-size: 0.9rem;">
+                <i class="fas fa-tag"></i>
+                <span>${product.bonus}%</span> bonus
+            </div>
+        `;
+        detailImage.dataset.productId = productId;
+    }
 
-    document.getElementById("productDetailName").textContent = product.name;
-    document.getElementById("productDetailPrice").textContent = `$${product.price.toFixed(2)}`;
-    document.getElementById("productDetailCategory").textContent = product.category;
-    document.getElementById("productDetailDesc").textContent = product.description;
-    document.getElementById("productBonus").textContent = product.bonus;
+    // Boshqa elementlarni yangilash
+    const elementsToUpdate = {
+        "productDetailName": product.name,
+        "productDetailPrice": `$${product.price.toFixed(2)}`,
+        "productDetailCategory": product.category,
+        "productDetailDesc": product.description,
+        "productBonus": product.bonus
+    };
 
-    document.getElementById("productDetailImage").dataset.productId = productId;
+    for (const [id, value] of Object.entries(elementsToUpdate)) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    }
 
+    // Xususiyatlarni yangilash
     const specsContainer = document.getElementById("productSpecs");
     if (specsContainer && product.specs) {
         specsContainer.innerHTML = product.specs.map(spec => `
@@ -467,11 +648,89 @@ function showProductDetail(productId) {
         `).join('');
     }
 
+    // Sevimlilarda borligini tekshirish
     const isInFavorites = favorites.some(item => item.id === productId);
     updateFavoriteButton(isInFavorites);
 
+    // Tegishli mahsulotlarni yuklash
+    loadRelatedProducts(productId, product.category);
+
+    // Sahifani o'zgartirish
     switchPage("productDetailPage");
     lastPage = "catalogPage";
+
+    console.log("Mahsulot tafsilotlari sahifasi ko'rsatildi");
+}
+
+// Tegishli mahsulotlarni yuklash funksiyasi
+function loadRelatedProducts(currentProductId, category) {
+    const container = document.querySelector(".related-products-grid");
+    if (!container) return;
+
+    // Xuddi shu kategoriyadagi boshqa mahsulotlar (joriy mahsulotdan tashqari)
+    const relatedProducts = sampleProducts.filter(p =>
+        p.category === category && p.id !== currentProductId
+    ).slice(0, 4);
+
+    if (relatedProducts.length === 0) {
+        // Agar tegishli mahsulot bo'lmasa, boshqa kategoriyadagi mahsulotlarni ko'rsatish
+        const otherProducts = sampleProducts.filter(p =>
+            p.id !== currentProductId
+        ).slice(0, 4);
+
+        displayProductsInGrid(otherProducts, container);
+        return;
+    }
+
+    displayProductsInGrid(relatedProducts, container);
+}
+
+// Mahsulotlarni grid shaklida ko'rsatish
+function displayProductsInGrid(products, container) {
+    container.innerHTML = "";
+
+    if (products.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 1rem; color: var(--text-light); font-size: 0.85rem;">
+                Tegishli mahsulotlar yo'q
+            </div>
+        `;
+        return;
+    }
+
+    products.forEach(product => {
+        const productElement = document.createElement("div");
+        productElement.className = "product-card";
+        productElement.style.cssText = `
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
+
+        productElement.onclick = () => showProductDetail(product.id);
+        productElement.innerHTML = `
+            <div class="product-image" style="background-image: url('${product.image}')">
+                <div class="product-badge">${product.bonus}% bonus</div>
+            </div>
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${product.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${product.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
+                    </button>
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(productElement);
+    });
 }
 
 function updateFavoriteButton(isFavorite) {
@@ -593,11 +852,11 @@ function updateCartDisplay() {
 
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-shopping-cart"></i>
-                <h3>Savat bo'sh</h3>
-                <p>Mahsulot qo'shish uchun katalogga o'ting</p>
-                <button class="btn btn-primary" onclick="showCatalog()">
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-shopping-cart" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Savat bo'sh</h3>
+                <p style="font-size: 0.85rem;">Mahsulot qo'shish uchun katalogga o'ting</p>
+                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
                     <i class="fas fa-th-large"></i> Katalogni ko'rish
                 </button>
             </div>
@@ -633,7 +892,7 @@ function updateCartDisplay() {
                     <button class="quantity-btn" onclick="updateCartQuantity(${item.id}, 1)">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="btn btn-danger" onclick="removeFromCart(${item.id})" style="margin-left: auto; padding: 0.5rem;">
+                    <button class="btn btn-danger" onclick="removeFromCart(${item.id})" style="margin-left: auto; padding: 0.4rem;">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -718,11 +977,11 @@ function updateFavoritesList() {
 
     if (favorites.length === 0) {
         container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-heart" style="color: red;"></i>
-                <h3>Sevimlilar bo'sh</h3>
-                <p>Yoqtirgan mahsulotlaringizni bu yerda saqlashingiz mumkin</p>
-                <button class="btn btn-primary" onclick="showCatalog()">
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-heart" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3; color: red;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Sevimlilar bo'sh</h3>
+                <p style="font-size: 0.85rem;">Yoqtirgan mahsulotlaringizni bu yerda saqlashingiz mumkin</p>
+                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
                     <i class="fas fa-th-large"></i> Mahsulotlarni ko'rish
                 </button>
             </div>
@@ -735,26 +994,34 @@ function updateFavoritesList() {
     favorites.forEach((item, index) => {
         const favoriteItem = document.createElement("div");
         favoriteItem.className = "product-card";
+        favoriteItem.style.cssText = `
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
         favoriteItem.innerHTML = `
             <div class="product-image" style="background-image: url('${item.image}')">
                 <div class="product-badge">${item.bonus}% bonus</div>
             </div>
-            <div class="product-info">
-                <div class="product-title">${item.name}</div>
-                <div class="product-price">$${item.price.toFixed(2)}</div>
-                <div class="product-category">${item.category}</div>
-                <div class="product-actions">
-                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})">
-                        <i class="fas fa-eye"></i> Ko'rish
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${item.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${item.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-outline" onclick="addToCart(${item.id})">
-                        <i class="fas fa-cart-plus"></i> Savatchaga
+                    <button class="btn btn-outline" onclick="addToCart(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-danger" onclick="removeFromFavorites(${index})">
-                        <i class="fas fa-trash"></i>
+                    <button class="btn btn-danger" onclick="removeFromFavorites(${index})" style="padding: 0.2rem; font-size: 0.55rem; min-width: 22px; min-height: 22px;">
+                        <i class="fas fa-trash" style="font-size: 0.6rem;"></i>
                     </button>
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
+                <div style="font-size: 0.55rem; color: var(--text-light); margin-top: 0.3rem; text-align: center;">
                     <i class="far fa-clock"></i> ${item.addedDate}
                 </div>
             </div>
@@ -788,7 +1055,7 @@ function clearFavorites() {
     }
 }
 
-// ===== KO'RILGAN MAHSULOTLAR FUNKSIYALARI =====
+// ===== KO'RILGAN MAHSULOTLAR =====
 function addToViewed(productId) {
     const product = sampleProducts.find(p => p.id === productId);
     if (!product) return;
@@ -832,11 +1099,11 @@ function updateViewedList() {
 
     if (viewedProducts.length === 0) {
         container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-eye"></i>
-                <h3>Ko'rilganlar yo'q</h3>
-                <p>Siz hali hech qanday mahsulotni ko'rmagansiz</p>
-                <button class="btn btn-primary" onclick="showCatalog()">
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-eye" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Ko'rilganlar yo'q</h3>
+                <p style="font-size: 0.85rem;">Siz hali hech qanday mahsulotni ko'rmagansiz</p>
+                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
                     <i class="fas fa-th-large"></i> Mahsulotlarni ko'rish
                 </button>
             </div>
@@ -849,26 +1116,34 @@ function updateViewedList() {
     viewedProducts.forEach(item => {
         const viewedItem = document.createElement("div");
         viewedItem.className = "product-card";
+        viewedItem.style.cssText = `
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
         viewedItem.innerHTML = `
             <div class="product-image" style="background-image: url('${item.image}')">
                 <div class="product-badge">${item.bonus}% bonus</div>
             </div>
-            <div class="product-info">
-                <div class="product-title">${item.name}</div>
-                <div class="product-price">$${item.price.toFixed(2)}</div>
-                <div class="product-category">${item.category}</div>
-                <div class="product-actions">
-                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})">
-                        <i class="fas fa-eye"></i> Ko'rish
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${item.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${item.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-primary" onclick="showProductDetail(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-outline" onclick="addToCart(${item.id})">
-                        <i class="fas fa-cart-plus"></i> Savatchaga
+                    <button class="btn btn-outline" onclick="addToCart(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-outline" onclick="addToFavoritesFromViewed(${item.id})">
-                        <i class="fas fa-heart"></i>
+                    <button class="btn btn-outline" onclick="addToFavoritesFromViewed(${item.id})" style="padding: 0.2rem; font-size: 0.55rem; min-width: 22px; min-height: 22px;">
+                        <i class="fas fa-heart" style="font-size: 0.6rem;"></i>
                     </button>
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
+                <div style="font-size: 0.55rem; color: var(--text-light); margin-top: 0.3rem; text-align: center;">
                     <i class="far fa-clock"></i> ${item.viewedDate}
                 </div>
             </div>
@@ -933,11 +1208,11 @@ function updateOrdersList(filter = "all") {
 
     if (filteredOrders.length === 0) {
         container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-box-open"></i>
-                <h3>Buyurtmalar yo'q</h3>
-                <p>Siz hali hech qanday buyurtma bermagansiz</p>
-                <button class="btn btn-primary" onclick="showCatalog()">
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Buyurtmalar yo'q</h3>
+                <p style="font-size: 0.85rem;">Siz hali hech qanday buyurtma bermagansiz</p>
+                <button class="btn btn-primary" onclick="showCatalog()" style="margin-top: 1rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
                     <i class="fas fa-shopping-cart"></i> Xarid qilishni boshlash
                 </button>
             </div>
@@ -950,52 +1225,52 @@ function updateOrdersList(filter = "all") {
     filteredOrders.forEach((order, index) => {
                 const orderItem = document.createElement("div");
                 orderItem.className = "section";
-                orderItem.style.marginBottom = "1rem";
+                orderItem.style.marginBottom = "0.75rem";
                 orderItem.innerHTML = `
-            <div class="order-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
                 <div>
-                    <h4 style="margin-bottom: 0.25rem; color: var(--text-primary);">Buyurtma #${order.id.toString().slice(-6)}</h4>
-                    <div style="font-size: 0.85rem; color: var(--text-light);">
+                    <h4 style="margin-bottom: 0.2rem; color: var(--text-primary); font-size: 0.9rem;">Buyurtma #${order.id.toString().slice(-6)}</h4>
+                    <div style="font-size: 0.75rem; color: var(--text-light);">
                         <i class="far fa-calendar"></i> ${order.date}
                     </div>
                 </div>
-                <div style="background: ${getStatusColor(order.status)}; color: white; padding: 0.375rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600;">
+                <div style="background: ${getStatusColor(order.status)}; color: white; padding: 0.3rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">
                     ${order.status}
                 </div>
             </div>
             
-            <div style="margin-bottom: 1rem;">
+            <div style="margin-bottom: 0.75rem;">
                 ${order.items.map(item => `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
-                        <span>${item.name} × ${item.quantity}</span>
-                        <span style="font-weight: 600;">$${(item.price * item.quantity).toFixed(2)}</span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.8rem;">
+                        <span style="flex: 1; margin-right: 0.5rem;">${item.name} × ${item.quantity}</span>
+                        <span style="font-weight: 600; white-space: nowrap;">$${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                 `).join('')}
             </div>
             
-            <div style="border-top: 2px solid var(--gray-200); padding-top: 1rem;">
-                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem;">
+            <div style="border-top: 1px solid var(--gray-200); padding-top: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem;">
                     <span>Jami:</span>
                     <span>$${order.totalAmount.toFixed(2)}</span>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.25rem;">
+                <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.2rem;">
                     <i class="fas fa-credit-card"></i> ${getPaymentMethodName(order.paymentMethod)}
                 </div>
-                <div style="font-size: 0.85rem; color: var(--text-light);">
+                <div style="font-size: 0.75rem; color: var(--text-light);">
                     <i class="fas fa-map-marker-alt"></i> ${order.region}, ${order.district}
                 </div>
                 ${order.comment ? `
-                    <div style="margin-top: 0.5rem; padding: 0.75rem; background: var(--gray-100); border-radius: var(--radius); font-size: 0.85rem; color: var(--text-secondary);">
+                    <div style="margin-top: 0.5rem; padding: 0.5rem; background: var(--gray-100); border-radius: var(--radius-sm); font-size: 0.75rem; color: var(--text-secondary);">
                         <i class="fas fa-comment"></i> ${order.comment}
                     </div>
                 ` : ''}
             </div>
             
-            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                <button class="btn btn-outline" style="flex: 1;" onclick="repeatOrder(${index})">
+            <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                <button class="btn btn-outline" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="repeatOrder(${index})">
                     <i class="fas fa-redo"></i> Qayta buyurtma
                 </button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="trackOrder(${index})">
+                <button class="btn btn-primary" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" onclick="trackOrder(${index})">
                     <i class="fas fa-shipping-fast"></i> Kuzatish
                 </button>
             </div>
@@ -1137,10 +1412,10 @@ function updateCheckoutDisplay() {
         itemElement.className = "menu-item";
         itemElement.innerHTML = `
             <div>
-                <div style="font-weight: 600; color: var(--text-primary);">${item.name}</div>
-                <div style="font-size: 0.85rem; color: var(--text-light);">${item.quantity} × $${item.price.toFixed(2)}</div>
+                <div style="font-weight: 600; color: var(--text-primary); font-size: 0.85rem;">${item.name}</div>
+                <div style="font-size: 0.75rem; color: var(--text-light);">${item.quantity} × $${item.price.toFixed(2)}</div>
             </div>
-            <div style="font-weight: 700; color: var(--primary);">$${itemTotal.toFixed(2)}</div>
+            <div style="font-weight: 700; color: var(--primary); font-size: 0.9rem;">$${itemTotal.toFixed(2)}</div>
         `;
         checkoutItems.appendChild(itemElement);
     });
@@ -1160,6 +1435,7 @@ function getPaymentMethodName(method) {
 }
 
 async function submitOrder() {
+    // Ma'lumotlarni tekshirish
     const region = document.getElementById("regionSelect").value;
     const district = document.getElementById("districtSelect").value;
     const fullAddress = document.getElementById("fullAddress").value.trim();
@@ -1168,6 +1444,7 @@ async function submitOrder() {
     const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
     const agreeTerms = document.getElementById("agreeTerms").checked;
     
+    // Validatsiya
     if (!region) {
         showNotification("Iltimos, viloyatni tanlang!", "error");
         return;
@@ -1188,6 +1465,7 @@ async function submitOrder() {
         return;
     }
     
+    // Telefon raqamni tekshirish
     const phoneRegex = /^\+998\d{9}$/;
     if (!phoneRegex.test(userPhone)) {
         showNotification("Iltimos, to'g'ri telefon raqam kiriting (+998901234567 formatida)", "error");
@@ -1199,8 +1477,10 @@ async function submitOrder() {
         return;
     }
     
+    // Yuklanmoqda bildirishnomasini ko'rsatish
     showNotification("Buyurtma yuborilmoqda...", "warning");
     
+    // Buyurtma ma'lumotlarini tayyorlash
     let orderItems = "";
     let totalAmount = 0;
     let totalBonusAmount = 0;
@@ -1219,6 +1499,7 @@ async function submitOrder() {
         orderItems += `\n`;
     });
     
+    // Telegram xabari
     const message = `
 🛒 YANGI BUYURTMA
 
@@ -1241,10 +1522,12 @@ ${orderItems}
 ⏰ Buyurtma vaqti: ${new Date().toLocaleString("uz-UZ")}
     `;
     
+    // Telegram botga xabar yuborish
     try {
         const response = await sendToTelegram(message);
         
         if (response.ok) {
+            // Muvaffaqiyatli yuborilgandan keyin
             currentOrder = {
                 id: Date.now(),
                 date: new Date().toLocaleString("uz-UZ"),
@@ -1261,23 +1544,30 @@ ${orderItems}
                 status: "Yangi",
             };
             
+            // Buyurtmani buyurtmalar ro'yxatiga qo'shish
             orders.unshift(currentOrder);
             
+            // Foydalanuvchi telefon raqamini saqlash
             currentUser.phone = userPhone;
             updateUserDisplay();
             
+            // Loyallik ballarini hisoblash
             const newPoints = Math.floor(totalAmount);
             currentUser.loyaltyPoints += newPoints;
             
+            // Savatni tozalash
             cart = [];
             
+            // Barcha ma'lumotlarni yangilash
             updateCartDisplay();
             updateCartBadge();
             updateOrdersBadge();
             updateAllBadges();
             
+            // Barcha ma'lumotlarni saqlash
             saveToLocalStorage();
             
+            // Xabarlar
             showNotification("Buyurtma muvaffaqiyatli qabul qilindi!", "success");
             
             if (newPoints > 0) {
@@ -1286,6 +1576,7 @@ ${orderItems}
                 }, 1000);
             }
             
+            // Buyurtma tasdiq sahifasiga o'tish
             showOrderConfirmation();
         } else {
             throw new Error("Telegram API xatosi");
@@ -1403,10 +1694,10 @@ function updateAddressesList() {
     
     if (addresses.length === 0) {
         container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-map-marker-alt"></i>
-                <h3>Manzillar yo'q</h3>
-                <p>Sizda hali saqlangan manzillar yo'q</p>
+            <div style="text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-map-marker-alt" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Manzillar yo'q</h3>
+                <p style="font-size: 0.85rem;">Sizda hali saqlangan manzillar yo'q</p>
             </div>
         `;
         return;
@@ -1417,20 +1708,20 @@ function updateAddressesList() {
     addresses.forEach((address, index) => {
         const addressItem = document.createElement("div");
         addressItem.className = "section";
-        addressItem.style.marginBottom = "1rem";
+        addressItem.style.marginBottom = "0.75rem";
         addressItem.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
                 <div>
-                    <h4 style="margin-bottom: 0.25rem; color: var(--text-primary);">${address.name}</h4>
-                    <div style="font-size: 0.85rem; color: var(--text-light);">
+                    <h4 style="margin-bottom: 0.2rem; color: var(--text-primary); font-size: 0.9rem;">${address.name}</h4>
+                    <div style="font-size: 0.75rem; color: var(--text-light);">
                         ${address.region}, ${address.district}
                     </div>
                 </div>
-                <button class="btn btn-danger" onclick="deleteAddress(${index})" style="padding: 0.5rem;">
+                <button class="btn btn-danger" onclick="deleteAddress(${index})" style="padding: 0.4rem; font-size: 0.8rem;">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
-            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+            <div style="color: var(--text-secondary); font-size: 0.8rem;">
                 ${address.address}
             </div>
         `;
@@ -1466,6 +1757,7 @@ function saveAddress() {
     closeModal("addressModal");
     updateAddressesList();
     
+    // Formani tozalash
     document.getElementById("addressName").value = "";
     document.getElementById("modalRegionSelect").value = "";
     document.getElementById("modalDistrictSelect").value = "";
@@ -1551,9 +1843,11 @@ function showNotification(message, type = "success") {
     
     notificationText.textContent = message;
     
+    // Oldingi klasslarni olib tashlash
     notification.className = "notification";
     notificationIcon.className = "notification-icon";
     
+    // Yangi klass qo'shish
     notification.classList.add(type);
     notificationIcon.classList.add(type);
     
@@ -1570,12 +1864,14 @@ document.addEventListener("DOMContentLoaded", function() {
     
     initializeApp();
     
+    // Inputga Enter bosganda kirish
     document.getElementById("userName").addEventListener("keypress", function(e) {
         if (e.key === "Enter") {
             startApp();
         }
     });
     
+    // Qidiruv funksiyasi
     document.getElementById("searchInput").addEventListener("input", function(e) {
         const searchTerm = e.target.value.toLowerCase();
         
@@ -1596,6 +1892,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     
+    // Modal overlay bosilganda yopish
     document.querySelectorAll(".modal-overlay").forEach(overlay => {
         overlay.addEventListener("click", function() {
             const modal = this.closest(".modal");
@@ -1619,10 +1916,10 @@ function loadSearchResults(filteredProducts) {
     
     if (filteredProducts.length === 0) {
         productGrid.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-search"></i>
-                <h3>Natija topilmadi</h3>
-                <p>"${document.getElementById("searchInput").value}" uchun hech narsa topilmadi</p>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: var(--text-light);">
+                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary); font-size: 1rem;">Natija topilmadi</h3>
+                <p style="font-size: 0.85rem;">"${document.getElementById("searchInput").value}" uchun hech narsa topilmadi</p>
             </div>
         `;
         return;
@@ -1631,21 +1928,29 @@ function loadSearchResults(filteredProducts) {
     filteredProducts.forEach(product => {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
+        productCard.style.cssText = `
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        `;
         productCard.onclick = () => showProductDetail(product.id);
         productCard.innerHTML = `
             <div class="product-image" style="background-image: url('${product.image}')">
                 <div class="product-badge">${product.bonus}% bonus</div>
             </div>
-            <div class="product-info">
-                <div class="product-title">${product.name}</div>
-                <div class="product-price">$${product.price.toFixed(2)}</div>
-                <div class="product-category">${product.category}</div>
-                <div class="product-actions">
-                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})">
-                        <i class="fas fa-cart-plus"></i> Savatchaga
+            <div class="product-info" style="flex: 1; display: flex; flex-direction: column; padding: 0.3rem;">
+                <div class="product-title" style="font-size: 0.6rem; text-align: center; margin-bottom: 0.3rem; flex-grow: 1; line-height: 1.1;">
+                    ${product.name}
+                </div>
+                <div class="product-price" style="font-size: 0.7rem; text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 0.2rem;">
+                    $${product.price.toFixed(2)}
+                </div>
+                <div class="product-actions" style="margin-top: auto; display: flex; gap: 0.2rem;">
+                    <button class="btn btn-outline" onclick="event.stopPropagation(); addToCart(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-cart-plus" style="font-size: 0.6rem;"></i>
                     </button>
-                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})">
-                        <i class="fas fa-eye"></i> Ko'rish
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showProductDetail(${product.id})" style="padding: 0.2rem; font-size: 0.55rem; flex: 1; min-height: 22px;">
+                        <i class="fas fa-eye" style="font-size: 0.6rem;"></i>
                     </button>
                 </div>
             </div>
@@ -1665,3 +1970,10 @@ function toggleSort() {
 function toggleFilter() {
     showNotification("Filtr funksiyasi tez orada qo'shiladi!", "info");
 }
+
+// Konsolni bloklash
+console.log = function() {};
+console.error = function() {};
+console.warn = function() {};
+console.info = function() {};
+console.debug = function() {};
