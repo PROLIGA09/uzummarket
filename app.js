@@ -2712,6 +2712,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+function openAdminPanel() {
+    // Admin panel alohida sahifaga o'tish
+    window.location.href = "admin.html";
+}
 
 // Konsolni bloklash
 console.log = function() {};

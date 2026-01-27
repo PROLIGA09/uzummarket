@@ -280,6 +280,21 @@
 
                     <div class="menu-section">
                         <h3><i class="fas fa-cog"></i> Sozlamalar</h3>
+
+                        <!-- YANGI: Admin Panel tugmasi -->
+                        <div class="menu-item admin-item" onclick="openAdminPanel()">
+                            <div class="menu-icon" style="background: linear-gradient(135deg, #6a00ff, #00c9a7);">
+                                <i class="fas fa-user-shield" style="color: white;"></i>
+                            </div>
+                            <div class="menu-content">
+                                <span style="color: #6a00ff; font-weight: 700;">Admin Panel</span>
+                                <small>Maxsus boshqaruv paneli</small>
+                            </div>
+                            <div class="menu-badge" style="background: #00c9a7; color: white;">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                        </div>
+
                         <div class="menu-item" onclick="changeName()">
                             <div class="menu-icon">
                                 <i class="fas fa-exchange-alt"></i>
@@ -601,7 +616,7 @@
                         <div class="map-form" id="mapAddressForm" style="display: none;">
                             <div id="mapContainer" style="height: 300px; border-radius: var(--radius); margin-bottom: 1rem; background: var(--gray-100);"></div>
 
-                            <!-- YANGI: Mening joyim tugmasi -->
+                            <!-- Mening joyim tugmasi -->
                             <button class="btn btn-location" onclick="getCurrentLocationFromCheckout()" style="width: 100%; margin-bottom: 1rem;">
                                 <i class="fas fa-location-crosshairs"></i> Mening turgan joyimni aniqlash
                             </button>
@@ -716,7 +731,7 @@
                     <h2>Manzilni belgilash</h2>
                 </div>
 
-                <!-- YANGI: Lokatsiya statusi -->
+                <!-- Lokatsiya statusi -->
                 <div class="location-status" id="mapLocationStatus"></div>
 
                 <div id="fullScreenMap" style="height: calc(100vh - 200px); width: 100%;"></div>
@@ -955,7 +970,7 @@
         </div>
     </div>
 
-    <!-- YANGI: Lokatsiya yuklash modali -->
+    <!-- Lokatsiya yuklash modali -->
     <div class="modal" id="locationLoadingModal">
         <div class="modal-overlay" onclick="cancelLocationSearch()"></div>
         <div class="modal-content">
@@ -988,6 +1003,25 @@
                 <button class="btn btn-outline" onclick="cancelLocationSearch()" style="width: 100%;">
                     <i class="fas fa-times"></i> Bekor qilish
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel uchun yangi modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-overlay" onclick="closeModal('adminModal')"></div>
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #6a00ff, #8a2be2);">
+                <h3 style="color: white;">
+                    <i class="fas fa-user-shield"></i> Hdroline Admin Panel
+                </h3>
+                <button class="modal-close" onclick="closeModal('adminModal')" style="color: white;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <!-- Admin Panel content JavaScript orqali yuklanadi -->
+                <div id="adminPanelContent" style="min-height: 400px;"></div>
             </div>
         </div>
     </div>

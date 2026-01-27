@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hdroline - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========== UMUMIY STILLAR ========== */
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        html {
+            height: 100%;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            -moz-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        /* ========== ADMIN KIRISH FORMASI ========== */
+        
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .login-logo {
+            font-size: 40px;
+            color: #6a00ff;
+            margin-bottom: 20px;
+        }
+        
+        .login-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: #fff;
+        }
+        
+        .login-input:focus {
+            border-color: #6a00ff;
+            outline: none;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #6a00ff, #00c9a7);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-error {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .security-badge {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        /* ========== ASOSIY TIZIM ========== */
+        
+        #mainApp {
+            display: none;
+        }
+        /* TOP BAR */
+        
+        .header {
+            background: linear-gradient(135deg, #6a00ff, #8a2be2);
+            color: #fff;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .menu-btn {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .admin-badge {
+            background: #00c9a7;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* SIDEBAR */
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: #2c2c3e;
+            color: white;
+            padding-top: 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sidebar.open {
+            left: 0;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-section h3 {
+            color: #8a8aa3;
+            margin: 0 20px 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 5px 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: #b5b5c3;
+            text-decoration: none;
+            padding: 12px 20px;
+            transition: all 0.2s;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu a:hover {
+            background: #37374d;
+            color: #fff;
+        }
+        
+        .sidebar-menu i {
+            width: 25px;
+            margin-right: 15px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .sidebar-menu .sub-item {
+            padding-left: 55px;
+            font-size: 14px;
+            color: #a0a0b5;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #3d3d52;
+            margin: 20px;
+        }
+        /* OVERLAY */
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        /* DASHBOARD */
+        
+        .dashboard {
+            padding: 15px;
+            max-width: 100%;
+        }
+        /* CARDS GRID - TELEFON UCHUN 2 KARTA */
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+        /* CARD STYLES */
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+        }
+        
+        .card-icon.pink {
+            background: #ff6b8b;
+        }
+        
+        .card-icon.green {
+            background: #2ecc71;
+        }
+        
+        .card-icon.blue {
+            background: #3498db;
+        }
+        
+        .card-icon.yellow {
+            background: #f1c40f;
+        }
+        
+        .card-icon.red {
+            background: #e74c3c;
+        }
+        
+        .card-icon.teal {
+            background: #1abc9c;
+        }
+        
+        .card-icon.purple {
+            background: #9b59b6;
+        }
+        
+        .card-icon.orange {
+            background: #e67e22;
+        }
+        
+        .card-icon.cyan {
+            background: #00cec9;
+        }
+        
+        .card small {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .card h2 {
+            margin: 8px 0;
+            font-size: 22px;
+            color: #333;
+            line-height: 1.2;
+        }
+        
+        .money {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 8px 0;
+        }
+        
+        .money.positive {
+            color: #27ae60;
+        }
+        
+        .money.negative {
+            color: #c0392b;
+        }
+        
+        .card-footer {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 11px;
+            color: #888;
+        }
+        /* PAGE CONTENT */
+        
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-btn {
+            background: #6a00ff;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #5a00e0;
+        }
+        
+        .page-title {
+            font-size: 20px;
+            color: #333;
+            margin: 0;
+            flex: 1;
+        }
+        /* FAB BUTTON */
+        
+        .fab {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6a00ff, #00c9a7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 99;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .fab-menu {
+            position: fixed;
+            bottom: 100px;
+            right: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            min-width: 180px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .fab-menu.open {
+            display: flex;
+        }
+        
+        .fab-menu-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .fab-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .fab-menu-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .fab-menu-item i {
+            width: 20px;
+            font-size: 16px;
+        }
+        /* MODAL */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.open {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-title {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        /* FORM STYLES */
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+            background: #fafafa;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        
+        .form-control:focus {
+            border-color: #6a00ff;
+            outline: none;
+            background: white;
+        }
+        
+        .price-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        @media (min-width: 400px) {
+            .price-group {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .btn {
+            background: #6a00ff;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: #5a00e0;
+        }
+        
+        .btn-success {
+            background: #00c9a7;
+        }
+        
+        .btn-success:hover {
+            background: #00b594;
+        }
+        /* IMAGE UPLOAD */
+        
+        .image-upload {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+            position: relative;
+        }
+        
+        .image-upload:hover {
+            border-color: #6a00ff;
+            background: #f5f5ff;
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border: 1px solid #eee;
+        }
+        
+        .image-preview.visible {
+            display: block;
+        }
+        /* TABLE STYLES */
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            color: #666;
+            transition: color 0.2s;
+            font-size: 16px;
+        }
+        
+        .action-btn:hover {
+            color: #6a00ff;
+        }
+        /* PRODUCT IMAGE IN TABLE */
+        
+        .product-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+        /* FINANCIAL INFO STYLES */
+        
+        .financial-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin: 3px 0;
+        }
+        
+        .info-label {
+            color: #666;
+        }
+        
+        .info-value {
+            font-weight: 500;
+        }
+        
+        .info-value.positive {
+            color: #27ae60;
+        }
+        
+        .info-value.negative {
+            color: #e74c3c;
+        }
+        /* SECURITY WARNING */
+        
+        .security-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .security-warning i {
+            font-size: 60px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        /* RESPONSIVE */
+        
+        @media (min-width: 768px) {
+            .cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            .price-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .fab {
+                bottom: 40px;
+                right: 40px;
+            }
+            .fab-menu {
+                bottom: 120px;
+                right: 40px;
+                min-width: 220px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .header {
+                padding: 12px 15px;
+            }
+            .modal-body {
+                padding: 15px;
+            }
+        }
+        /* ANTI-ZOOM STYLES */
+        
+        @media screen and (max-width: 767px) {
+            body {
+                -webkit-text-size-adjust: none;
+                text-size-adjust: none;
+            }
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;" onkeydown="return disableKeys(event);">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen">
+        <div class="login-container">
+            <div class="login-logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1 class="login-title">Hdroline Admin</h1>
+            <p class="login-subtitle">Maxsus kirish imkoniyati faqat ma'sul shaxslar uchun</p>
+
+            <form id="loginForm">
+                <input type="text" class="login-input" id="username" placeholder="Admin nomi" required>
+                <input type="password" class="login-input" id="password" placeholder="Maxfiy kod" required>
+                <div id="captchaContainer">
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <div id="captchaText" style="flex: 1; background: #f0f0f0; padding: 10px; border-radius: 5px; font-weight: bold; letter-spacing: 5px; text-align: center;"></div>
+                        <button type="button" onclick="generateCaptcha()" style="background: #6a00ff; color: white; border: none; border-radius: 5px; padding: 0 15px; cursor: pointer;">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    <input type="text" class="login-input" id="captchaInput" placeholder="Yuqoridagi kodni kiriting" required>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-lock"></i> Tizimga Kirish
+                </button>
+            </form>
+
+            <div class="login-error" id="loginError">
+                Noto'g'ri ma'lumotlar yoki ruxsat yo'q!
+            </div>
+        </div>
+
+        <div class="security-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure System v2.0</span>
+        </div>
+    </div>
+
+    <!-- SECURITY WARNING -->
+    <div id="securityWarning" class="security-warning">
+        <i class="fas fa-ban"></i>
+        <h1>XAVFSIZLIK XATOSI</h1>
+        <p>Siz bu tizimga ruxsatsiz kirishga urinyapsiz!</p>
+        <p style="font-size: 14px; color: #999; margin-top: 20px;">
+            Bu xatolik log fayliga yozildi va ma'sul shaxslarga xabar berildi.
+        </p>
+    </div>
+
+    <!-- ASOSIY TIZIM (Faqat kirishdan keyin ko'rinadi) -->
+    <div id="mainApp">
+        <!-- SIDEBAR MENU -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showPage('home')"><i class="fas fa-home"></i> Dashboard</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Maxsulotlar</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showPage('products')"><i class="fas fa-box"></i> Maxsulotlar</a></li>
+                    <li><a href="#" onclick="showPage('productList')" class="sub-item"><i class="fas fa-list"></i> Maxsulotlar ro'yxati</a></li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="sidebar-section">
+                <h3>Mijozlar va Agentlar</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showPage('agents')"><i class="fas fa-users"></i> Agentlar</a></li>
+                    <li><a href="#" onclick="showPage('clients')" class="sub-item"><i class="fas fa-user-tie"></i> Mijozlar</a></li>
+                    <li><a href="#" onclick="showPage('debtors')" class="sub-item"><i class="fas fa-hand-holding-usd"></i> Qarzdorlar</a></li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="sidebar-section">
+                <h3>Buyurtmalar</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showPage('orders')"><i class="fas fa-shopping-bag"></i> Buyurtmalar</a></li>
+                    <li><a href="#" onclick="showPage('creditSales')" class="sub-item"><i class="fas fa-credit-card"></i> Nasiya savdo</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- OVERLAY -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <div class="menu-btn" id="menuBtn">☰</div>
+                <div id="pageTitle">Hdroline</div>
+            </div>
+            <div class="admin-badge">
+                <i class="fas fa-user-shield"></i> Admin
+                <button onclick="logout()" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- FAB MENYU -->
+        <div class="fab" id="fabBtn">
+            <i class="fas fa-plus"></i>
+        </div>
+
+        <div class="fab-menu" id="fabMenu">
+            <div class="fab-menu-item" onclick="openAddModal('product')">
+                <i class="fas fa-box" style="color: #ff6b8b;"></i> Maxsulot qo'shish
+            </div>
+            <div class="fab-menu-item" onclick="openAddModal('agent')">
+                <i class="fas fa-user-plus" style="color: #2ecc71;"></i> Agent qo'shish
+            </div>
+            <div class="fab-menu-item" onclick="openAddModal('client')">
+                <i class="fas fa-user-tie" style="color: #3498db;"></i> Mijoz qo'shish
+            </div>
+            <div class="fab-menu-item" onclick="openAddModal('order')">
+                <i class="fas fa-shopping-bag" style="color: #9b59b6;"></i> Buyurtma qo'shish
+            </div>
+        </div>
+
+        <!-- QO'SHISH MODALI -->
+        <div class="modal" id="addModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Qo'shish</h3>
+                    <button class="close-btn" onclick="closeAddModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm">
+                        <!-- Form content will be loaded here -->
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="home" class="dashboard page-content active">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+            </div>
+
+            <div class="cards-grid" id="dashboardCards">
+                <!-- Kartalar JavaScript orqali yuklanadi -->
+            </div>
+        </div>
+
+        <!-- MAXSULOTLAR SAHIFASI -->
+        <div id="products" class="dashboard page-content">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('home')">←</button>
+                <h1 class="page-title">Maxsulotlar</h1>
+            </div>
+
+            <div class="table-container">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Rasm</th>
+                            <th>Nomi</th>
+                            <th>Asosiy narxlar</th>
+                            <th>Moliyaviy ma'lumot</th>
+                            <th>Qoldiq</th>
+                            <th>Harakatlar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsList">
+                        <!-- Maxsulotlar ro'yxati -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AGENTLAR SAHIFASI -->
+        <div id="agents" class="dashboard page-content">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('home')">←</button>
+                <h1 class="page-title">Agentlar</h1>
+            </div>
+
+            <div class="table-container">
+                <table id="agentsTable">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Ismi</th>
+                            <th>Telefon</th>
+                            <th>Harakatlar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agentsList">
+                        <!-- Agentlar ro'yxati -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MIJOZLAR SAHIFASI -->
+        <div id="clients" class="dashboard page-content">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('home')">←</button>
+                <h1 class="page-title">Mijozlar</h1>
+            </div>
+
+            <div class="table-container">
+                <table id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Ismi</th>
+                            <th>Telefon</th>
+                            <th>Qarz</th>
+                            <th>Harakatlar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsList">
+                        <!-- Mijozlar ro'yxati -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- BUYURTMALAR SAHIFASI -->
+        <div id="orders" class="dashboard page-content">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('home')">←</button>
+                <h1 class="page-title">Buyurtmalar</h1>
+            </div>
+
+            <div class="table-container">
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Mijoz</th>
+                            <th>Summa</th>
+                            <th>Sana</th>
+                            <th>Holati</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersList">
+                        <!-- Buyurtmalar ro'yxati -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== MAXFIY MA'LUMOTLAR ==========
+        const SECRET_CONFIG = {
+            ADMIN_USERNAME: 'Shoxrux',
+            ADMIN_PASSWORD: 'Shoxrux',
+            SESSION_TIMEOUT: 30 * 60 * 1000, // 30 daqiqa
+            MAX_LOGIN_ATTEMPTS: 3,
+            SECURITY_KEY: 'X-Hydro-Security-Key'
+        };
+
+        // ========== XAVFSIZLIK FUNKSIYALARI ==========
+
+        // 1. F12 (DevTools) bloklash
+        function blockDevTools() {
+            // Developer tools ochilishini tekshirish
+            const devtools = /./;
+            devtools.toString = function() {
+                showSecurityWarning('Developer Tools aniqlandi!');
+                return '';
+            };
+
+            console.log('%c⚠️ XAVFSIZLIK OGOHLANTIRISHI ⚠️', 'color: red; font-size: 30px; font-weight: bold;');
+            console.log('%cBu tizim maxfiy ma\'lumotlarni o\'z ichiga oladi.', 'color: orange; font-size: 16px;');
+            console.log('%cHech qanday kodni bu yerga kiritmang!', 'color: red; font-size: 16px; font-weight: bold;');
+
+            // Consolega xabar berish
+            setInterval(() => {
+                console.clear();
+                console.log('%c🚫 BU TIZIM XAVFSIZLIK KODI BILAN HIMOYALANGAN 🚫',
+                    'color: red; font-size: 20px; font-weight: bold; background: yellow; padding: 10px;');
+            }, 1000);
+        }
+
+        // 2. Zoom bloklash
+        function blockZoom() {
+            document.addEventListener('wheel', function(e) {
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, {
+                passive: false
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '0')) ||
+                    (e.ctrlKey && e.key === 'MouseWheelZoom')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+
+        // 3. Kontekst menyusini bloklash
+        function blockContextMenu() {
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
+
+        // 4. Klaviatura tugmalarini bloklash
+        function disableKeys(e) {
+            // F12 bloklash
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                showSecurityWarning('Developer Tools bloklandi!');
+                return false;
+            }
+
+            // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C bloklash
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+                e.preventDefault();
+                showSecurityWarning('Inspector bloklandi!');
+                return false;
+            }
+
+            // Ctrl+U (View Source) bloklash
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                showSecurityWarning('Sahifa manbasini ko\'rish bloklandi!');
+                return false;
+            }
+
+            // Print Screen bloklash
+            if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+
+        // 5. Sahifa tarkibini bloklash
+        function blockCopyPaste() {
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            document.addEventListener('cut', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            document.addEventListener('paste', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Elementlarni tanlashni bloklash
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Drag and drop bloklash
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            document.addEventListener('drop', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
+
+        // 6. Security warning ko'rsatish
+        function showSecurityWarning(message) {
+            const warning = document.getElementById('securityWarning');
+            warning.style.display = 'flex';
+            warning.querySelector('p').textContent = message;
+
+            // Logga yozish
+            logSecurityEvent(message);
+
+            // 5 soniyadan keyin yashirish
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 5000);
+        }
+
+        // 7. Security eventlarni log qilish
+        function logSecurityEvent(event) {
+            const logs = JSON.parse(localStorage.getItem('security_logs') || '[]');
+            logs.push({
+                timestamp: new Date().toISOString(),
+                event: event,
+                ip: 'N/A', // Haqiqiy loyihada serverdan olinadi
+                userAgent: navigator.userAgent
+            });
+
+            // Faqat oxirgi 100 ta logni saqlash
+            if (logs.length > 100) {
+                logs.shift();
+            }
+
+            localStorage.setItem('security_logs', JSON.stringify(logs));
+        }
+
+        // 8. CAPTCHA generatsiyasi
+        function generateCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('captchaText').textContent = captcha;
+            localStorage.setItem('captcha_code', captcha);
+            return captcha;
+        }
+
+        // 9. Session management
+        function checkSession() {
+            const session = JSON.parse(localStorage.getItem('admin_session') || '{}');
+            if (session.expires && new Date(session.expires) > new Date()) {
+                return true;
+            }
+            return false;
+        }
+
+        function createSession() {
+            const session = {
+                loggedIn: true,
+                expires: new Date(Date.now() + SECRET_CONFIG.SESSION_TIMEOUT).toISOString(),
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('admin_session', JSON.stringify(session));
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_session');
+            window.location.reload();
+        }
+
+        // ========== ASOSIY KOD ==========
+        let currentData = {
+            products: JSON.parse(localStorage.getItem('hdroline_products')) || [],
+            agents: JSON.parse(localStorage.getItem('hdroline_agents')) || [],
+            clients: JSON.parse(localStorage.getItem('hdroline_clients')) || [],
+            orders: JSON.parse(localStorage.getItem('hdroline_orders')) || [],
+            debts: JSON.parse(localStorage.getItem('hdroline_debts') || '[]')
+        };
+
+        let loginAttempts = JSON.parse(localStorage.getItem('login_attempts') || '0');
+
+        // ========== SAHIFA YUKLANGANDA ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Barcha xavfsizlik funksiyalarini ishga tushirish
+            blockDevTools();
+            blockZoom();
+            blockContextMenu();
+            blockCopyPaste();
+
+            // CAPTCHA generatsiya
+            generateCaptcha();
+
+            // Sessionni tekshirish
+            if (checkSession()) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                initializeApp();
+                loadDashboard();
+            }
+
+            // Login form
+            document.getElementById('loginForm').onsubmit = function(e) {
+                e.preventDefault();
+
+                // Login urinishlari limiti
+                if (loginAttempts >= SECRET_CONFIG.MAX_LOGIN_ATTEMPTS) {
+                    document.getElementById('loginError').textContent =
+                        'Juda ko\'p urinishlar! Iltimos, 30 daqiqadan keyin qayta urinib ko\'ring.';
+                    document.getElementById('loginError').style.display = 'block';
+                    return;
+                }
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const captchaInput = document.getElementById('captchaInput').value;
+                const captchaCode = localStorage.getItem('captcha_code');
+
+                if (captchaInput !== captchaCode) {
+                    document.getElementById('loginError').textContent = 'Noto\'g\'ri CAPTCHA kodi!';
+                    document.getElementById('loginError').style.display = 'block';
+                    loginAttempts++;
+                    localStorage.setItem('login_attempts', loginAttempts);
+                    generateCaptcha();
+                    return;
+                }
+
+                if (username === SECRET_CONFIG.ADMIN_USERNAME && password === SECRET_CONFIG.ADMIN_PASSWORD) {
+                    // Muvaffaqiyatli login
+                    createSession();
+                    loginAttempts = 0;
+                    localStorage.setItem('login_attempts', 0);
+
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    initializeApp();
+                    loadDashboard();
+
+                    // Security log
+                    logSecurityEvent('Muvaffaqiyatli admin kirish');
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                    loginAttempts++;
+                    localStorage.setItem('login_attempts', loginAttempts);
+                    generateCaptcha();
+
+                    // Security log
+                    logSecurityEvent('Noto\'g\'ri kirish urinishi');
+                }
+            };
+
+            // Session timeout tekshirish
+            setInterval(() => {
+                if (!checkSession() && document.getElementById('mainApp').style.display === 'block') {
+                    logout();
+                }
+            }, 60000); // Har daqiqa tekshirish
+        });
+
+        function initializeApp() {
+            // UI elementlari
+            const menuBtn = document.getElementById('menuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const fabBtn = document.getElementById('fabBtn');
+            const fabMenu = document.getElementById('fabMenu');
+
+            // Sidebar menyusi
+            menuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.style.display = 'block';
+            });
+
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.style.display = 'none';
+            });
+
+            // FAB menyusi
+            fabBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                fabMenu.classList.toggle('open');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!fabBtn.contains(e.target) && !fabMenu.contains(e.target)) {
+                    fabMenu.classList.remove('open');
+                }
+            });
+
+            // Dastlabki ma'lumotlarni yuklash
+            loadProductsPage();
+            loadAgentsPage();
+            loadClientsPage();
+            loadOrdersPage();
+        }
+
+        // ========== DASHBOARD FUNKSIYALARI ==========
+        function loadDashboard() {
+            const dashboardCards = document.getElementById('dashboardCards');
+            const cards = [{
+                id: 'products',
+                title: 'MAXSULOTLAR',
+                count: currentData.products.length,
+                icon: 'fa-boxes',
+                color: 'pink',
+                subtitle: 'Jami maxsulotlar'
+            }, {
+                id: 'agents',
+                title: 'AGENTLAR',
+                count: currentData.agents.length,
+                icon: 'fa-users',
+                color: 'green',
+                subtitle: 'Faol agentlar'
+            }, {
+                id: 'clients',
+                title: 'MIJOZLAR',
+                count: currentData.clients.length,
+                icon: 'fa-user-tie',
+                color: 'blue',
+                subtitle: 'Ro\'yxatdagi mijozlar'
+            }, {
+                id: 'orders',
+                title: 'BUYURTMALAR',
+                count: currentData.orders.length,
+                icon: 'fa-shopping-bag',
+                color: 'purple',
+                subtitle: 'Oxirgi 30 kun'
+            }, {
+                id: 'debtors',
+                title: 'QARZDORLAR',
+                count: currentData.debts.length,
+                icon: 'fa-hand-holding-usd',
+                color: 'red',
+                subtitle: 'Qarzi borlar'
+            }, {
+                id: 'revenue',
+                title: 'DAROMAD',
+                count: calculateRevenue(),
+                icon: 'fa-chart-line',
+                color: 'teal',
+                subtitle: 'Umumiy daromad',
+                isMoney: true
+            }];
+
+            dashboardCards.innerHTML = cards.map(card => `
+                <div class="card" onclick="showPage('${card.id}')">
+                    <div class="card-header">
+                        <small>${card.title}</small>
+                        <div class="card-icon ${card.color}">
+                            <i class="fas ${card.icon}"></i>
+                        </div>
+                    </div>
+                    <h2>${card.isMoney ? formatMoney(card.count, 'USD') : card.count}</h2>
+                    <div class="card-footer">${card.subtitle}</div>
+                </div>
+            `).join('');
+        }
+
+        // ========== MODAL FUNKSIYALARI ==========
+        function openAddModal(type) {
+            const modal = document.getElementById('addModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('addForm');
+
+            document.getElementById('fabMenu').classList.remove('open');
+            form.innerHTML = '';
+
+            const titles = {
+                'product': 'Yangi Maxsulot Qo\'shish',
+                'agent': 'Yangi Agent Qo\'shish',
+                'client': 'Yangi Mijoz Qo\'shish',
+                'order': 'Yangi Buyurtma Qo\'shish'
+            };
+            modalTitle.textContent = titles[type] || 'Yangi Qo\'shish';
+
+            if (type === 'product') {
+                form.innerHTML = createProductForm();
+            } else if (type === 'agent') {
+                form.innerHTML = createAgentForm();
+            } else if (type === 'client') {
+                form.innerHTML = createClientForm();
+            } else if (type === 'order') {
+                form.innerHTML = createOrderForm();
+            }
+
+            form.innerHTML += `
+                <div class="form-group" style="margin-top: 25px;">
+                    <button type="submit" class="btn">
+                        <i class="fas fa-save"></i> Saqlash
+                    </button>
+                </div>
+            `;
+
+            modal.classList.add('open');
+
+            if (type === 'product') {
+                const imageUpload = document.getElementById('imageUpload');
+                const imagePreview = document.getElementById('imagePreview');
+
+                imageUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // 20MB limit
+                        if (file.size > 20 * 1024 * 1024) {
+                            alert('Rasm hajmi 20MB dan oshmasligi kerak!');
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            imagePreview.classList.add('visible');
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Auto-calculate fields
+                const costInput = document.getElementById('productCost');
+                const priceInput = document.getElementById('productPrice');
+                const agentBonusInput = document.getElementById('productAgentBonus');
+                const profitInput = document.getElementById('productProfit');
+
+                costInput.addEventListener('input', calculateProductFinance);
+                priceInput.addEventListener('input', calculateProductFinance);
+                agentBonusInput.addEventListener('input', calculateProductFinance);
+
+                function calculateProductFinance() {
+                    const cost = parseFloat(costInput.value) || 0;
+                    const price = parseFloat(priceInput.value) || 0;
+                    const agentBonus = parseFloat(agentBonusInput.value) || 0;
+
+                    // Calculate profit
+                    const profit = price - cost - agentBonus;
+                    profitInput.value = profit.toFixed(2);
+                }
+            }
+
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                saveData(type);
+            };
+        }
+
+        function createProductForm() {
+            return `
+                <div class="form-group">
+                    <label>Maxsulot nomi *</label>
+                    <input type="text" class="form-control" id="productName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Maxsulot rasmi (Max: 20MB)</label>
+                    <div class="image-upload" onclick="document.getElementById('imageUpload').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 30px; color: #6a00ff; margin-bottom: 10px;"></i>
+                        <p style="margin: 5px 0; color: #666;">Rasm yuklash uchun bosing</p>
+                        <p style="font-size: 12px; color: #888;">PNG, JPG yoki JPEG (Max: 20MB)</p>
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                        <img id="imagePreview" class="image-preview" src="" alt="Rasm ko'rinishi">
+                    </div>
+                </div>
+                
+                <div class="form-group price-group">
+                    <div>
+                        <label>Tannarxi ($) *</label>
+                        <input type="number" class="form-control" id="productCost" required placeholder="0" step="0.01">
+                    </div>
+                    <div>
+                        <label>Sotish narxi ($) *</label>
+                        <input type="number" class="form-control" id="productPrice" required placeholder="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-group price-group">
+                    <div>
+                        <label>Agent bonusi ($)</label>
+                        <input type="number" class="form-control" id="productAgentBonus" placeholder="0" step="0.01">
+                    </div>
+                    <div>
+                        <label>Sof foyda ($)</label>
+                        <input type="number" class="form-control" id="productProfit" placeholder="0" step="0.01" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Miqdori *</label>
+                    <input type="number" class="form-control" id="productQuantity" required placeholder="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Kategoriya *</label>
+                    <select class="form-control" id="productCategory" required>
+                        <option value="">Tanlang</option>
+                        <option value="elektronika">Elektronika</option>
+                        <option value="kiyim">Kiyim</option>
+                        <option value="oziq-ovqat">Oziq-ovqat</option>
+                        <option value="uy-ro'zg'or">Uy-ro'zg'or</option>
+                        <option value="avtomobil">Avtomobil ehtiyot qismlari</option>
+                        <option value="qurilish">Qurilish materiallari</option>
+                        <option value="boshqa">Boshqa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tavsif</label>
+                    <textarea class="form-control" id="productDescription" rows="3" placeholder="Maxsulot haqida qisqacha ma'lumot..."></textarea>
+                </div>
+            `;
+        }
+
+        function createAgentForm() {
+            return `
+                <div class="form-group">
+                    <label>Ism Familiya *</label>
+                    <input type="text" class="form-control" id="agentName" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefon raqami *</label>
+                    <input type="tel" class="form-control" id="agentPhone" required placeholder="+998">
+                </div>
+                <div class="form-group">
+                    <label>Foiz (%)</label>
+                    <input type="number" class="form-control" id="agentCommission" placeholder="Agent komissiyasi">
+                </div>
+            `;
+        }
+
+        function createClientForm() {
+            return `
+                <div class="form-group">
+                    <label>Ism Familiya *</label>
+                    <input type="text" class="form-control" id="clientName" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefon raqami *</label>
+                    <input type="tel" class="form-control" id="clientPhone" required placeholder="+998">
+                </div>
+                <div class="form-group">
+                    <label>Qarz limiti ($)</label>
+                    <input type="number" class="form-control" id="clientCreditLimit" placeholder="0" step="0.01">
+                </div>
+            `;
+        }
+
+        function createOrderForm() {
+            return `
+                <div class="form-group">
+                    <label>Mijoz *</label>
+                    <select class="form-control" id="orderClient" required>
+                        <option value="">Tanlang</option>
+                        ${currentData.clients.map(client => 
+                            `<option value="${client.id}">${client.name}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Maxsulot *</label>
+                    <select class="form-control" id="orderProduct" required>
+                        <option value="">Tanlang</option>
+                        ${currentData.products.map(product => 
+                            `<option value="${product.id}">${product.name} (${formatMoney(product.price, 'USD')})</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Miqdori *</label>
+                    <input type="number" class="form-control" id="orderQuantity" required placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>To'lov turi</label>
+                    <select class="form-control" id="orderPaymentType">
+                        <option value="naqd">Naqd</option>
+                        <option value="nasiya">Nasiya</option>
+                        <option value="karta">Karta</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('open');
+            document.getElementById('addForm').reset();
+            const imagePreview = document.getElementById('imagePreview');
+            if (imagePreview) {
+                imagePreview.classList.remove('visible');
+                imagePreview.src = '';
+            }
+        }
+
+        // ========== MA'LUMOTLARNI SAQLASH FUNKSIYALARI ==========
+        function saveData(type) {
+            const id = Date.now();
+            
+            switch(type) {
+                case 'product':
+                    const imageFile = document.getElementById('imageUpload').files[0];
+                    let productImage = null;
+                    
+                    if (imageFile) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            productImage = e.target.result;
+                            saveProductWithImage(id, productImage);
+                        }
+                        reader.readAsDataURL(imageFile);
+                    } else {
+                        saveProductWithImage(id, null);
+                    }
+                    break;
+                    
+                case 'agent':
+                    const agent = {
+                        id: id,
+                        name: document.getElementById('agentName').value,
+                        phone: document.getElementById('agentPhone').value,
+                        commission: parseFloat(document.getElementById('agentCommission').value) || 0,
+                        createdAt: new Date().toISOString(),
+                        status: 'active'
+                    };
+                    currentData.agents.push(agent);
+                    localStorage.setItem('hdroline_agents', JSON.stringify(currentData.agents));
+                    postSaveActions('agent');
+                    break;
+                    
+                case 'client':
+                    const client = {
+                        id: id,
+                        name: document.getElementById('clientName').value,
+                        phone: document.getElementById('clientPhone').value,
+                        creditLimit: parseFloat(document.getElementById('clientCreditLimit').value) || 0,
+                        createdAt: new Date().toISOString(),
+                        debt: 0
+                    };
+                    currentData.clients.push(client);
+                    localStorage.setItem('hdroline_clients', JSON.stringify(currentData.clients));
+                    postSaveActions('client');
+                    break;
+                    
+                case 'order':
+                    const order = {
+                        id: id,
+                        orderNumber: 'ORD-' + id.toString().slice(-6),
+                        clientId: document.getElementById('orderClient').value,
+                        productId: document.getElementById('orderProduct').value,
+                        quantity: parseInt(document.getElementById('orderQuantity').value),
+                        paymentType: document.getElementById('orderPaymentType').value,
+                        status: 'yangi',
+                        createdAt: new Date().toISOString()
+                    };
+                    currentData.orders.push(order);
+                    localStorage.setItem('hdroline_orders', JSON.stringify(currentData.orders));
+                    postSaveActions('order');
+                    break;
+            }
+        }
+
+        function saveProductWithImage(id, productImage) {
+            const cost = parseFloat(document.getElementById('productCost').value);
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const agentBonus = parseFloat(document.getElementById('productAgentBonus').value) || 0;
+            const profit = parseFloat(document.getElementById('productProfit').value) || 0;
+            
+            const product = {
+                id: id,
+                name: document.getElementById('productName').value,
+                cost: cost,
+                price: price,
+                agentBonus: agentBonus,
+                profit: profit,
+                quantity: parseInt(document.getElementById('productQuantity').value),
+                category: document.getElementById('productCategory').value,
+                description: document.getElementById('productDescription').value,
+                image: productImage,
+                createdAt: new Date().toISOString()
+            };
+            currentData.products.push(product);
+            localStorage.setItem('hdroline_products', JSON.stringify(currentData.products));
+            postSaveActions('product');
+        }
+
+        function postSaveActions(type) {
+            closeAddModal();
+            alert('Muvaffaqiyatli qo\'shildi!');
+            
+            loadDashboard();
+            switch(type) {
+                case 'product':
+                    loadProductsPage();
+                    showPage('products');
+                    break;
+                case 'agent':
+                    loadAgentsPage();
+                    showPage('agents');
+                    break;
+                case 'client':
+                    loadClientsPage();
+                    showPage('clients');
+                    break;
+                case 'order':
+                    loadOrdersPage();
+                    showPage('orders');
+                    break;
+            }
+            
+            logSecurityEvent(`${type} qo'shildi`);
+        }
+
+        // ========== MAHSULOTLAR SAHIFASI ==========
+        function loadProductsPage() {
+            const tbody = document.getElementById('productsList');
+            tbody.innerHTML = currentData.products.map((product, index) => {
+                // Asosiy narxlar uchun HTML
+                const priceInfo = `
+                    <div style="min-width: 120px;">
+                        <div class="info-row">
+                            <span class="info-label">Tannarx:</span>
+                            <span class="info-value">${formatMoney(product.cost, 'USD')}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Sotish narxi:</span>
+                            <span class="info-value">${formatMoney(product.price, 'USD')}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Moliyaviy ma'lumotlar uchun HTML
+                const financialInfo = `
+                    <div style="min-width: 120px;">
+                        <div class="info-row">
+                            <span class="info-label">Agent bonusi:</span>
+                            <span class="info-value">${formatMoney(product.agentBonus || 0, 'USD')}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Sof foyda:</span>
+                            <span class="info-value ${(product.profit || 0) >= 0 ? 'positive' : 'negative'}">
+                                ${formatMoney(product.profit || 0, 'USD')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+                return `
+                    <tr>
+                        <td>
+                            ${product.image ? 
+                                `<img src="${product.image}" class="product-image" alt="${product.name}">` : 
+                                `<div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999;">
+                                    <i class="fas fa-box"></i>
+                                </div>`
+                            }
+                        </td>
+                        <td>
+                            <strong>${product.name}</strong><br>
+                            <small style="color: #666;">${product.category}</small>
+                        </td>
+                        <td>${priceInfo}</td>
+                        <td>${financialInfo}</td>
+                        <td>
+                            <div style="text-align: center;">
+                                <span style="font-weight: bold; font-size: 16px;">${product.quantity}</span><br>
+                                <small style="color: #666;">dona</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="editProduct(${product.id})" title="Tahrirlash">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" onclick="deleteItem('product', ${product.id})" title="O'chirish">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="6" style="text-align: center; padding: 30px; color: #999;">Maxsulotlar mavjud emas</td></tr>`;
+        }
+
+        // ========== AGENTLAR SAHIFASI ==========
+        function loadAgentsPage() {
+            const tbody = document.getElementById('agentsList');
+            tbody.innerHTML = currentData.agents.map((agent, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <strong>${agent.name}</strong><br>
+                        <small style="color: #666;">${agent.commission}% komissiya</small>
+                    </td>
+                    <td>${agent.phone}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="editAgent(${agent.id})" title="Tahrirlash">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteItem('agent', ${agent.id})" title="O'chirish">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('') || `<tr><td colspan="4" style="text-align: center; padding: 30px; color: #999;">Agentlar mavjud emas</td></tr>`;
+        }
+
+        // ========== MIJOZLAR SAHIFASI ==========
+        function loadClientsPage() {
+            const tbody = document.getElementById('clientsList');
+            tbody.innerHTML = currentData.clients.map((client, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <strong>${client.name}</strong><br>
+                        <small style="color: #666;">${client.address || 'Manzil kiritilmagan'}</small>
+                    </td>
+                    <td>${client.phone}</td>
+                    <td>${formatMoney(client.debt || 0, 'USD')}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="editClient(${client.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteItem('client', ${client.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('') || `<tr><td colspan="5" style="text-align: center; padding: 30px; color: #999;">Mijozlar mavjud emas</td></tr>`;
+        }
+
+        // ========== BUYURTMALAR SAHIFASI ==========
+        function loadOrdersPage() {
+            const tbody = document.getElementById('ordersList');
+            tbody.innerHTML = currentData.orders.map((order, index) => {
+                const client = currentData.clients.find(c => c.id == order.clientId) || {name: 'Noma\'lum'};
+                const product = currentData.products.find(p => p.id == order.productId) || {price: 0};
+                const total = (product.price || 0) * (order.quantity || 1);
+                
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${client.name}</td>
+                        <td>${formatMoney(total, 'USD')}</td>
+                        <td>${formatDate(order.createdAt)}</td>
+                        <td>
+                            <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; 
+                                background: ${order.status === 'yangi' ? '#e3f2fd' : 
+                                           order.status === 'bajarildi' ? '#e8f5e9' : '#fff3e0'}; 
+                                color: ${order.status === 'yangi' ? '#1976d2' : 
+                                        order.status === 'bajarildi' ? '#388e3c' : '#f57c00'};">
+                                ${order.status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="5" style="text-align: center; padding: 30px; color: #999;">Buyurtmalar mavjud emas</td></tr>`;
+        }
+
+        // ========== YORDAMCHI FUNKSIYALAR ==========
+        function calculateRevenue() {
+            return currentData.orders.reduce((sum, order) => {
+                const product = currentData.products.find(p => p.id == order.productId);
+                return sum + ((product?.price || 0) * (order.quantity || 1));
+            }, 0);
+        }
+
+        function formatMoney(amount, currency = 'USD') {
+            if (currency === 'USD') {
+                return '$' + parseFloat(amount).toFixed(2);
+            } else {
+                return parseFloat(amount).toLocaleString('uz-UZ') + ' so\'m';
+            }
+        }
+
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('uz-UZ', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) selectedPage.classList.add('active');
+            
+            const pageTitles = {
+                'home': 'Dashboard',
+                'products': 'Maxsulotlar',
+                'agents': 'Agentlar',
+                'clients': 'Mijozlar',
+                'debtors': 'Qarzdorlar',
+                'orders': 'Buyurtmalar',
+                'productList': 'Maxsulotlar ro\'yxati'
+            };
+            
+            document.getElementById('pageTitle').textContent = pageTitles[pageId] || 'Hdroline';
+            
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('fabMenu').classList.remove('open');
+            
+            switch(pageId) {
+                case 'home': loadDashboard(); break;
+                case 'products': loadProductsPage(); break;
+                case 'agents': loadAgentsPage(); break;
+                case 'clients': loadClientsPage(); break;
+                case 'orders': loadOrdersPage(); break;
+            }
+        }
+
+        function deleteItem(type, id) {
+            if (confirm('Rostdan o\'chirmoqchimisiz?')) {
+                let arrayName = type + 's';
+                let storageKey = 'hdroline_' + arrayName;
+                
+                currentData[arrayName] = currentData[arrayName].filter(item => item.id != id);
+                localStorage.setItem(storageKey, JSON.stringify(currentData[arrayName]));
+                
+                alert('Muvaffaqiyatli o\'chirildi!');
+                logSecurityEvent(`${type} o'chirildi (ID: ${id})`);
+                
+                switch(type) {
+                    case 'product':
+                        loadProductsPage();
+                        loadDashboard();
+                        break;
+                    case 'agent':
+                        loadAgentsPage();
+                        loadDashboard();
+                        break;
+                    case 'client':
+                        loadClientsPage();
+                        loadDashboard();
+                        break;
+                }
+            }
+        }
+
+        function editProduct(id) {
+            alert('Tahrirlash funksiyasi keyingi yangilanishda qo\'shiladi!');
+        }
+
+        function editAgent(id) {
+            alert('Tahrirlash funksiyasi keyingi yangilanishda qo\'shiladi!');
+        }
+
+        function editClient(id) {
+            alert('Tahrirlash funksiyasi keyingi yangilanishda qo\'shiladi!');
+        }
+    </script>
+</body>
+
+</html>
