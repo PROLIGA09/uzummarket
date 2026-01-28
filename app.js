@@ -2717,940 +2717,7 @@ function openAdminPanel() {
     window.location.href = "admin.html";
 }
 // ===== ADMIN PANEL KONFIGURATSIYASI =====
-const ADMIN_CONFIG = {
-    USERNAME: 'Shoxrux',
-    PASSWORD: 'Shoxrux',
-    MAX_LOGIN_ATTEMPTS: 3,
-    SESSION_TIMEOUT: 30 * 60 * 1000 // 30 daqiqa
-};
 
-// ===== ADMIN PANEL O'ZGARUVCHILARI =====
-let adminProducts = [];
-let adminAgents = [];
-let adminClients = [];
-let adminOrders = [];
-let adminLoginAttempts = 0;
-// ===== ADMIN PANEL FUNKSIYALARI =====
-function openAdminPanel() {
-    console.log("Admin panel ochilmoqda...");
-    
-    // Admin ma'lumotlarini localStorage'dan yuklash
-    loadAdminData();
-    
-    // Admin login sahifasini ko'rsatish
-    showAdminLogin();
-}
-
-function showAdminLogin() {
-    // Modal o'rniga HTML ichida admin login sahifasini yaratish
-    const adminContent = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-            <div style="background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 40px 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); max-width: 400px; width: 100%; text-align: center;">
-                <div style="font-size: 40px; color: #6a00ff; margin-bottom: 20px;">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h1 style="font-size: 28px; color: #333; margin-bottom: 10px; font-weight: 700;">Hdroline Admin</h1>
-                <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Maxsus kirish imkoniyati</p>
-                
-                <div id="adminLoginForm">
-                    <input type="text" style="width: 100%; padding: 15px; margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;" 
-                           id="adminUsername" placeholder="Admin nomi" required>
-                    <input type="password" style="width: 100%; padding: 15px; margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;" 
-                           id="adminPassword" placeholder="Maxfiy kod" required>
-                    
-                    <div id="adminCaptchaContainer" style="margin-bottom: 20px;">
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                            <div id="adminCaptchaText" style="flex: 1; background: #f0f0f0; padding: 10px; border-radius: 5px; font-weight: bold; letter-spacing: 5px; text-align: center;"></div>
-                            <button type="button" onclick="generateAdminCaptcha()" style="background: #6a00ff; color: white; border: none; border-radius: 5px; padding: 0 15px; cursor: pointer;">
-                                <i class="fas fa-redo"></i>
-                            </button>
-                        </div>
-                        <input type="text" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;" 
-                               id="adminCaptchaInput" placeholder="Yuqoridagi kodni kiriting" required>
-                    </div>
-                    
-                    <button type="button" onclick="adminLogin()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #6a00ff, #00c9a7); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-lock"></i> Tizimga Kirish
-                    </button>
-                </div>
-                
-                <div id="adminLoginError" style="color: #e74c3c; margin-top: 10px; font-size: 14px; display: none;">
-                    Noto'g'ri ma'lumotlar yoki ruxsat yo'q!
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Admin panel kontentini modalga yuklash
-    document.getElementById('adminPanelContent').innerHTML = adminContent;
-    
-    // CAPTCHA generatsiya
-    generateAdminCaptcha();
-    
-    // Modalni ochish
-    openModal('adminModal');
-}
-
-function generateAdminCaptcha() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let captcha = '';
-    for (let i = 0; i < 6; i++) {
-        captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    
-    const captchaElement = document.getElementById('adminCaptchaText');
-    if (captchaElement) {
-        captchaElement.textContent = captcha;
-        localStorage.setItem('admin_captcha_code', captcha);
-    }
-}
-
-function adminLogin() {
-    const username = document.getElementById('adminUsername')?.value;
-    const password = document.getElementById('adminPassword')?.value;
-    const captchaInput = document.getElementById('adminCaptchaInput')?.value;
-    const captchaCode = localStorage.getItem('admin_captcha_code');
-    
-    // Login urinishlari limiti
-    if (adminLoginAttempts >= ADMIN_CONFIG.MAX_LOGIN_ATTEMPTS) {
-        document.getElementById('adminLoginError').textContent = 'Juda ko\'p urinishlar! Iltimos, keyinroq qayta urinib ko\'ring.';
-        document.getElementById('adminLoginError').style.display = 'block';
-        generateAdminCaptcha();
-        return;
-    }
-    
-    // CAPTCHA tekshirish
-    if (captchaInput !== captchaCode) {
-        document.getElementById('adminLoginError').textContent = 'Noto\'g\'ri CAPTCHA kodi!';
-        document.getElementById('adminLoginError').style.display = 'block';
-        adminLoginAttempts++;
-        generateAdminCaptcha();
-        return;
-    }
-    
-    // Foydalanuvchi va parolni tekshirish
-    if (username === ADMIN_CONFIG.USERNAME && password === ADMIN_CONFIG.PASSWORD) {
-        // Muvaffaqiyatli login
-        adminLoginAttempts = 0;
-        createAdminSession();
-        showAdminDashboard();
-    } else {
-        document.getElementById('adminLoginError').textContent = 'Noto\'g\'ri foydalanuvchi nomi yoki parol!';
-        document.getElementById('adminLoginError').style.display = 'block';
-        adminLoginAttempts++;
-        generateAdminCaptcha();
-    }
-}
-
-function createAdminSession() {
-    const session = {
-        loggedIn: true,
-        expires: new Date(Date.now() + ADMIN_CONFIG.SESSION_TIMEOUT).toISOString(),
-        timestamp: new Date().toISOString()
-    };
-    localStorage.setItem('admin_session', JSON.stringify(session));
-}
-
-function checkAdminSession() {
-    const session = JSON.parse(localStorage.getItem('admin_session') || '{}');
-    if (session.expires && new Date(session.expires) > new Date()) {
-        return true;
-    }
-    return false;
-}
-
-function loadAdminData() {
-    try {
-        adminProducts = JSON.parse(localStorage.getItem('admin_products')) || [];
-        adminAgents = JSON.parse(localStorage.getItem('admin_agents')) || [];
-        adminClients = JSON.parse(localStorage.getItem('admin_clients')) || [];
-        adminOrders = JSON.parse(localStorage.getItem('admin_orders')) || [];
-        
-        // Agar admin ma'lumotlari bo'sh bo'lsa, asosiy ma'lumotlardan nusxa olish
-        if (adminProducts.length === 0 && sampleProducts.length > 0) {
-            adminProducts = [...sampleProducts];
-            localStorage.setItem('admin_products', JSON.stringify(adminProducts));
-        }
-        
-    } catch (error) {
-        console.error('Admin ma\'lumotlarini yuklashda xatolik:', error);
-        adminProducts = [];
-        adminAgents = [];
-        adminClients = [];
-        adminOrders = [];
-    }
-}
-
-function showAdminDashboard() {
-    const adminContent = `
-        <div style="background: #f5f7fa; min-height: 400px; padding: 0;">
-            <!-- HEADER -->
-            <div style="background: linear-gradient(135deg, #6a00ff, #8a2be2); color: #fff; padding: 15px 20px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 24px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: background 0.3s;" id="adminMenuBtn">
-                        ☰
-                    </div>
-                    <div id="adminPageTitle">Hdroline Admin</div>
-                </div>
-                <div style="background: #00c9a7; padding: 6px 15px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-user-shield"></i> Admin
-                    <button onclick="adminLogout()" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- SIDEBAR -->
-            <div id="adminSidebar" style="position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #2c2c3e; color: white; padding-top: 70px; transition: left 0.3s ease; z-index: 1000; overflow-y: auto; box-shadow: 5px 0 25px rgba(0, 0, 0, 0.3);">
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: #8a8aa3; margin: 0 20px 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Dashboard</h3>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin: 5px 0;">
-                            <a href="#" onclick="showAdminPage('dashboard')" style="display: flex; align-items: center; color: #b5b5c3; text-decoration: none; padding: 12px 20px; transition: all 0.2s; font-size: 15px; cursor: pointer;">
-                                <i class="fas fa-home" style="width: 25px; margin-right: 15px; font-size: 16px; text-align: center;"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: #8a8aa3; margin: 0 20px 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Maxsulotlar</h3>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin: 5px 0;">
-                            <a href="#" onclick="showAdminPage('products')" style="display: flex; align-items: center; color: #b5b5c3; text-decoration: none; padding: 12px 20px; transition: all 0.2s; font-size: 15px; cursor: pointer;">
-                                <i class="fas fa-box" style="width: 25px; margin-right: 15px; font-size: 16px; text-align: center;"></i>
-                                Maxsulotlar
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div style="height: 1px; background: #3d3d52; margin: 20px;"></div>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: #8a8aa3; margin: 0 20px 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Mijozlar va Agentlar</h3>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin: 5px 0;">
-                            <a href="#" onclick="showAdminPage('agents')" style="display: flex; align-items: center; color: #b5b5c3; text-decoration: none; padding: 12px 20px; transition: all 0.2s; font-size: 15px; cursor: pointer;">
-                                <i class="fas fa-users" style="width: 25px; margin-right: 15px; font-size: 16px; text-align: center;"></i>
-                                Agentlar
-                            </a>
-                        </li>
-                        <li style="margin: 5px 0;">
-                            <a href="#" onclick="showAdminPage('clients')" style="display: flex; align-items: center; color: #b5b5c3; text-decoration: none; padding: 12px 55px; transition: all 0.2s; font-size: 14px; cursor: pointer;">
-                                Mijozlar
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- OVERLAY -->
-            <div id="adminOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; display: none;"></div>
-            
-            <!-- CONTENT AREA -->
-            <div id="adminContentArea" style="padding: 15px; margin-top: 10px;">
-                <!-- Dashboard kontenti bu yerda yuklanadi -->
-            </div>
-            
-            <!-- FAB BUTTON -->
-            <div id="adminFab" style="position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: linear-gradient(135deg, #6a00ff, #00c9a7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); color: white; cursor: pointer; transition: all 0.3s; z-index: 99;">
-                <i class="fas fa-plus"></i>
-            </div>
-            
-            <!-- FAB MENU -->
-            <div id="adminFabMenu" style="position: fixed; bottom: 100px; right: 25px; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); display: none; flex-direction: column; min-width: 180px; z-index: 100; overflow: hidden;">
-                <div class="fab-menu-item" onclick="openAdminAddModal('product')">
-                    <i class="fas fa-box" style="color: #ff6b8b; width: 20px; font-size: 16px;"></i> Maxsulot qo'shish
-                </div>
-                <div class="fab-menu-item" onclick="openAdminAddModal('agent')">
-                    <i class="fas fa-user-plus" style="color: #2ecc71; width: 20px; font-size: 16px;"></i> Agent qo'shish
-                </div>
-            </div>
-            
-            <style>
-                .fab-menu-item {
-                    padding: 15px 20px;
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    cursor: pointer;
-                    transition: background 0.2s;
-                    border-bottom: 1px solid #f5f5f5;
-                    font-size: 14px;
-                }
-                .fab-menu-item:last-child {
-                    border-bottom: none;
-                }
-                .fab-menu-item:hover {
-                    background: #f8f9fa;
-                }
-            </style>
-        </div>
-    `;
-    
-    document.getElementById('adminPanelContent').innerHTML = adminContent;
-    
-    // Event listenerlarni qo'shish
-    setTimeout(() => {
-        // Sidebar toggle
-        document.getElementById('adminMenuBtn').addEventListener('click', function() {
-            const sidebar = document.getElementById('adminSidebar');
-            const overlay = document.getElementById('adminOverlay');
-            sidebar.style.left = '0';
-            overlay.style.display = 'block';
-        });
-        
-        // Overlay click
-        document.getElementById('adminOverlay').addEventListener('click', function() {
-            const sidebar = document.getElementById('adminSidebar');
-            const overlay = document.getElementById('adminOverlay');
-            sidebar.style.left = '-300px';
-            overlay.style.display = 'none';
-        });
-        
-        // FAB button
-        const fab = document.getElementById('adminFab');
-        const fabMenu = document.getElementById('adminFabMenu');
-        
-        fab.addEventListener('click', function(e) {
-            e.stopPropagation();
-            fabMenu.style.display = fabMenu.style.display === 'flex' ? 'none' : 'flex';
-        });
-        
-        document.addEventListener('click', function(e) {
-            if (!fab.contains(e.target) && !fabMenu.contains(e.target)) {
-                fabMenu.style.display = 'none';
-            }
-        });
-        
-        // Dashboardni yuklash
-        showAdminPage('dashboard');
-    }, 100);
-}
-
-function showAdminPage(page) {
-    const contentArea = document.getElementById('adminContentArea');
-    const pageTitle = document.getElementById('adminPageTitle');
-    
-    // Sahifa sarlavhasini o'zgartirish
-    const titles = {
-        'dashboard': 'Dashboard',
-        'products': 'Maxsulotlar',
-        'agents': 'Agentlar',
-        'clients': 'Mijozlar'
-    };
-    
-    if (pageTitle) pageTitle.textContent = titles[page] || 'Admin Panel';
-    
-    // Sidebar va overlayni yopish
-    const sidebar = document.getElementById('adminSidebar');
-    const overlay = document.getElementById('adminOverlay');
-    const fabMenu = document.getElementById('adminFabMenu');
-    
-    if (sidebar) sidebar.style.left = '-300px';
-    if (overlay) overlay.style.display = 'none';
-    if (fabMenu) fabMenu.style.display = 'none';
-    
-    // Kontentni yuklash
-    switch(page) {
-        case 'dashboard':
-            loadAdminDashboard();
-            break;
-        case 'products':
-            loadAdminProducts();
-            break;
-        case 'agents':
-            loadAdminAgents();
-            break;
-        case 'clients':
-            loadAdminClients();
-            break;
-    }
-}
-
-function loadAdminDashboard() {
-    const contentArea = document.getElementById('adminContentArea');
-    
-    const totalProducts = adminProducts.length;
-    const totalAgents = adminAgents.length;
-    const totalClients = adminClients.length;
-    const totalOrders = adminOrders.length;
-    
-    // Daromadni hisoblash
-    let totalRevenue = 0;
-    adminOrders.forEach(order => {
-        const product = adminProducts.find(p => p.id == order.productId);
-        if (product) {
-            totalRevenue += product.price * order.quantity;
-        }
-    });
-    
-    // Qarzdorlarni hisoblash
-    const debtors = adminClients.filter(client => (client.debt || 0) > 0);
-    
-    const cards = [
-        {
-            title: 'MAXSULOTLAR',
-            count: totalProducts,
-            icon: 'fa-boxes',
-            color: 'pink',
-            subtitle: 'Jami maxsulotlar'
-        },
-        {
-            title: 'AGENTLAR',
-            count: totalAgents,
-            icon: 'fa-users',
-            color: 'green',
-            subtitle: 'Faol agentlar'
-        },
-        {
-            title: 'MIJOZLAR',
-            count: totalClients,
-            icon: 'fa-user-tie',
-            color: 'blue',
-            subtitle: 'Ro\'yxatdagi mijozlar'
-        },
-        {
-            title: 'BUYURTMALAR',
-            count: totalOrders,
-            icon: 'fa-shopping-bag',
-            color: 'purple',
-            subtitle: 'Umumiy buyurtmalar'
-        },
-        {
-            title: 'QARZDORLAR',
-            count: debtors.length,
-            icon: 'fa-hand-holding-usd',
-            color: 'red',
-            subtitle: 'Qarzi borlar'
-        },
-        {
-            title: 'DAROMAD',
-            count: totalRevenue,
-            icon: 'fa-chart-line',
-            color: 'teal',
-            subtitle: 'Umumiy daromad',
-            isMoney: true
-        }
-    ];
-    
-    const cardsHTML = cards.map(card => `
-        <div style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); transition: all 0.3s; cursor: pointer; border: 1px solid #f0f0f0; height: 100%;" 
-             onclick="showAdminPage('${card.title.toLowerCase().split(' ')[0]}')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                <small style="color: #666; font-size: 12px; display: block; margin-bottom: 5px; font-weight: 500;">${card.title}</small>
-                <div style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; background: ${getColorForIcon(card.color)};">
-                    <i class="fas ${card.icon}"></i>
-                </div>
-            </div>
-            <h2 style="margin: 8px 0; font-size: 22px; color: #333; line-height: 1.2;">
-                ${card.isMoney ? formatAdminMoney(card.count, 'USD') : card.count}
-            </h2>
-            <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f0f0f0; font-size: 11px; color: #888;">${card.subtitle}</div>
-        </div>
-    `).join('');
-    
-    contentArea.innerHTML = `
-        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-            <h1 style="font-size: 20px; color: #333; margin: 0;">Dashboard</h1>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px;">
-            ${cardsHTML}
-        </div>
-        
-        <style>
-            @media (min-width: 768px) {
-                #adminContentArea > div:last-child {
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 15px;
-                }
-            }
-        </style>
-    `;
-}
-
-function getColorForIcon(color) {
-    const colors = {
-        'pink': '#ff6b8b',
-        'green': '#2ecc71',
-        'blue': '#3498db',
-        'purple': '#9b59b6',
-        'red': '#e74c3c',
-        'teal': '#1abc9c',
-        'yellow': '#f1c40f',
-        'orange': '#e67e22'
-    };
-    return colors[color] || '#6a00ff';
-}
-
-function formatAdminMoney(amount, currency = 'USD') {
-    if (currency === 'USD') {
-        return '$' + parseFloat(amount).toFixed(2);
-    }
-    return parseFloat(amount).toLocaleString('uz-UZ') + ' so\'m';
-}
-
-function loadAdminProducts() {
-    const contentArea = document.getElementById('adminContentArea');
-    
-    let productsHTML = '';
-    
-    if (adminProducts.length === 0) {
-        productsHTML = `
-            <div style="text-align: center; padding: 50px 20px; color: #999;">
-                <i class="fas fa-box-open" style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;"></i>
-                <h3 style="margin-bottom: 10px; color: #333; font-size: 18px;">Maxsulotlar yo'q</h3>
-                <p style="font-size: 14px;">Hozircha maxsulotlar ro'yxati bo'sh</p>
-                <button onclick="openAdminAddModal('product')" style="background: #6a00ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; cursor: pointer;">
-                    <i class="fas fa-plus"></i> Birinchi maxsulotni qo'shing
-                </button>
-            </div>
-        `;
-    } else {
-        // Jadval HTML
-        productsHTML = `
-            <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                <h1 style="font-size: 20px; color: #333; margin: 0; display: flex; justify-content: space-between; align-items: center;">
-                    <span>Maxsulotlar</span>
-                    <button onclick="openAdminAddModal('product')" style="background: #6a00ff; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer;">
-                        <i class="fas fa-plus"></i> Yangi maxsulot
-                    </button>
-                </h1>
-            </div>
-            
-            <div style="overflow-x: auto; margin-top: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: #f8f9fa;">
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Rasm</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Nomi</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Narxlar</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Qoldiq</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Harakatlar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${adminProducts.map((product, index) => `
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px 15px;">
-                                    ${product.image ? 
-                                        `<img src="${product.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #eee;">` : 
-                                        `<div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999;">
-                                            <i class="fas fa-box"></i>
-                                        </div>`
-                                    }
-                                </td>
-                                <td style="padding: 12px 15px;">
-                                    <strong style="display: block; margin-bottom: 5px;">${product.name}</strong>
-                                    <small style="color: #666;">${product.category || 'Kategoriya yo\'q'}</small>
-                                </td>
-                                <td style="padding: 12px 15px;">
-                                    <div style="min-width: 120px;">
-                                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin: 3px 0;">
-                                            <span style="color: #666;">Tannarx:</span>
-                                            <span>${formatAdminMoney(product.cost || 0, 'USD')}</span>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin: 3px 0;">
-                                            <span style="color: #666;">Sotish narxi:</span>
-                                            <span style="font-weight: 500; color: #27ae60;">${formatAdminMoney(product.price || 0, 'USD')}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td style="padding: 12px 15px;">
-                                    <div style="text-align: center;">
-                                        <span style="font-weight: bold; font-size: 16px;">${product.quantity || 0}</span><br>
-                                        <small style="color: #666;">dona</small>
-                                    </div>
-                                </td>
-                                <td style="padding: 12px 15px;">
-                                    <div style="display: flex; gap: 5px;">
-                                        <button onclick="editAdminProduct(${product.id})" style="background: none; border: none; cursor: pointer; padding: 6px; color: #666;" title="Tahrirlash">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button onclick="deleteAdminItem('product', ${product.id})" style="background: none; border: none; cursor: pointer; padding: 6px; color: #e74c3c;" title="O'chirish">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-    
-    contentArea.innerHTML = productsHTML;
-}
-
-function loadAdminAgents() {
-    const contentArea = document.getElementById('adminContentArea');
-    
-    let agentsHTML = '';
-    
-    if (adminAgents.length === 0) {
-        agentsHTML = `
-            <div style="text-align: center; padding: 50px 20px; color: #999;">
-                <i class="fas fa-users" style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;"></i>
-                <h3 style="margin-bottom: 10px; color: #333; font-size: 18px;">Agentlar yo'q</h3>
-                <p style="font-size: 14px;">Hozircha agentlar ro'yxati bo'sh</p>
-                <button onclick="openAdminAddModal('agent')" style="background: #6a00ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 15px; cursor: pointer;">
-                    <i class="fas fa-plus"></i> Birinchi agentni qo'shing
-                </button>
-            </div>
-        `;
-    } else {
-        agentsHTML = `
-            <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                <h1 style="font-size: 20px; color: #333; margin: 0; display: flex; justify-content: space-between; align-items: center;">
-                    <span>Agentlar</span>
-                    <button onclick="openAdminAddModal('agent')" style="background: #6a00ff; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer;">
-                        <i class="fas fa-plus"></i> Yangi agent
-                    </button>
-                </h1>
-            </div>
-            
-            <div style="overflow-x: auto; margin-top: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: #f8f9fa;">
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">№</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Ismi</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Telefon</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Komissiya</th>
-                            <th style="padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #eee; font-size: 14px;">Harakatlar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${adminAgents.map((agent, index) => `
-                            <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px 15px;">${index + 1}</td>
-                                <td style="padding: 12px 15px;">
-                                    <strong>${agent.name}</strong><br>
-                                    <small style="color: #666;">ID: ${agent.id.toString().slice(-6)}</small>
-                                </td>
-                                <td style="padding: 12px 15px;">${agent.phone}</td>
-                                <td style="padding: 12px 15px;">
-                                    <span style="padding: 4px 8px; background: #e8f5e9; color: #388e3c; border-radius: 4px; font-size: 12px;">
-                                        ${agent.commission || 0}%
-                                    </span>
-                                </td>
-                                <td style="padding: 12px 15px;">
-                                    <div style="display: flex; gap: 5px;">
-                                        <button onclick="editAdminAgent(${agent.id})" style="background: none; border: none; cursor: pointer; padding: 6px; color: #666;" title="Tahrirlash">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button onclick="deleteAdminItem('agent', ${agent.id})" style="background: none; border: none; cursor: pointer; padding: 6px; color: #e74c3c;" title="O'chirish">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-    
-    contentArea.innerHTML = agentsHTML;
-}
-
-function loadAdminClients() {
-    const contentArea = document.getElementById('adminContentArea');
-    
-    // Mijozlar ro'yxati (oddiy versiya)
-    contentArea.innerHTML = `
-        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-            <h1 style="font-size: 20px; color: #333; margin: 0;">Mijozlar</h1>
-        </div>
-        
-        <div style="text-align: center; padding: 50px 20px; color: #999;">
-            <i class="fas fa-user-tie" style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;"></i>
-            <h3 style="margin-bottom: 10px; color: #333; font-size: 18px;">Mijozlar funksiyasi</h3>
-            <p style="font-size: 14px;">Bu funksiya keyingi yangilanishda qo'shiladi</p>
-        </div>
-    `;
-}
-
-function openAdminAddModal(type) {
-    // Modal HTML yaratish
-    const modalHTML = `
-        <div id="adminAddModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: flex; align-items: center; justify-content: center; padding: 20px;">
-            <div style="background: white; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
-                <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
-                    <h3 style="margin: 0; font-size: 18px;" id="adminModalTitle">
-                        ${type === 'product' ? 'Yangi Maxsulot Qo\'shish' : 
-                          type === 'agent' ? 'Yangi Agent Qo\'shish' : 
-                          type === 'client' ? 'Yangi Mijoz Qo\'shish' : 'Qo\'shish'}
-                    </h3>
-                    <button onclick="closeAdminAddModal()" style="background: rgba(255,255,255,0.2); border: none; font-size: 20px; cursor: pointer; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                        &times;
-                    </button>
-                </div>
-                <div style="padding: 20px;">
-                    <form id="adminAddForm">
-                        ${type === 'product' ? createAdminProductForm() : 
-                          type === 'agent' ? createAdminAgentForm() : 
-                          type === 'client' ? createAdminClientForm() : ''}
-                        
-                        <div style="margin-top: 25px;">
-                            <button type="submit" style="background: #6a00ff; color: white; border: none; padding: 14px 25px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 500; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                <i class="fas fa-save"></i> Saqlash
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Modalni sahifaga qo'shish
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHTML;
-    document.getElementById('adminPanelContent').appendChild(modalContainer);
-    
-    // Form submit event
-    setTimeout(() => {
-        document.getElementById('adminAddForm').onsubmit = function(e) {
-            e.preventDefault();
-            saveAdminData(type);
-        };
-    }, 100);
-}
-
-function createAdminProductForm() {
-    return `
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Maxsulot nomi *</label>
-            <input type="text" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminProductName" required>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-            <div>
-                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Tannarxi ($) *</label>
-                <input type="number" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                       id="adminProductCost" required placeholder="0" step="0.01">
-            </div>
-            <div>
-                <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Sotish narxi ($) *</label>
-                <input type="number" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                       id="adminProductPrice" required placeholder="0" step="0.01">
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Miqdori *</label>
-            <input type="number" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminProductQuantity" required placeholder="0">
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Kategoriya *</label>
-            <select style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                    id="adminProductCategory" required>
-                <option value="">Tanlang</option>
-                <option value="RAKOVINA UCHUN">RAKOVINA UCHUN</option>
-                <option value="DUSH UCHUN">DUSH UCHUN</option>
-                <option value="OSHXONA UCHUN">OSHXONA UCHUN</option>
-                <option value="RAKOVINA">RAKOVINA</option>
-                <option value="AKSESSUARLAR">AKSESSUARLAR</option>
-                <option value="Barcha kategoriyalar">Barcha kategoriyalar</option>
-            </select>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Tavsif</label>
-            <textarea style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa; resize: vertical; min-height: 80px;" 
-                      id="adminProductDescription" placeholder="Maxsulot haqida qisqacha ma'lumot..."></textarea>
-        </div>
-    `;
-}
-
-function createAdminAgentForm() {
-    return `
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Ism Familiya *</label>
-            <input type="text" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminAgentName" required>
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Telefon raqami *</label>
-            <input type="tel" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminAgentPhone" required placeholder="+998">
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Komissiya foizi (%)</label>
-            <input type="number" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminAgentCommission" placeholder="0" step="0.01">
-        </div>
-    `;
-}
-
-function createAdminClientForm() {
-    return `
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Ism Familiya *</label>
-            <input type="text" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminClientName" required>
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px;">Telefon raqami *</label>
-            <input type="tel" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #fafafa;" 
-                   id="adminClientPhone" required placeholder="+998">
-        </div>
-    `;
-}
-
-function saveAdminData(type) {
-    const id = Date.now();
-    
-    switch(type) {
-        case 'product':
-            const product = {
-                id: id,
-                name: document.getElementById('adminProductName').value,
-                cost: parseFloat(document.getElementById('adminProductCost').value) || 0,
-                price: parseFloat(document.getElementById('adminProductPrice').value) || 0,
-                bonus: Math.floor(Math.random() * 20) + 5, // 5-25% oralig'ida bonus
-                quantity: parseInt(document.getElementById('adminProductQuantity').value) || 0,
-                category: document.getElementById('adminProductCategory').value,
-                description: document.getElementById('adminProductDescription').value,
-                image: `https://images.unsplash.com/photo-${1558618000 + id % 10000}?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80`,
-                specs: ["Yuqori sifat", "Zamonaviy dizayn", "Uzoq muddatli kafolat"],
-                createdAt: new Date().toISOString()
-            };
-            
-            adminProducts.push(product);
-            localStorage.setItem('admin_products', JSON.stringify(adminProducts));
-            
-            // Asosiy mahsulotlar ro'yxatiga ham qo'shish (agar kerak bo'lsa)
-            if (!sampleProducts.find(p => p.id === product.id)) {
-                sampleProducts.push(product);
-                localStorage.setItem('hydroline_products', JSON.stringify(sampleProducts));
-            }
-            
-            break;
-            
-        case 'agent':
-            const agent = {
-                id: id,
-                name: document.getElementById('adminAgentName').value,
-                phone: document.getElementById('adminAgentPhone').value,
-                commission: parseFloat(document.getElementById('adminAgentCommission').value) || 0,
-                createdAt: new Date().toISOString(),
-                status: 'active'
-            };
-            
-            adminAgents.push(agent);
-            localStorage.setItem('admin_agents', JSON.stringify(adminAgents));
-            break;
-            
-        case 'client':
-            const client = {
-                id: id,
-                name: document.getElementById('adminClientName').value,
-                phone: document.getElementById('adminClientPhone').value,
-                createdAt: new Date().toISOString(),
-                debt: 0
-            };
-            
-            adminClients.push(client);
-            localStorage.setItem('admin_clients', JSON.stringify(adminClients));
-            break;
-    }
-    
-    closeAdminAddModal();
-    
-    // Sahifani yangilash
-    switch(type) {
-        case 'product':
-            loadAdminProducts();
-            loadAdminDashboard();
-            showNotification('Yangi maxsulot muvaffaqiyatli qo\'shildi!', 'success');
-            break;
-        case 'agent':
-            loadAdminAgents();
-            loadAdminDashboard();
-            showNotification('Yangi agent muvaffaqiyatli qo\'shildi!', 'success');
-            break;
-        case 'client':
-            loadAdminClients();
-            loadAdminDashboard();
-            showNotification('Yangi mijoz muvaffaqiyatli qo\'shildi!', 'success');
-            break;
-    }
-}
-
-function closeAdminAddModal() {
-    const modal = document.getElementById('adminAddModal');
-    if (modal) {
-        modal.remove();
-    }
-}
-
-function editAdminProduct(id) {
-    showNotification('Tahrirlash funksiyasi tez orada qo\'shiladi!', 'info');
-}
-
-function editAdminAgent(id) {
-    showNotification('Tahrirlash funksiyasi tez orada qo\'shiladi!', 'info');
-}
-
-function deleteAdminItem(type, id) {
-    if (confirm(`Rostdan ${type === 'product' ? 'maxsulotni' : 'agentni'} o'chirmoqchimisiz?`)) {
-        let arrayName, storageKey;
-        
-        switch(type) {
-            case 'product':
-                arrayName = 'adminProducts';
-                storageKey = 'admin_products';
-                adminProducts = adminProducts.filter(item => item.id !== id);
-                
-                // Asosiy ro'yxatdan ham o'chirish
-                const index = sampleProducts.findIndex(p => p.id === id);
-                if (index !== -1) {
-                    sampleProducts.splice(index, 1);
-                    localStorage.setItem('hydroline_products', JSON.stringify(sampleProducts));
-                }
-                break;
-                
-            case 'agent':
-                arrayName = 'adminAgents';
-                storageKey = 'admin_agents';
-                adminAgents = adminAgents.filter(item => item.id !== id);
-                break;
-        }
-        
-        localStorage.setItem(storageKey, JSON.stringify(window[arrayName]));
-        
-        showNotification(`${type === 'product' ? 'Maxsulot' : 'Agent'} muvaffaqiyatli o'chirildi!`, 'success');
-        
-        // Sahifani yangilash
-        switch(type) {
-            case 'product':
-                loadAdminProducts();
-                loadAdminDashboard();
-                break;
-            case 'agent':
-                loadAdminAgents();
-                loadAdminDashboard();
-                break;
-        }
-    }
-}
-
-function adminLogout() {
-    if (confirm('Admin panelidan chiqmoqchimisiz?')) {
-        localStorage.removeItem('admin_session');
-        closeModal('adminModal');
-        showNotification('Admin panelidan chiqdingiz', 'success');
-    }
-}
 
 // ===== ASOSIY APP.JS GA QO'SHILADIGAN FUNCTION CALL =====
 
@@ -3660,7 +2727,539 @@ function adminLogout() {
 //     openModal('adminModal');
 //     showAdminLogin();
 // }
+// ===== YANGI: ADMIN PANEL OCHISH FUNKSIYASI =====
+function openAdminPanel() {
+    // Admin panel modalini ochish
+    openModal('adminModal');
+    
+    // Admin panel kontentini yuklash
+    document.getElementById('adminPanelContent').innerHTML = `
+        <div class="admin-dashboard">
+            <div class="admin-header">
+                <h3><i class="fas fa-user-shield"></i> Hydroline Admin Panel</h3>
+            </div>
+            
+            <div class="admin-stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; padding: 1rem;">
+                <div class="admin-card">
+                    <div class="admin-card-icon" style="background: var(--primary);">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h4>Maxsulotlar</h4>
+                    <div class="count">${currentData.products.length}</div>
+                </div>
+                <div class="admin-card">
+                    <div class="admin-card-icon" style="background: var(--accent);">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h4>Buyurtmalar</h4>
+                    <div class="count">${currentData.orders.length}</div>
+                </div>
+                <div class="admin-card">
+                    <div class="admin-card-icon" style="background: var(--success);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4>Mijozlar</h4>
+                    <div class="count">${currentData.clients.length}</div>
+                </div>
+            </div>
+            
+            <div style="padding: 0 1rem 1rem;">
+                <button class="btn btn-admin btn-block" onclick="showAdminProducts()">
+                    <i class="fas fa-box"></i> Maxsulotlarni Boshqarish
+                </button>
+                <button class="btn btn-admin btn-block" onclick="showAddProductForm()" style="margin-top: 0.75rem;">
+                    <i class="fas fa-plus-circle"></i> Yangi Maxsulot Qo'shish
+                </button>
+            </div>
+        </div>
+    `;
+}
 
+// ===== YANGI: MAXSULOTLARNI BOSHQARISH FUNKSIYALARI =====
+
+// LocalStorage dan ma'lumotlarni yuklash
+function loadDataFromLocalStorage() {
+    try {
+        // Asosiy ma'lumotlar
+        currentData = {
+            products: JSON.parse(localStorage.getItem('hydroline_products')) || sampleProducts,
+            orders: JSON.parse(localStorage.getItem('hydroline_orders')) || [],
+            clients: JSON.parse(localStorage.getItem('hydroline_clients')) || [],
+            agents: JSON.parse(localStorage.getItem('hydroline_agents')) || [],
+            debts: JSON.parse(localStorage.getItem('hydroline_debts')) || []
+        };
+    } catch (error) {
+        console.error('LocalStorage yuklash xatosi:', error);
+        currentData = {
+            products: sampleProducts,
+            orders: [],
+            clients: [],
+            agents: [],
+            debts: []
+        };
+    }
+}
+
+// Ma'lumotlarni saqlash
+function saveDataToLocalStorage() {
+    try {
+        localStorage.setItem('hydroline_products', JSON.stringify(currentData.products));
+        localStorage.setItem('hydroline_orders', JSON.stringify(currentData.orders));
+        localStorage.setItem('hydroline_clients', JSON.stringify(currentData.clients));
+        localStorage.setItem('hydroline_agents', JSON.stringify(currentData.agents));
+        localStorage.setItem('hydroline_debts', JSON.stringify(currentData.debts));
+    } catch (error) {
+        console.error('LocalStorage saqlash xatosi:', error);
+    }
+}
+
+// Admin maxsulotlar sahifasini ko'rsatish
+function showAdminProducts() {
+    document.getElementById('adminPanelContent').innerHTML = `
+        <div class="admin-dashboard">
+            <div class="admin-header">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <h3><i class="fas fa-boxes"></i> Maxsulotlar Boshqaruvi</h3>
+                    <button class="btn btn-admin btn-sm" onclick="showAddProductForm()">
+                        <i class="fas fa-plus"></i> Yangi
+                    </button>
+                </div>
+            </div>
+            
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nomi</th>
+                            <th>Kategoriya</th>
+                            <th>Narxi</th>
+                            <th>Qoldiq</th>
+                            <th>Harakatlar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminProductsList">
+                        <!-- Maxsulotlar JavaScript orqali yuklanadi -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    loadAdminProductsList();
+}
+
+// Admin maxsulotlar ro'yxatini yuklash
+function loadAdminProductsList() {
+    const tbody = document.getElementById('adminProductsList');
+    if (!tbody) return;
+    
+    if (currentData.products.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                    <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <div>Hech qanday maxsulot yo'q</div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = currentData.products.map(product => `
+        <tr>
+            <td>${product.id}</td>
+            <td style="display: flex; align-items: center; gap: 0.5rem;">
+                ${product.image ? 
+                    `<img src="${product.image}" style="width: 40px; height: 40px; border-radius: var(--radius-sm); object-fit: cover;">` : 
+                    `<div style="width: 40px; height: 40px; background: var(--gray-100); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-box" style="color: var(--text-light);"></i>
+                    </div>`
+                }
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">${product.name}</div>
+                    <small style="color: var(--text-light); font-size: 0.8rem;">
+                        ${(product.description || '').substring(0, 30)}...
+                    </small>
+                </div>
+            </td>
+            <td>${product.category || 'Noma\'lum'}</td>
+            <td>
+                <div style="font-weight: 700; color: var(--primary);">$${product.price.toFixed(2)}</div>
+                <small style="color: var(--text-light);">${product.bonus || 0}% bonus</small>
+            </td>
+            <td>
+                <div style="font-weight: 600;">${product.quantity || 0}</div>
+                <small style="color: var(--text-light);">dona</small>
+            </td>
+            <td>
+                <div class="admin-actions">
+                    <button class="btn-edit" onclick="editProduct(${product.id})" title="Tahrirlash">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-delete" onclick="deleteProduct(${product.id})" title="O'chirish">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Yangi maxsulot qo'shish formasi
+function showAddProductForm() {
+    document.getElementById('adminPanelContent').innerHTML = `
+        <div class="admin-dashboard">
+            <div class="admin-header">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <h3><i class="fas fa-plus-circle"></i> Yangi Maxsulot Qo'shish</h3>
+                    <button class="btn btn-admin btn-sm" onclick="showAdminProducts()">
+                        <i class="fas fa-arrow-left"></i> Orqaga
+                    </button>
+                </div>
+            </div>
+            
+            <div class="admin-form">
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label for="adminProductName">
+                            <i class="fas fa-tag"></i> Maxsulot nomi *
+                        </label>
+                        <input type="text" id="adminProductName" class="form-control" required placeholder="Maxsulot nomi">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminProductPrice">
+                                <i class="fas fa-dollar-sign"></i> Narxi ($) *
+                            </label>
+                            <input type="number" id="adminProductPrice" class="form-control" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminProductBonus">
+                                <i class="fas fa-gift"></i> Bonus (%)
+                            </label>
+                            <input type="number" id="adminProductBonus" class="form-control" min="0" max="100" placeholder="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adminProductCategory">
+                            <i class="fas fa-filter"></i> Kategoriya *
+                        </label>
+                        <select id="adminProductCategory" class="form-control" required>
+                            <option value="">Tanlang</option>
+                            <option value="RAKOVINA UCHUN">RAKOVINA UCHUN</option>
+                            <option value="DUSH UCHUN">DUSH UCHUN</option>
+                            <option value="OSHXONA UCHUN">OSHXONA UCHUN</option>
+                            <option value="RAKOVINA">RAKOVINA</option>
+                            <option value="AKSESSUARLAR">AKSESSUARLAR</option>
+                            <option value="Barcha kategoriyalar">Barcha kategoriyalar</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminProductQuantity">
+                                <i class="fas fa-cubes"></i> Miqdori *
+                            </label>
+                            <input type="number" id="adminProductQuantity" class="form-control" required min="1" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminProductCost">
+                                <i class="fas fa-money-bill-wave"></i> Tannarxi ($)
+                            </label>
+                            <input type="number" id="adminProductCost" class="form-control" min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adminProductImage">
+                            <i class="fas fa-image"></i> Rasm URL (ixtiyoriy)
+                        </label>
+                        <input type="text" id="adminProductImage" class="form-control" 
+                               placeholder="https://images.unsplash.com/photo-...">
+                        <small style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.25rem;">
+                            Unsplash yoki boshqa hostingdan rasm linki
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adminProductDescription">
+                            <i class="fas fa-align-left"></i> Tavsif
+                        </label>
+                        <textarea id="adminProductDescription" class="form-control" rows="3" 
+                                  placeholder="Maxsulot haqida batafsil ma'lumot..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adminProductSpecs">
+                            <i class="fas fa-list"></i> Xususiyatlar (har biri yangi qatorda)
+                        </label>
+                        <textarea id="adminProductSpecs" class="form-control" rows="3" 
+                                  placeholder="Material: Mis
+Kafolat: 5 yil
+Rang: Xrom"></textarea>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <button type="submit" class="btn btn-admin btn-block">
+                            <i class="fas fa-save"></i> MAXSULOTNI SAQLASH
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    // Form submit qilish
+    document.getElementById('addProductForm').onsubmit = function(e) {
+        e.preventDefault();
+        addNewProduct();
+    };
+}
+
+// Yangi maxsulot qo'shish funksiyasi
+function addNewProduct() {
+    const name = document.getElementById('adminProductName').value.trim();
+    const price = parseFloat(document.getElementById('adminProductPrice').value);
+    const bonus = parseInt(document.getElementById('adminProductBonus').value) || 0;
+    const category = document.getElementById('adminProductCategory').value;
+    const quantity = parseInt(document.getElementById('adminProductQuantity').value);
+    const cost = parseFloat(document.getElementById('adminProductCost').value) || 0;
+    const image = document.getElementById('adminProductImage').value.trim() || 
+                  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+    const description = document.getElementById('adminProductDescription').value.trim();
+    const specsText = document.getElementById('adminProductSpecs').value.trim();
+    
+    // Validatsiya
+    if (!name || !price || !category || !quantity) {
+        showNotification("Iltimos, barcha kerakli maydonlarni to'ldiring!", "error");
+        return;
+    }
+    
+    if (price <= 0) {
+        showNotification("Narx noldan katta bo'lishi kerak!", "error");
+        return;
+    }
+    
+    if (quantity <= 0) {
+        showNotification("Miqdor noldan katta bo'lishi kerak!", "error");
+        return;
+    }
+    
+    // Yangi maxsulot ID
+    const newId = currentData.products.length > 0 ? 
+                  Math.max(...currentData.products.map(p => p.id)) + 1 : 1;
+    
+    // Xususiyatlarni massivga o'tkazish
+    const specs = specsText ? specsText.split('\n').map(spec => spec.trim()).filter(spec => spec) : [
+        "Yuqori sifatli material",
+        "Uzoq muddatli kafolat",
+        "Zamonaviy dizayn"
+    ];
+    
+    // Yangi maxsulot yaratish
+    const newProduct = {
+        id: newId,
+        name: name,
+        price: price,
+        bonus: bonus,
+        category: category,
+        quantity: quantity,
+        cost: cost,
+        image: image,
+        description: description || "Yuqori sifatli mahsulot, kafolat bilan",
+        specs: specs,
+        createdAt: new Date().toISOString(),
+        profit: price - cost
+    };
+    
+    // Maxsulotlarni qo'shish
+    currentData.products.push(newProduct);
+    
+    // Saqlash
+    saveDataToLocalStorage();
+    
+    // Xabar va sahifani yangilash
+    showNotification("Yangi maxsulot muvaffaqiyatli qo'shildi!", "success");
+    
+    // Asosiy do'konni yangilash
+    sampleProducts.push(newProduct);
+    
+    // Admin panelni yangilash
+    setTimeout(() => {
+        showAdminProducts();
+        // Asosiy katalogni yangilash (agar ochiq bo'lsa)
+        if (document.getElementById("catalogPage").classList.contains("active")) {
+            loadCatalog(currentCategory);
+        }
+        // Bosh sahifadagi tavsiya etilgan maxsulotlarni yangilash
+        loadFeaturedProducts();
+    }, 1000);
+}
+
+// Maxsulotni tahrirlash
+function editProduct(productId) {
+    const product = currentData.products.find(p => p.id === productId);
+    if (!product) {
+        showNotification("Maxsulot topilmadi!", "error");
+        return;
+    }
+    
+    showAddProductForm();
+    
+    // Formani to'ldirish
+    document.getElementById('adminProductName').value = product.name;
+    document.getElementById('adminProductPrice').value = product.price;
+    document.getElementById('adminProductBonus').value = product.bonus || 0;
+    document.getElementById('adminProductCategory').value = product.category;
+    document.getElementById('adminProductQuantity').value = product.quantity || 1;
+    document.getElementById('adminProductCost').value = product.cost || 0;
+    document.getElementById('adminProductImage').value = product.image || '';
+    document.getElementById('adminProductDescription').value = product.description || '';
+    document.getElementById('adminProductSpecs').value = Array.isArray(product.specs) ? 
+        product.specs.join('\n') : '';
+    
+    // Form nomini o'zgartirish
+    document.querySelector('.admin-header h3').innerHTML = '<i class="fas fa-edit"></i> Maxsulotni Tahrirlash';
+    
+    // Submit funksiyasini o'zgartirish
+    document.getElementById('addProductForm').onsubmit = function(e) {
+        e.preventDefault();
+        updateProduct(productId);
+    };
+    
+    // Tugma matnini o'zgartirish
+    const submitBtn = document.querySelector('#addProductForm button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> SAQLASH';
+    submitBtn.onclick = function() { updateProduct(productId); };
+}
+
+// Maxsulotni yangilash
+function updateProduct(productId) {
+    const index = currentData.products.findIndex(p => p.id === productId);
+    if (index === -1) {
+        showNotification("Maxsulot topilmadi!", "error");
+        return;
+    }
+    
+    const name = document.getElementById('adminProductName').value.trim();
+    const price = parseFloat(document.getElementById('adminProductPrice').value);
+    const bonus = parseInt(document.getElementById('adminProductBonus').value) || 0;
+    const category = document.getElementById('adminProductCategory').value;
+    const quantity = parseInt(document.getElementById('adminProductQuantity').value);
+    const cost = parseFloat(document.getElementById('adminProductCost').value) || 0;
+    const image = document.getElementById('adminProductImage').value.trim() || currentData.products[index].image;
+    const description = document.getElementById('adminProductDescription').value.trim();
+    const specsText = document.getElementById('adminProductSpecs').value.trim();
+    
+    // Validatsiya
+    if (!name || !price || !category || !quantity) {
+        showNotification("Iltimos, barcha kerakli maydonlarni to'ldiring!", "error");
+        return;
+    }
+    
+    if (price <= 0) {
+        showNotification("Narx noldan katta bo'lishi kerak!", "error");
+        return;
+    }
+    
+    if (quantity <= 0) {
+        showNotification("Miqdor noldan katta bo'lishi kerak!", "error");
+        return;
+    }
+    
+    // Xususiyatlarni massivga o'tkazish
+    const specs = specsText ? specsText.split('\n').map(spec => spec.trim()).filter(spec => spec) : currentData.products[index].specs;
+    
+    // Maxsulotni yangilash
+    currentData.products[index] = {
+        ...currentData.products[index],
+        name: name,
+        price: price,
+        bonus: bonus,
+        category: category,
+        quantity: quantity,
+        cost: cost,
+        image: image,
+        description: description || currentData.products[index].description,
+        specs: specs,
+        profit: price - cost
+    };
+    
+    // Saqlash
+    saveDataToLocalStorage();
+    
+    // Asosiy do'kondagi maxsulotni yangilash
+    const sampleIndex = sampleProducts.findIndex(p => p.id === productId);
+    if (sampleIndex !== -1) {
+        sampleProducts[sampleIndex] = currentData.products[index];
+    } else {
+        // Agar asosiy ro'yxatda yo'q bo'lsa, qo'shish
+        sampleProducts.push(currentData.products[index]);
+    }
+    
+    // Xabar va sahifani yangilash
+    showNotification("Maxsulot muvaffaqiyatli yangilandi!", "success");
+    
+    setTimeout(() => {
+        showAdminProducts();
+        // Asosiy katalogni yangilash
+        if (document.getElementById("catalogPage").classList.contains("active")) {
+            loadCatalog(currentCategory);
+        }
+        // Bosh sahifani yangilash
+        loadFeaturedProducts();
+    }, 1000);
+}
+
+// Maxsulotni o'chirish
+function deleteProduct(productId) {
+    if (!confirm("Bu maxsulotni o'chirishni istaysizmi?\n\nEslatma: O'chirilgan maxsulot butunlay yo'qoladi!")) {
+        return;
+    }
+    
+    // Admin panel ro'yxatidan o'chirish
+    const adminIndex = currentData.products.findIndex(p => p.id === productId);
+    if (adminIndex !== -1) {
+        currentData.products.splice(adminIndex, 1);
+        saveDataToLocalStorage();
+    }
+    
+    // Asosiy do'kon ro'yxatidan o'chirish
+    const sampleIndex = sampleProducts.findIndex(p => p.id === productId);
+    if (sampleIndex !== -1) {
+        sampleProducts.splice(sampleIndex, 1);
+    }
+    
+    showNotification("Maxsulot o'chirildi!", "success");
+    
+    // Sahifalarni yangilash
+    setTimeout(() => {
+        showAdminProducts();
+        // Asosiy katalogni yangilash
+        if (document.getElementById("catalogPage").classList.contains("active")) {
+            loadCatalog(currentCategory);
+        }
+        // Bosh sahifani yangilash
+        loadFeaturedProducts();
+    }, 500);
+}
+
+// ===== DASTLABKI YUKLASHNI YANGILASH =====
+// app.js ning DOMContentLoaded ichiga quyidagini qo'shing:
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Hydroline do'koni yuklandi!");
+    
+    // OLDINGI KODLAR...
+    
+    // YANGI: Admin ma'lumotlarini yuklash
+    loadDataFromLocalStorage();
+    
+    // OLDINGI KODLAR...
+});
 // Konsolni bloklash
 console.log = function() {};
 console.error = function() {};

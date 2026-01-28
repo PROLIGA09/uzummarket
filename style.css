@@ -2909,3 +2909,71 @@ a:hover {
         box-shadow: none;
     }
 }
+
+
+/* Admin Panel uchun qo'shimcha stillar */
+
+.success-light {
+    background: rgba(6, 214, 160, 0.1) !important;
+    color: var(--success) !important;
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #6a00ff, #00c9a7) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.btn-admin:hover {
+    background: linear-gradient(135deg, #5a00e0, #00b594) !important;
+    transform: translateY(-2px) !important;
+}
+
+.btn-admin:active {
+    transform: translateY(0) !important;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+}
+
+
+/* Modal ichidagi form stilini yaxshilash */
+
+.modal-body .form-group label {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.modal-body .form-group input,
+.modal-body .form-group select,
+.modal-body .form-group textarea {
+    padding: 0.75rem !important;
+    font-size: 0.9rem !important;
+}
+
+
+/* Responsive admin panel */
+
+@media (max-width: 768px) {
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .admin-table-container {
+        overflow-x: auto !important;
+    }
+    .admin-table {
+        min-width: 600px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .admin-page-actions {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+}
